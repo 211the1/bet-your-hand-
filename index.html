@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bet Your Hand — Game Night</title>
+<style>
+*{box-sizing:border-box} body{margin:0;background:#08052a;color:#fff;font-family:Arial,Helvetica,sans-serif}
+button,input{font:inherit} .wrap{max-width:1100px;margin:auto;padding:18px}
+header{text-align:center;padding:12px 0 18px}.logo{font-size:clamp(34px,7vw,70px);font-weight:900;color:#ffd21c;text-shadow:0 4px #e54b19,0 0 18px #7c28ff;letter-spacing:-2px}.tag{font-weight:800;font-size:clamp(14px,3vw,24px);color:#eee}
+.tabs{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:10px 0 18px}.tab,.btn{border:2px solid #743cff;background:#17104f;color:white;border-radius:18px;padding:13px 20px;font-weight:800;cursor:pointer}.tab.active,.btn.primary{background:linear-gradient(135deg,#7b2cff,#5425ff);box-shadow:0 0 18px #6d2cff55}.panel{background:linear-gradient(180deg,#17105c,#0d0a49);border:3px solid #713bff;border-radius:24px;padding:18px;box-shadow:0 0 25px #4d24ff33;margin-bottom:18px}
+.hidden{display:none!important}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.players{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.player{border:2px solid #4031b9;border-radius:16px;padding:12px;background:#09083b}.player.active{border-color:#ffd21c;box-shadow:0 0 14px #ffd21c55}.name{font-size:20px;font-weight:900}.coins{color:#ffd21c;font-weight:900;margin-top:4px}.status{text-align:center;font-size:28px;font-weight:900;color:#ffd21c;margin:18px 0 8px}.sub{text-align:center;color:#ddd;font-size:17px}.piles{display:flex;justify-content:center;gap:35px;margin:20px 0}.card{width:90px;height:126px;border-radius:15px;border:5px solid white;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:900;box-shadow:0 5px 14px #0008}.blue{background:#2670df}.red{background:#e92136}.green{background:#18a84d}.yellow{background:#f3bd18;color:#17110b}.wild{background:linear-gradient(135deg,#ef3434 0 25%,#1f72dd 25% 50%,#1aaa52 50% 75%,#f2c31c 75%)}.hand{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}.hand .card{width:76px;height:108px;font-size:36px;cursor:pointer}.hand .card.disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}.btn.green{background:#0aaa45;border-color:#35ff86}.btn.yellow{background:#f4c316;color:#17110b;border-color:#ffe66b}.btn.red{background:#ef233c;border-color:#ff7181}.roomcode{font-size:42px;font-weight:900;color:#ffd21c;text-align:center;letter-spacing:8px}.center{text-align:center}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.input{width:100%;padding:14px;border-radius:14px;border:2px solid #5b48e6;background:#07052d;color:white}.small{font-size:13px;color:#bbb}.feed{max-height:180px;overflow:auto;background:#07052d;border-radius:14px;padding:10px}.feed div{padding:5px;border-bottom:1px solid #252060}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#ffd21c;color:#15102f;padding:12px 18px;border-radius:15px;font-weight:900;display:none;z-index:20}
+@media(max-width:700px){.players{grid-template-columns:repeat(2,1fr)}.wrap{padding:10px}.card{width:76px;height:108px}.piles{gap:18px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo">BET YOUR HAND</div><div class="tag">PLAY CARDS • MAKE YOUR MOVE • PROVE YOU WIN</div></header>
+
+<div class="tabs">
+<button id="hostTab" class="tab active" onclick="showMode('host')">HOST / TV</button>
+<button id="playerTab" class="tab" onclick="showMode('player')">PLAYER PHONE</button>
+</div>
+
+<section id="setup" class="panel">
+<div id="hostSetup">
+<h2>Create a Game Night Room</h2>
+<p class="small">The host screen creates the room. Players join from their phones using the code. Game points are fictional and have no cash value.</p>
+<div class="row"><input id="hostName" class="input" placeholder="Host name (optional)" maxlength="16"><button class="btn primary" onclick="createRoom()">CREATE GAME</button></div>
+</div>
+<div id="playerSetup" class="hidden">
+<h2>Join Game Night</h2>
+<div class="grid"><input id="playerName" class="input" placeholder="Your name" maxlength="16"><input id="joinCode" class="input" placeholder="4-digit game code" inputmode="numeric" maxlength="4"></div>
+<div class="actions"><button class="btn primary" onclick="joinRoom()">JOIN GAME</button></div>
+<p class="small">Your cards stay private on your phone.</p>
+</div>
+</section>
+
+<section id="room" class="panel hidden">
+<div class="center"><div class="small">GAME CODE</div><div id="code" class="roomcode">----</div><div id="connection" class="small">Waiting for players…</div></div>
+<div class="players" id="players"></div>
+<div id="hostControls" class="actions"><button class="btn primary" onclick="startGame()">START GAME</button></div>
+</section>
+
+<section id="game" class="panel hidden">
+<div class="grid">
+<div><div class="small">ROUND</div><div id="round" class="name">1</div></div>
+<div style="text-align:right"><div class="small">GAME-POINT POOL</div><div id="pool" class="coins">0</div></div>
+</div>
+<div id="turn" class="status">WAITING</div>
+<div id="turnSub" class="sub"></div>
+<div class="players" id="gamePlayers"></div>
+<div class="piles">
+<div class="center"><div id="drawCard" class="card blue">?</div><div class="small">DRAW PILE</div></div>
+<div class="center"><div id="discardCard" class="card red">7</div><div class="small">DISCARD</div></div>
+</div>
+<div id="hostGameArea" class="center">
+<div class="small">HOST / TV</div>
+<div id="hostMessage">Players use their phones to play cards.</div>
+</div>
+<div id="playerGameArea" class="hidden">
+<div class="center"><h2 id="myTurnLabel">YOUR HAND</h2><div class="hand" id="myHand"></div></div>
+<div class="actions">
+<button class="btn" onclick="drawForMe()">DRAW</button>
+<button class="btn yellow" onclick="callShot()">CALL YOUR SHOT</button>
+</div>
+</div>
+</section>
+
+<section id="shotPanel" class="panel hidden center">
+<h2>🔥 CALL YOUR SHOT!</h2>
+<p id="shotText">Choose a fictional game-point challenge.</p>
+<div class="actions">
+<button class="btn green" onclick="sendShot(50)">SAFE — 50</button>
+<button class="btn yellow" onclick="sendShot(100)">CONFIDENT — 100</button>
+<button class="btn red" onclick="sendShot(250)">ALL IN — 250</button>
+</div>
+</section>
+
+<section id="feedPanel" class="panel hidden"><h3>GAME LOG</h3><div class="feed" id="feed"></div></section>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let mode='host', peer=null, conns=[], hostConn=null, myId='', myName='', roomCode='', state=null, shotOpen=false;
+
+const COLORS=['red','blue','green','yellow'];
+function rand(n){return Math.floor(Math.random()*n)}
+function deck(){
+ let d=[]; for(const c of COLORS){ for(let n=0;n<=9;n++){d.push({c,n}); if(n>0)d.push({c,n})} for(let i=0;i<2;i++)d.push({c,'a':'SKIP'}); for(let i=0;i<2;i++)d.push({c,'a':'BLOCK'});}
+ for(let i=0;i<4;i++)d.push({c:'wild',a:'WILD'}); return d.sort(()=>Math.random()-.5);
+}
+function code(){return String(rand(9000)+1000)}
+function cardText(c){return c.a||c.n}
+function cardClass(c){return c.c==='wild'?'wild':c.c}
+function log(t){$('feedPanel').classList.remove('hidden'); const x=document.createElement('div'); x.textContent=t; $('feed').prepend(x)}
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1800)}
+function showMode(m){
+ mode=m;$('hostTab').classList.toggle('active',m==='host');$('playerTab').classList.toggle('active',m==='player');
+ $('hostSetup').classList.toggle('hidden',m!=='host');$('playerSetup').classList.toggle('hidden',m!=='player');
+ if(state){render();} 
+}
+function makePeer(){
+ return new Promise((resolve,reject)=>{
+  peer=new Peer();
+  peer.on('open',id=>{myId=id;resolve(id)});
+  peer.on('error',e=>{toast('Connection error: '+e.type);reject(e)});
+  peer.on('connection',c=>{ if(mode==='host') accept(c); });
+ });
+}
+async function createRoom(){
+ if(!peer) await makePeer();
+ roomCode=code();
+ $('setup').classList.add('hidden');$('room').classList.remove('hidden');$('code').textContent=roomCode;
+ state={phase:'lobby',round:1,turn:0,players:[],deck:[],discard:[],pool:0};
+ render(); log('Room '+roomCode+' created.');
+}
+function accept(c){
+ c.on('open',()=>{
+  conns.push(c);
+  c.on('data',msg=>hostMessage(msg,c));
+  c.on('close',()=>{state.players=state.players.filter(p=>p.id!==c.peer);broadcast();render()});
+ });
+}
+function joinRoom(){
+ const name=($('playerName').value||'Player').trim().slice(0,16); const rc=$('joinCode').value.trim();
+ if(rc.length!==4){toast('Enter the 4-digit code');return}
+ myName=name;
+ // The host peer ID is encoded by a deterministic room namespace.
+ const hostPeerId='BYH-'+rc;
+ if(!peer) peer=new Peer();
+ peer.on('open',id=>{
+  myId=id; hostConn=peer.connect(hostPeerId,{reliable:true});
+  hostConn.on('open',()=>{hostConn.send({type:'join',name});$('setup').classList.add('hidden');$('room').classList.remove('hidden');$('code').textContent=rc;$('connection').textContent='Connected to host';});
+  hostConn.on('data',msg=>playerMessage(msg));
+  hostConn.on('close',()=>toast('Host disconnected'));
+ });
+ peer.on('error',e=>toast('Could not connect. Check the code and that the host is online.'));
+}
+async function createRoomPeer(){
+ // unused; room peer must have predictable ID
+}
+async function hostPeerForRoom(rc){
+ if(peer) try{peer.destroy()}catch(e){}
+ return new Promise((resolve,reject)=>{
+  peer=new Peer('BYH-'+rc);
+  peer.on('open',id=>{myId=id;resolve(id)});
+  peer.on('error',e=>{toast('Room could not start. Try creating again.');reject(e)});
+  peer.on('connection',c=>accept(c));
+ });
+}
+// Replace generic host creation with predictable Peer ID
+const oldCreateRoom=createRoom;
+createRoom=async function(){
+ $('hostSetup').classList.add('hidden');
+ const n=($('hostName').value||'Host').trim().slice(0,16);
+ for(let attempt=0;attempt<8;attempt++){
+  const rc=code();
+  try{await hostPeerForRoom(rc);roomCode=rc;state={phase:'lobby',round:1,turn:0,players:[],deck:[],discard:[],pool:0};$('setup').classList.add('hidden');$('room').classList.remove('hidden');$('code').textContent=rc;$('connection').textContent='Waiting for players…';render();log('Room '+rc+' created.');return}catch(e){}
+ }
+ toast('Could not create a room. Check internet and try again.');
+ $('hostSetup').classList.remove('hidden');
+}
+function hostMessage(msg,c){
+ if(msg.type==='join'){
+  if(state.players.length>=6){c.send({type:'full'});return}
+  if(state.players.some(p=>p.name.toLowerCase()===msg.name.toLowerCase())){c.send({type:'error',text:'That name is already in use.'});return}
+  const p={id:c.peer,name:msg.name||'Player',coins:1000,hand:[],ready:true};
+  state.players.push(p); c.playerId=p.id;
+  c.send({type:'welcome',room:roomCode,id:p.id,state:safeState()});
+  broadcast();render();log(p.name+' joined the game.');
+ }
+ if(msg.type==='play') playCard(c.peer,msg.index);
+ if(msg.type==='draw') drawCard(c.peer);
+ if(msg.type==='shot') shot(c.peer,msg.amount);
+}
+function safeState(){
+ return {...state,players:state.players.map(p=>({...p,hand:undefined}))};
+}
+function broadcast(){
+ render();
+ for(const c of conns){if(c.open){const p=state.players.find(x=>x.id===c.peer);c.send({type:'state',state:safeState(),hand:p?p.hand:[]})}}
+}
+function startGame(){
+ if(state.players.length<2){toast('Need at least 2 players');return}
+ state.phase='playing';state.round=1;state.deck=deck();state.discard=[];state.pool=0;state.turn=0;
+ for(const p of state.players){p.coins=1000;p.hand=state.deck.splice(0,5)}
+ state.discard.push(state.deck.pop()); if(state.discard[0].c==='wild')state.discard[0]={c:'red',n:7};
+ broadcast();log('Round 1 started.');
+}
+function valid(c){
+ const top=state.discard[state.discard.length-1];
+ return c.c==='wild'||c.c===top.c||c.n!==undefined&&top.n!==undefined&&c.n===top.n||c.a&&c.a===top.a;
+}
+function playCard(id,index){
+ if(state.phase!=='playing'||state.players[state.turn]?.id!==id)return;
+ const p=state.players.find(x=>x.id===id); const c=p.hand[index]; if(!c||!valid(c)){sendTo(id,{type:'toast',text:'That card cannot be played.'});return}
+ p.hand.splice(index,1);state.discard.push(c);
+ if(c.a==='SKIP'||c.a==='BLOCK') advance(2); else advance(1);
+ log(p.name+' played '+cardText(c)+'.');
+ if(p.hand.length===0){p.coins+=state.pool;state.phase='roundover';broadcast();log(p.name+' won the round!');return}
+ if(c.a==='WILD'){state.pendingWild=true}
+ broadcast();
+}
+function drawCard(id){
+ if(state.phase!=='playing'||state.players[state.turn]?.id!==id)return;
+ const p=state.players.find(x=>x.id===id);
+ if(!state.deck.length){const top=state.discard.pop();state.deck=state.discard.sort(()=>Math.random()-.5);state.discard=[top]}
+ p.hand.push(state.deck.pop()); log(p.name+' drew a card.'); advance(1);broadcast();
+}
+function advance(n){state.turn=(state.turn+n)%state.players.length}
+function shot(id,amount){
+ if(state.phase!=='playing')return;
+ const p=state.players.find(x=>x.id===id); if(!p||p.coins<amount)return;
+ state.pool+=amount;p.coins-=amount;log(p.name+' called a '+amount+' point challenge.');broadcast();
+}
+function sendTo(id,msg){const c=conns.find(x=>x.peer===id);if(c?.open)c.send(msg)}
+function playerMessage(msg){
+ if(msg.type==='welcome'||msg.type==='state'){state=msg.state;roomCode=$('code').textContent; if(msg.hand)window.myHand=msg.hand; render()}
+ if(msg.type==='toast')toast(msg.text);
+ if(msg.type==='error')toast(msg.text);
+}
+function sendShot(amount){if(hostConn?.open){hostConn.send({type:'shot',amount});$('shotPanel').classList.add('hidden');}}
+function callShot(){if(mode!=='player')return;$('shotPanel').classList.remove('hidden')}
+function drawForMe(){if(hostConn?.open)hostConn.send({type:'draw'})}
+function playMe(i){if(hostConn?.open)hostConn.send({type:'play',index:i})}
+function render(){
+ $('players').innerHTML='';$('gamePlayers').innerHTML='';
+ const ps=state?.players||[];
+ ps.forEach((p,i)=>{
+  const d=document.createElement('div');d.className='player '+(state&&i===state.turn?'active':'');d.innerHTML='<div class="name">'+esc(p.name)+'</div><div class="coins">🪙 '+p.coins+'</div>'; $('players').appendChild(d);
+  const g=d.cloneNode(true);$('gamePlayers').appendChild(g);
+ });
+ if(!state)return;
+ $('connection').textContent=mode==='host'?ps.length+'/6 players connected':'Connected • '+ps.length+' players';
+ $('room').classList.toggle('hidden',state.phase==='playing'||state.phase==='roundover');
+ $('game').classList.toggle('hidden',state.phase==='lobby');
+ $('hostControls').classList.toggle('hidden',mode!=='host'||state.phase!=='lobby');
+ $('round').textContent=state.round;
+ $('pool').textContent=state.pool;
+ const current=ps[state.turn];
+ $('turn').textContent=current?current.name+"'S TURN":'WAITING';
+ $('turnSub').textContent=state.phase==='roundover'?'Round over!':'Play a card or call your shot.';
+ if(state.discard?.length){const c=state.discard[state.discard.length-1];$('discardCard').className='card '+cardClass(c);$('discardCard').textContent=cardText(c)}
+ $('hostGameArea').classList.toggle('hidden',mode!=='host');
+ $('playerGameArea').classList.toggle('hidden',mode!=='player');
+ if(mode==='player') renderHand();
+}
+function renderHand(){
+ const h=window.myHand||[]; $('myHand').innerHTML='';
+ h.forEach((c,i)=>{const d=document.createElement('button');d.className='card '+cardClass(c);d.textContent=cardText(c);d.onclick=()=>playMe(i);$('myHand').appendChild(d)})
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+</script>
+</body>
+</html>
