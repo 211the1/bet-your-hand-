@@ -1,29 +1,794 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>BET YOUR HAND — Game Night</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BET YOUR HAND — Game Night</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#08052a;color:#fff;font-family:Arial,Helvetica,sans-serif}button,input{font:inherit}.wrap{max-width:1150px;margin:auto;padding:14px}.hidden{display:none!important}header{text-align:center;padding:8px 0 14px}.logo{font-size:clamp(34px,7vw,68px);font-weight:900;color:#ffd21c;text-shadow:0 4px #e54b19,0 0 18px #7c28ff;letter-spacing:-2px}.tag{font-weight:800;color:#eee}.tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:8px 0 14px}.tab,.btn{border:2px solid #743cff;background:#17104f;color:#fff;border-radius:16px;padding:12px 18px;font-weight:900;cursor:pointer;touch-action:manipulation}.tab.active,.btn.primary{background:linear-gradient(135deg,#7b2cff,#5425ff);box-shadow:0 0 18px #6d2cff55}.btn:disabled{opacity:.4}.btn.big{font-size:20px;padding:16px 24px}.panel{background:linear-gradient(180deg,#17105c,#0d0a49);border:3px solid #713bff;border-radius:22px;padding:16px;box-shadow:0 0 25px #4d24ff33;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.players{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.player{border:2px solid #4031b9;border-radius:15px;padding:10px;background:#09083b}.player.active{border-color:#ffd21c;box-shadow:0 0 14px #ffd21c55}.name{font-size:19px;font-weight:900}.points{color:#ffd21c;font-weight:900;margin-top:4px}.status{text-align:center;font-size:27px;font-weight:900;color:#ffd21c;margin:14px 0 6px}.sub{text-align:center;color:#ddd;font-size:16px}.roomcode{font-size:42px;font-weight:900;color:#ffd21c;text-align:center;letter-spacing:8px}.input{width:100%;padding:13px;border-radius:13px;border:2px solid #5b48e6;background:#07052d;color:#fff}.small{font-size:14px;color:#bbb}.center{text-align:center}.actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:14px}.connection{display:inline-block;padding:7px 12px;border-radius:10px;font-weight:900}.ok{background:#0b6b39}.bad{background:#7d1f2c}.wait{background:#5c4a12}.piles{display:flex;justify-content:center;gap:28px;margin:18px 0}.card{width:94px;height:128px;border-radius:15px;border:5px solid #fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:23px;font-weight:900;box-shadow:0 5px 14px #0008}.hand{display:flex;flex-wrap:wrap;justify-content:center;gap:9px}.hand .card{width:76px;height:108px;font-size:19px;padding:4px}.red{background:#e92136}.blue{background:#2670df}.green{background:#18a84d}.yellow{background:#f3bd18;color:#17110b}.royal{background:#2456d9}.wild{background:linear-gradient(135deg,#ef3434 0 25%,#1f72dd 25% 50%,#1aaa52 50% 75%,#f2c31c 75%)}.feed{max-height:190px;overflow:auto;background:#07052d;border-radius:13px;padding:9px}.feed div{padding:5px;border-bottom:1px solid #252060}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#ffd21c;color:#15102f;padding:12px 18px;border-radius:15px;font-weight:900;display:none;z-index:50}.modalbg{position:fixed;inset:0;background:#08052add;display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}.modal{width:min(700px,100%);background:linear-gradient(180deg,#1b1165,#0c093f);border:3px solid #ffd21c;border-radius:24px;padding:20px;text-align:center;box-shadow:0 0 35px #000}.amount{font-size:36px;font-weight:900;color:#ffd21c}.colors{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px}.wheel{width:min(330px,75vw);aspect-ratio:1;border-radius:50%;margin:12px auto;border:8px solid #fff;display:grid;place-items:center;background:conic-gradient(#2456d9 0 40deg,#6732a8 40deg 80deg,#18a84d 80deg 120deg,#f3bd18 120deg 160deg,#2456d9 160deg 200deg,#18a84d 200deg 240deg,#6732a8 240deg 280deg,#f3bd18 280deg 320deg,#2456d9 320deg);transition:transform 2.2s cubic-bezier(.17,.67,.12,.99)}
-@media(max-width:700px){.players{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.wrap{padding:9px}.card{width:78px;height:108px}}
-</style></head><body><div class="wrap"><header><div class="logo">BET YOUR HAND</div><div class="tag">GAME NIGHT • 2–6 PLAYERS • FICTIONAL GAME POINTS</div></header><div class="tabs"><button id="hostTab" class="tab active">HOST / TV</button><button id="playerTab" class="tab">PLAYER PHONE</button></div>
-<section id="setup" class="panel"><div id="hostSetup"><h2>Create a Game Night Room</h2><p class="small">The host keeps the room open. All points are fictional game points with no cash value.</p><div class="grid"><input id="hostName" class="input" placeholder="Host name (optional)" maxlength="16"><button id="createBtn" class="btn primary big">CREATE GAME</button></div></div><div id="playerSetup" class="hidden"><h2>Join Game Night</h2><div class="grid"><input id="playerName" class="input" placeholder="Your name" maxlength="16"><input id="joinCode" class="input" placeholder="4-digit game code" inputmode="numeric" maxlength="4"></div><div class="actions"><button id="joinBtn" class="btn primary big">JOIN GAME</button></div><p id="joinStatus" class="small center">Enter the code shown on the host screen.</p></div></section>
-<section id="room" class="panel hidden"><div class="center"><div class="small">GAME CODE</div><div id="code" class="roomcode">----</div><div id="connection" class="connection wait">CONNECTING…</div></div><div id="players" class="players" style="margin-top:14px"></div><div id="hostControls" class="center" style="margin-top:16px"><button id="startBtn" class="btn primary big">START GAME</button><p class="small">At least 2 players are required.</p></div></section>
-<section id="game" class="panel hidden"><div class="center"><div id="round" class="small">ROUND 1</div><div id="turn" class="status">WAITING</div><div id="turnSub" class="sub"></div></div><div class="piles"><div><div class="small center">DISCARD</div><div id="discardCard" class="card">—</div></div><div><div class="small center">DECK</div><div class="card royal">DECK</div></div></div><div id="hostGameArea"><h3>PLAYERS</h3><div id="gamePlayers" class="players"></div></div><div id="playerGameArea" class="hidden"><h3 id="myTurnLabel">YOUR HAND</h3><div id="playerConnection" class="small"></div><div id="myHand" class="hand" style="margin-top:12px"></div><div class="actions"><button id="drawBtn" class="btn">DRAW UNTIL PLAYABLE</button><button id="betBtn" class="btn primary hidden">BET YOUR HAND</button></div><div id="colorPrompt" class="panel hidden" style="margin-top:14px"><h3>Choose a color</h3><div class="colors"><button class="btn redChoice" data-color="red">RED</button><button class="btn blueChoice" data-color="blue">BLUE</button><button class="btn greenChoice" data-color="green">GREEN</button><button class="btn yellowChoice" data-color="yellow">YELLOW</button></div></div></div><h3>GAME LOG</h3><div id="feed" class="feed"></div></section></div>
-<div id="betModal" class="modalbg hidden"><div class="modal"><h2>BET YOUR HAND</h2><p>Choose fictional game points for your wager.</p><div id="betAmount" class="amount">50</div><div class="actions"><button class="btn" data-bet="-50">−50</button><button class="btn" data-bet="50">+50</button><button class="btn" data-bet="500">+500</button><button class="btn" id="betAll">ALL</button></div><div class="actions"><button class="btn primary big" id="placeBet">PLACE WAGER</button><button class="btn" id="closeBet">CANCEL</button></div></div></div>
-<div id="challengeModal" class="modalbg hidden"><div class="modal"><h2>BET YOUR HAND CHALLENGE</h2><p id="challengeText"></p><p class="small">Choose the amount of fictional game points to risk.</p><div id="challengeAmount" class="amount">50</div><div class="actions"><button class="btn" data-chal="-50">−50</button><button class="btn" data-chal="50">+50</button><button class="btn" data-chal="500">+500</button><button class="btn" id="chalAll">ALL</button></div><button class="btn primary big" id="challengeBtn">CHALLENGE</button><button class="btn" id="declineBtn" style="margin-left:8px">PASS</button></div></div>
-<div id="wheelModal" class="modalbg hidden"><div class="modal"><h2>BET YOUR HAND WHEEL</h2><div id="wheelText">Resolving challenge…</div><div class="wheel" id="wheel"><span>SPIN</span></div></div></div><div id="toast" class="toast"></div>
+*{box-sizing:border-box}
+body{margin:0;background:#08052a;color:#fff;font-family:Arial,Helvetica,sans-serif}
+button,input{font:inherit}
+.wrap{max-width:1150px;margin:auto;padding:14px}
+.hidden{display:none!important}
+header{text-align:center;padding:8px 0 14px}
+.logo{font-size:clamp(34px,7vw,68px);font-weight:900;color:#ffd21c;text-shadow:0 4px #e54b19,0 0 18px #7c28ff;letter-spacing:-2px}
+.tag{font-weight:800;color:#eee}
+.tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:8px 0 14px}
+.tab,.btn{border:2px solid #743cff;background:#17104f;color:#fff;border-radius:16px;padding:12px 18px;font-weight:900;cursor:pointer;touch-action:manipulation}
+.tab.active,.btn.primary{background:linear-gradient(135deg,#7b2cff,#5425ff);box-shadow:0 0 18px #6d2cff55}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.big{font-size:20px;padding:16px 24px}
+.panel{background:linear-gradient(180deg,#17105c,#0d0a49);border:3px solid #713bff;border-radius:22px;padding:16px;box-shadow:0 0 25px #4d24ff33;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.players{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.player{border:2px solid #4031b9;border-radius:15px;padding:10px;background:#09083b}
+.player.active{border-color:#ffd21c;box-shadow:0 0 14px #ffd21c55}
+.name{font-size:19px;font-weight:900}
+.coins{color:#ffd21c;font-weight:900;margin-top:4px}
+.status{text-align:center;font-size:27px;font-weight:900;color:#ffd21c;margin:14px 0 6px}
+.sub{text-align:center;color:#ddd;font-size:16px}
+.piles{display:flex;justify-content:center;gap:28px;margin:18px 0}
+.card{width:94px;height:128px;border-radius:15px;border:5px solid #fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:28px;font-weight:900;box-shadow:0 5px 14px #0008}
+.red{background:#e92136}
+.blue{background:#2670df}
+.green{background:#18a84d}
+.yellow{background:#f3bd18;color:#17110b}
+.royal{background:#2456d9}
+.purple{background:#6732a8}
+.wild{background:linear-gradient(135deg,#ef3434 0 25%,#1f72dd 25% 50%,#1aaa52 50% 75%,#f2c31c 75%)}
+.hand{display:flex;flex-wrap:wrap;justify-content:center;gap:9px}
+.hand .card{width:76px;height:108px;font-size:22px;padding:4px}
+.hand button{touch-action:manipulation}
+.actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1}
+.input{width:100%;padding:13px;border-radius:13px;border:2px solid #5b48e6;background:#07052d;color:#fff}
+.small{font-size:13px;color:#bbb}
+.center{text-align:center}
+.roomcode{font-size:42px;font-weight:900;color:#ffd21c;text-align:center;letter-spacing:8px}
+.feed{max-height:180px;overflow:auto;background:#07052d;border-radius:13px;padding:9px}
+.feed div{padding:5px;border-bottom:1px solid #252060}
+.connection{display:inline-block;padding:6px 10px;border-radius:10px;font-weight:900}
+.ok{background:#0b6b39}
+.bad{background:#7d1f2c}
+.wait{background:#5c4a12}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#ffd21c;color:#15102f;padding:12px 18px;border-radius:15px;font-weight:900;display:none;z-index:50}
+.modalbg{position:fixed;inset:0;background:#08052add;display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
+.modal{width:min(700px,100%);background:linear-gradient(180deg,#1b1165,#0c093f);border:3px solid #ffd21c;border-radius:24px;padding:20px;text-align:center;box-shadow:0 0 35px #000}
+.amount{font-size:36px;font-weight:900;color:#ffd21c}
+.wheel{width:min(330px,75vw);aspect-ratio:1;border-radius:50%;margin:12px auto;border:8px solid #fff;display:grid;place-items:center;background:conic-gradient(#2456d9 0 40deg,#6732a8 40deg 80deg,#18a84d 80deg 120deg,#f3bd18 120deg 160deg,#2456d9 160deg 200deg,#18a84d 200deg 240deg,#6732a8 240deg 280deg,#f3bd18 280deg 320deg,#2456d9 320deg 360deg);transition:transform 2.4s cubic-bezier(.17,.67,.12,.99)}
+.wheel span{font-size:30px;font-weight:900;text-shadow:0 2px #000}
+@media(max-width:700px){
+.players{grid-template-columns:repeat(2,1fr)}
+.grid{grid-template-columns:1fr}
+.wrap{padding:9px}
+.card{width:78px;height:108px}
+.piles{gap:18px}
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<header>
+<div class="logo">BET YOUR HAND</div>
+<div class="tag">GAME NIGHT • 2–6 PLAYERS • FICTIONAL GAME POINTS</div>
+</header>
+
+<div class="tabs">
+<button id="hostTab" class="tab active" onclick="showMode('host')">HOST / TV</button>
+<button id="playerTab" class="tab" onclick="showMode('player')">PLAYER PHONE</button>
+</div>
+
+<section id="setup" class="panel">
+
+<div id="hostSetup">
+<h2>Create a Game Night Room</h2>
+<p class="small">Game points are fictional and have no cash value.</p>
+<div class="row">
+<input id="hostName" class="input" placeholder="Host name (optional)" maxlength="16">
+<button class="btn primary" onclick="createRoom()">CREATE GAME</button>
+</div>
+</div>
+
+<div id="playerSetup" class="hidden">
+<h2>Join Game Night</h2>
+<div class="grid">
+<input id="playerName" class="input" placeholder="Your name" maxlength="16">
+<input id="joinCode" class="input" placeholder="4-digit game code" inputmode="numeric" maxlength="4">
+</div>
+<div class="actions">
+<button class="btn primary big" onclick="joinRoom()">JOIN GAME</button>
+</div>
+<p class="small">Your cards stay private on your phone. If the connection drops, the game will try to reconnect.</p>
+</div>
+
+</section>
+
+<section id="room" class="panel hidden">
+<div class="center">
+<div class="small">GAME CODE</div>
+<div id="code" class="roomcode">----</div>
+<div id="connection" class="connection wait">Connecting…</div>
+</div>
+<div class="players" id="players"></div>
+<div id="hostControls" class="actions">
+<button class="btn primary big" onclick="startGame()">START GAME</button>
+</div>
+</section>
+
+<section id="game" class="panel hidden">
+
+<div class="grid">
+<div><div class="small">ROUND</div><div id="round" class="name">1</div></div>
+<div style="text-align:right"><div class="small">STATUS</div><div id="pool" class="coins">GAME NIGHT</div></div>
+</div>
+
+<div id="turn" class="status">WAITING</div>
+<div id="turnSub" class="sub"></div>
+
+<div class="players" id="gamePlayers"></div>
+
+<div class="piles">
+<div class="center">
+<div class="card blue">DRAW</div>
+<div class="small">DRAW PILE</div>
+</div>
+<div class="center">
+<div id="discardCard" class="card red">—</div>
+<div class="small">DISCARD</div>
+</div>
+</div>
+
+<div id="hostGameArea" class="center">
+<div class="small">HOST / TV</div>
+<div id="hostMessage">Players use their phones to play.</div>
+</div>
+
+<div id="playerGameArea" class="hidden">
+<div class="center">
+<h2 id="myTurnLabel">YOUR HAND</h2>
+<div class="hand" id="myHand"></div>
+</div>
+
+<div class="actions">
+<button id="drawBtn" class="btn big" onclick="drawForMe()">DRAW</button>
+<button id="betBtn" class="btn primary big hidden" onclick="openBet()">BET YOUR HAND</button>
+</div>
+
+<div id="playerConnection" class="small center"></div>
+</div>
+
+</section>
+
+<section id="feedPanel" class="panel hidden">
+<h3>GAME LOG</h3>
+<div class="feed" id="feed"></div>
+</section>
+
+</div>
+
+<div id="betPanel" class="modalbg hidden">
+<div class="modal">
+<h2>🔥 BET YOUR HAND</h2>
+<p>You're down to 2 cards. Choose a fictional game-point wager.</p>
+<div class="amount" id="betAmount">50</div>
+<div class="actions">
+<button class="btn" onclick="changeBet(-50)">−50</button>
+<button class="btn" onclick="changeBet(50)">+50</button>
+<button class="btn" onclick="betAll()">ALL</button>
+</div>
+<div class="actions">
+<button class="btn primary big" onclick="sendBet()">PLACE WAGER</button>
+<button class="btn" onclick="closeBet()">CANCEL</button>
+</div>
+</div>
+</div>
+
+<div id="challengePanel" class="modalbg hidden">
+<div class="modal">
+<h2>⚡ BET YOUR HAND CHALLENGE</h2>
+<p id="challengeText"></p>
+<div class="grid">
+<input id="challengeAmount" class="input" type="number" min="1" placeholder="Game points">
+<button class="btn primary big" onclick="sendChallenge()">CHALLENGE</button>
+</div>
+<div class="actions">
+<button class="btn" onclick="closeChallenge()">WAIT</button>
+</div>
+</div>
+</div>
+
+<div id="colorPanel" class="modalbg hidden">
+<div class="modal">
+<h2>🎨 CHOOSE A COLOR</h2>
+<div class="actions">
+<button class="btn red" onclick="chooseColor('red')">RED</button>
+<button class="btn blue" onclick="chooseColor('blue')">BLUE</button>
+<button class="btn green" onclick="chooseColor('green')">GREEN</button>
+<button class="btn yellow" onclick="chooseColor('yellow')">YELLOW</button>
+</div>
+</div>
+</div>
+
+<div id="wheelPanel" class="modalbg hidden">
+<div class="modal">
+<h2>🎡 BET YOUR HAND WHEEL</h2>
+<p id="wheelText">Challenge result</p>
+<div class="wheel" id="wheel"><span>SPIN</span></div>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
 <script>
-const $=id=>document.getElementById(id);let mode='host',ws=null,state=null,myId='',myHand=[],roomCode='',betAmount=50,challengeAmount=50;const COLORS=['red','blue','green','yellow'];
-function toast(t){$('toast').textContent=t;$('toast').style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>{$('toast').style.display='none'},2200)}
-function setConn(t,k){$('connection').textContent=t;$('connection').className='connection '+k}
-function showMode(m){mode=m;$('hostTab').classList.toggle('active',m==='host');$('playerTab').classList.toggle('active',m==='player');$('hostSetup').classList.toggle('hidden',m!=='host');$('playerSetup').classList.toggle('hidden',m!=='player');if(!state)$('setup').classList.remove('hidden')}
-function send(o){if(!ws||ws.readyState!==1){toast('Not connected.');return false}ws.send(JSON.stringify(o));return true}
-function connect(){if(ws){try{ws.close()}catch(e){}}const proto=location.protocol==='https:'?'wss':'ws';ws=new WebSocket(proto+'://'+location.host);ws.onopen=()=>{if(mode==='host')send({type:'create',name:($('hostName').value||'Host').trim()});else{setConn('CONNECTED TO SERVER','ok');send({type:'join',code:roomCode,name:($('playerName').value||'Player').trim()})}};ws.onclose=()=>{setConn('DISCONNECTED','bad');toast('Connection lost. Reconnect by joining again.');};ws.onerror=()=>toast('Connection error.');ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch{return}handle(m)}}
-function handle(m){if(m.type==='hostRoom'){roomCode=m.code;state=m.state;$('setup').classList.add('hidden');$('room').classList.remove('hidden');$('code').textContent=roomCode;setConn('ROOM ACTIVE','ok');render();return}if(m.type==='welcome'){myId=m.id;state=m.state;myHand=m.hand||[];$('setup').classList.add('hidden');$('room').classList.remove('hidden');$('code').textContent=roomCode;setConn('CONNECTED TO GAME','ok');render();toast('Joined game');return}if(m.type==='state'){state=m.state;if(mode==='player'){myHand=m.hand||[];myId=m.me||myId}render();return}if(m.type==='log'){addLog(m.text);return}if(m.type==='toast'){toast(m.text);return}if(m.type==='error'){toast(m.text);$('joinStatus').textContent=m.text;return}}
-function addLog(t){const d=document.createElement('div');d.textContent=t;$('feed').prepend(d)}
-function esc(s){return String(s).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
-function cardText(c){return c?.action==='BET'?'BET YOUR HAND':c?.action||c?.ch||'—'}function cardClass(c){if(!c)return 'royal';if(c.action==='BET')return'royal';if(c.action==='WILD')return'wild';return c.color||'royal'}
-function render(){if(!state)return;const ps=state.players||[];$('players').innerHTML='';$('gamePlayers').innerHTML='';ps.forEach((p,i)=>{const d=document.createElement('div');d.className='player '+(state.phase==='playing'&&i===state.turn?'active':'');d.innerHTML='<div class="name">'+esc(p.name)+'</div><div class="points">⭐ '+p.points+'</div><div class="small">'+p.handCount+' cards</div>';$('players').appendChild(d);$('gamePlayers').appendChild(d.cloneNode(true))});$('room').classList.toggle('hidden',state.phase!=='lobby');$('game').classList.toggle('hidden',state.phase==='lobby');$('hostControls').classList.toggle('hidden',mode!=='host'||state.phase!=='lobby');$('round').textContent='ROUND '+state.round;const cur=ps[state.turn];$('turn').textContent=state.phase==='finished'?'MATCH OVER':state.phase==='roundover'?'ROUND COMPLETE':cur?cur.name.toUpperCase()+"'S TURN":'WAITING';$('turnSub').textContent=state.phase==='playing'?'A playable card at the start of a turn earns +150 game points.':'';const top=state.discard?.[state.discard.length-1];$('discardCard').className='card '+cardClass(top);$('discardCard').textContent=cardText(top);$('hostGameArea').classList.toggle('hidden',mode!=='host');$('playerGameArea').classList.toggle('hidden',mode!=='player');if(mode==='player')renderPlayer();}
-function renderPlayer(){const isTurn=state?.players?.[state.turn]?.id===myId;$('myTurnLabel').textContent=isTurn?'🔥 YOUR TURN':'YOUR HAND';$('drawBtn').disabled=!isTurn;$('betBtn').classList.toggle('hidden',myHand.length!==2);$('myHand').innerHTML='';myHand.forEach((c,i)=>{const b=document.createElement('button');b.className='card '+cardClass(c);b.textContent=cardText(c);b.disabled=!isTurn||state.pending||!isPlayableLocal(c);b.onclick=()=>send({type:'play',index:i});$('myHand').appendChild(b)});const pending=state.pending;if(pending?.type==='color'&&pending.playerId===myId)$('colorPrompt').classList.remove('hidden');else $('colorPrompt').classList.add('hidden');if(pending?.type==='bet'&&pending.playerId!==myId&&pending.challengerId===null&&state.phase==='playing')showChallenge(pending);else if(pending?.type!=='bet')hideChallenge();$('playerConnection').textContent=ws?.readyState===1?'CONNECTED • Your hand is private':'DISCONNECTED'}
-function isPlayableLocal(c){const t=state.discard?.[state.discard.length-1];if(!t)return true;if(c.action==='BET'||c.action==='WILD')return true;const color=state.pendingColor||t.color;if(c.color&&c.color===color)return true;if(c.ch&&t.ch&&c.ch===t.ch)return true;if(c.action&&t.action&&c.action===t.action&&c.action!=='BET')return true;return false}
-function showChallenge(p){$('challengeText').textContent=p.playerName+' played BET YOUR HAND.';$('challengeModal').classList.remove('hidden');challengeAmount=50;updateChallenge();}function hideChallenge(){$('challengeModal').classList.add('hidden')}
-function updateBet(){const me=state?.players?.find(p=>p.id===myId);const max=me?.points||500;betAmount=Math.max(1,Math.min(betAmount,max));$('betAmount').textContent=betAmount.toLocaleString()}function updateChallenge(){const me=state?.players?.find(p=>p.id===myId);const max=me?.points||500;challengeAmount=Math.max(1,Math.min(challengeAmount,max));$('challengeAmount').textContent=challengeAmount.toLocaleString()}
-$('hostTab').onclick=()=>showMode('host');$('playerTab').onclick=()=>showMode('player');$('createBtn').onclick=()=>{mode='host';connect()};$('joinBtn').onclick=()=>{const n=$('playerName').value.trim(),c=$('joinCode').value.trim();if(!n||c.length!==4){toast('Enter your name and 4-digit code');return}mode='player';roomCode=c;toast('Connecting…');connect()};$('startBtn').onclick=()=>send({type:'start'});$('drawBtn').onclick=()=>send({type:'draw'});$('betBtn').onclick=()=>{betAmount=50;updateBet();$('betModal').classList.remove('hidden')};$('closeBet').onclick=()=>$('betModal').classList.add('hidden');$('placeBet').onclick=()=>{if(send({type:'bet',amount:betAmount}))$('betModal').classList.add('hidden')};$('betAll').onclick=()=>{betAmount=999999;updateBet()};document.querySelectorAll('[data-bet]').forEach(b=>b.onclick=()=>{betAmount+=Number(b.dataset.bet);updateBet()});$('challengeBtn').onclick=()=>{if(send({type:'bet',amount:challengeAmount}))hideChallenge()};$('declineBtn').onclick=()=>hideChallenge();$('chalAll').onclick=()=>{challengeAmount=999999;updateChallenge()};document.querySelectorAll('[data-chal]').forEach(b=>b.onclick=()=>{challengeAmount+=Number(b.dataset.chal);updateChallenge()});document.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>send({type:'color',color:b.dataset.color}));
-</script></body></html>
+const $=id=>document.getElementById(id);
+
+let mode='host';
+let ws=null;
+let state=null;
+let myId='';
+let myName='';
+let roomCode='';
+let resumeToken='';
+let betAmount=50;
+let reconnectTimer=null;
+let reconnectDelay=1500;
+let manualClose=false;
+let pendingChallenge=false;
+
+const COLORS=['red','blue','green','yellow'];
+
+function toast(t){
+  $('toast').textContent=t;
+  $('toast').style.display='block';
+  clearTimeout(toast.t);
+  toast.t=setTimeout(()=>$('toast').style.display='none',2200);
+}
+
+function log(t){
+  $('feedPanel').classList.remove('hidden');
+  const x=document.createElement('div');
+  x.textContent=t;
+  $('feed').prepend(x);
+}
+
+function setConn(text,kind){
+  $('connection').textContent=text;
+  $('connection').className='connection '+kind;
+}
+
+function showMode(m){
+  mode=m;
+  $('hostTab').classList.toggle('active',m==='host');
+  $('playerTab').classList.toggle('active',m==='player');
+  $('hostSetup').classList.toggle('hidden',m!=='host');
+  $('playerSetup').classList.toggle('hidden',m!=='player');
+
+  if(state) render();
+}
+
+function saveSession(){
+  localStorage.setItem('byhMode',mode);
+  localStorage.setItem('byhRoom',roomCode);
+  localStorage.setItem('byhToken',resumeToken);
+  localStorage.setItem('byhName',myName);
+}
+
+function clearSession(){
+  localStorage.removeItem('byhMode');
+  localStorage.removeItem('byhRoom');
+  localStorage.removeItem('byhToken');
+  localStorage.removeItem('byhName');
+}
+
+function send(o){
+  if(ws && ws.readyState===WebSocket.OPEN)
+    ws.send(JSON.stringify(o));
+}
+
+function connect(){
+  if(ws && (ws.readyState===WebSocket.OPEN || ws.readyState===WebSocket.CONNECTING))
+    return;
+
+  const proto=location.protocol==='https:'?'wss':'ws';
+
+  try{
+    ws=new WebSocket(proto+'://'+location.host);
+  }catch(e){
+    scheduleReconnect();
+    return;
+  }
+
+  ws.onopen=()=>{
+    reconnectDelay=1500;
+
+    if(mode==='host'){
+      if(roomCode && resumeToken){
+        setConn('RECONNECTING HOST…','wait');
+        send({type:'resumeHost',code:roomCode,token:resumeToken});
+      }else{
+        createRoomConnection();
+      }
+    }else{
+      if(roomCode && resumeToken){
+        setConn('RECONNECTING…','wait');
+        send({type:'resumePlayer',code:roomCode,token:resumeToken});
+      }else if(roomCode && myName){
+        setConn('JOINING GAME…','wait');
+        send({type:'join',code:roomCode,name:myName});
+      }
+    }
+  };
+
+  ws.onmessage=e=>{
+    try{
+      handle(JSON.parse(e.data));
+    }catch(err){}
+  };
+
+  ws.onclose=()=>{
+    ws=null;
+
+    if(manualClose) return;
+
+    setConn('DISCONNECTED — RECONNECTING…','bad');
+
+    if(mode==='player')
+      $('playerConnection').textContent='DISCONNECTED — RECONNECTING…';
+
+    scheduleReconnect();
+  };
+
+  ws.onerror=()=>{
+    setConn('CONNECTION ERROR — RETRYING…','bad');
+  };
+}
+
+function createRoomConnection(){
+  const n=($('hostName').value||'Host').trim().slice(0,16)||'Host';
+  send({type:'create',name:n});
+}
+
+function scheduleReconnect(){
+  clearTimeout(reconnectTimer);
+
+  reconnectTimer=setTimeout(()=>{
+    connect();
+  },reconnectDelay);
+
+  reconnectDelay=Math.min(reconnectDelay*1.6,10000);
+}
+
+function createRoom(){
+  mode='host';
+  myName=($('hostName').value||'Host').trim().slice(0,16)||'Host';
+
+  roomCode='';
+  resumeToken='';
+  state=null;
+
+  clearSession();
+
+  $('setup').classList.add('hidden');
+  $('room').classList.remove('hidden');
+
+  setConn('CONNECTING…','wait');
+
+  connect();
+}
+
+function joinRoom(){
+  mode='player';
+
+  myName=($('playerName').value||'Player').trim().slice(0,16)||'Player';
+  roomCode=($('joinCode').value||'').replace(/\D/g,'').slice(0,4);
+
+  if(roomCode.length!==4){
+    toast('Enter the 4-digit game code');
+    return;
+  }
+
+  resumeToken='';
+
+  saveSession();
+
+  $('setup').classList.add('hidden');
+  $('room').classList.remove('hidden');
+  $('code').textContent=roomCode;
+  setConn('CONNECTING…','wait');
+
+  connect();
+}
+
+function handle(m){
+
+  if(m.type==='hostRoom'){
+    mode='host';
+    roomCode=m.code;
+    resumeToken=m.token||'';
+
+    saveSession();
+
+    state=m.state;
+
+    $('setup').classList.add('hidden');
+    $('room').classList.remove('hidden');
+    $('code').textContent=roomCode;
+
+    setConn('ROOM ACTIVE','ok');
+    render();
+    return;
+  }
+
+  if(m.type==='hostResumed'){
+    mode='host';
+    roomCode=m.code;
+    resumeToken=m.token||resumeToken;
+    state=m.state;
+
+    saveSession();
+
+    $('setup').classList.add('hidden');
+    $('room').classList.remove('hidden');
+    $('code').textContent=roomCode;
+
+    setConn('ROOM ACTIVE','ok');
+
+    (m.log||[]).slice().reverse().forEach(x=>log(x));
+
+    render();
+    toast('Host connection restored');
+    return;
+  }
+
+  if(m.type==='welcome'){
+    mode='player';
+    myId=m.id||'';
+    resumeToken=m.token||'';
+    state=m.state;
+    window.myHand=m.hand||[];
+
+    saveSession();
+
+    $('setup').classList.add('hidden');
+    $('room').classList.remove('hidden');
+    $('code').textContent=roomCode;
+
+    setConn('CONNECTED TO SERVER','ok');
+    $('playerConnection').textContent='CONNECTED • Your hand is private';
+
+    render();
+    toast('Joined game');
+    return;
+  }
+
+  if(m.type==='playerResumed'){
+    mode='player';
+    myId=m.id||myId;
+    resumeToken=m.token||resumeToken;
+    state=m.state;
+    window.myHand=m.hand||[];
+
+    saveSession();
+
+    setConn('CONNECTED TO SERVER','ok');
+    $('playerConnection').textContent='CONNECTED • Your hand is private';
+
+    (m.log||[]).slice().reverse().forEach(x=>log(x));
+
+    render();
+    toast('Connection restored');
+    return;
+  }
+
+  if(m.type==='state'){
+    state=m.state;
+
+    if(mode==='player')
+      window.myHand=m.hand||[];
+
+    render();
+    return;
+  }
+
+  if(m.type==='log'){
+    log(m.text);
+    return;
+  }
+
+  if(m.type==='toast'){
+    toast(m.text);
+    return;
+  }
+
+  if(m.type==='error'){
+    toast(m.text);
+
+    if(String(m.text).includes('SESSION EXPIRED')){
+      resumeToken='';
+      saveSession();
+    }
+
+    return;
+  }
+
+  if(m.type==='hostDisconnected'){
+    setConn('HOST RECONNECTING…','wait');
+    if(mode==='player')
+      $('playerConnection').textContent='HOST RECONNECTING…';
+    toast('Host connection temporarily lost');
+    return;
+  }
+
+  if(m.type==='playerDisconnected'){
+    render();
+    return;
+  }
+
+  if(m.type==='challenge'){
+    if(mode==='player'){
+      pendingChallenge=true;
+      $('challengeText').textContent=m.player+' played BET YOUR HAND for '+Number(m.amount).toLocaleString()+' game points.';
+      $('challengeAmount').value='';
+      $('challengePanel').classList.remove('hidden');
+    }
+    return;
+  }
+
+  if(m.type==='betPlaced'){
+    closeBet();
+    toast('BET YOUR HAND wager placed');
+    return;
+  }
+}
+
+function startGame(){
+  send({type:'start'});
+}
+
+function cardText(c){
+  if(!c) return '—';
+  return c.action==='BET'?'BET':c.action||c.ch;
+}
+
+function cardClass(c){
+  if(!c) return 'red';
+  if(c.action==='BET') return 'royal';
+  if(c.color==='wild') return 'wild';
+  return c.color||'red';
+}
+
+function playable(c){
+  const top=state?.discard?.at(-1);
+  if(!top) return true;
+
+  if(c.action==='BET'||c.action==='WILD') return true;
+  if(c.color && c.color===top.color) return true;
+  if(c.ch && top.ch && c.ch===top.ch) return true;
+  if(c.action && top.action && c.action===top.action && c.action!=='BET') return true;
+
+  return false;
+}
+
+function render(){
+  if(!state) return;
+
+  const ps=state.players||[];
+
+  $('players').innerHTML='';
+  $('gamePlayers').innerHTML='';
+
+  ps.forEach((p,i)=>{
+    const d=document.createElement('div');
+
+    d.className='player '+(i===state.turn?'active':'');
+    d.innerHTML=
+      '<div class="name">'+escapeHtml(p.name)+'</div>'+
+      '<div class="coins">⭐ '+Number(p.points).toLocaleString()+'</div>'+
+      '<div class="small">'+p.handCount+' cards'+
+      (p.connected===false?' • reconnecting…':'')+
+      '</div>';
+
+    $('players').appendChild(d);
+    $('gamePlayers').appendChild(d.cloneNode(true));
+  });
+
+  $('code').textContent=roomCode||'----';
+
+  $('room').classList.toggle(
+    'hidden',
+    state.phase==='playing'||
+    state.phase==='roundover'||
+    state.phase==='finished'
+  );
+
+  $('game').classList.toggle('hidden',state.phase==='lobby');
+
+  $('hostControls').classList.toggle(
+    'hidden',
+    mode!=='host'||state.phase!=='lobby'
+  );
+
+  $('round').textContent=state.round;
+
+  const cur=ps[state.turn];
+
+  if(state.phase==='roundover')
+    $('turn').textContent='ROUND COMPLETE';
+  else if(state.phase==='finished')
+    $('turn').textContent='MATCH COMPLETE';
+  else
+    $('turn').textContent=cur?cur.name.toUpperCase()+"'S TURN":'WAITING';
+
+  $('turnSub').textContent=
+    state.phase==='finished'
+    ? 'Highest total after Round 2 wins.'
+    : 'A playable card earns +150 at the start of the turn.';
+
+  if(state.discard?.length){
+    const c=state.discard.at(-1);
+    $('discardCard').className='card '+cardClass(c);
+    $('discardCard').textContent=cardText(c);
+  }
+
+  $('hostGameArea').classList.toggle('hidden',mode!=='host');
+  $('playerGameArea').classList.toggle('hidden',mode!=='player');
+
+  if(mode==='host')
+    setConn(ps.length+'/6 PLAYERS CONNECTED','ok');
+
+  if(mode==='player' && ws?.readyState===WebSocket.OPEN)
+    setConn('CONNECTED TO SERVER','ok');
+
+  if(mode==='player')
+    renderHand();
+}
+
+function renderHand(){
+  const h=window.myHand||[];
+
+  $('myHand').innerHTML='';
+
+  const isTurn=
+    state?.players?.[state.turn]?.id===myId;
+
+  $('myTurnLabel').textContent=
+    isTurn?'🔥 YOUR TURN':'YOUR HAND';
+
+  $('drawBtn').disabled=
+    !isTurn||h.some(playable);
+
+  $('betBtn').classList.toggle(
+    'hidden',
+    h.length!==2
+  );
+
+  h.forEach((c,i)=>{
+    const d=document.createElement('button');
+
+    d.type='button';
+    d.className='card '+cardClass(c);
+    d.textContent=cardText(c);
+    d.disabled=!isTurn||!playable(c);
+    d.onclick=()=>playMe(i);
+
+    $('myHand').appendChild(d);
+  });
+
+  $('playerConnection').textContent=
+    ws?.readyState===WebSocket.OPEN
+    ? 'CONNECTED • Your hand is private'
+    : 'WAITING FOR CONNECTION…';
+}
+
+function playMe(i){
+  send({type:'play',index:i});
+}
+
+function drawForMe(){
+  send({type:'draw'});
+}
+
+function openBet(){
+  if((window.myHand||[]).length!==2){
+    toast('BET YOUR HAND appears when you have exactly 2 cards.');
+    return;
+  }
+
+  betAmount=50;
+  updateBet();
+  $('betPanel').classList.remove('hidden');
+}
+
+function closeBet(){
+  $('betPanel').classList.add('hidden');
+}
+
+function changeBet(n){
+  betAmount=Math.max(50,betAmount+n);
+  updateBet();
+}
+
+function betAll(){
+  const p=state?.players?.find(x=>x.id===myId);
+  betAmount=p?.points||50;
+  updateBet();
+}
+
+function updateBet(){
+  const max=state?.players?.find(p=>p.id===myId)?.points||500;
+  betAmount=Math.min(betAmount,max);
+  $('betAmount').textContent=Number(betAmount).toLocaleString();
+}
+
+function sendBet(){
+  if(!ws || ws.readyState!==WebSocket.OPEN){
+    toast('Not connected yet. Reconnecting…');
+    return;
+  }
+
+  send({type:'bet',amount:betAmount});
+}
+
+function sendChallenge(){
+  const amount=Math.floor(Number($('challengeAmount').value)||0);
+
+  if(amount<1){
+    toast('Choose a game-point amount');
+    return;
+  }
+
+  send({type:'bet',amount});
+  closeChallenge();
+}
+
+function closeChallenge(){
+  pendingChallenge=false;
+  $('challengePanel').classList.add('hidden');
+}
+
+function chooseColor(c){
+  send({type:'color',color:c});
+  $('colorPanel').classList.add('hidden');
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m]));
+}
+
+window.addEventListener('load',()=>{
+  const savedMode=localStorage.getItem('byhMode');
+  const savedRoom=localStorage.getItem('byhRoom');
+  const savedToken=localStorage.getItem('byhToken');
+  const savedName=localStorage.getItem('byhName');
+
+  if(savedMode) mode=savedMode;
+
+  if(savedRoom && savedToken && savedName){
+    roomCode=savedRoom;
+    resumeToken=savedToken;
+    myName=savedName;
+
+    $('hostName').value=savedName;
+    $('playerName').value=savedName;
+    $('joinCode').value=savedRoom;
+
+    $('setup').classList.add('hidden');
+    $('room').classList.remove('hidden');
+    $('code').textContent=roomCode;
+    setConn('RECONNECTING…','wait');
+
+    connect();
+  }
+});
+</script>
+</body>
+</html>
