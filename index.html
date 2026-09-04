@@ -107,7 +107,23 @@ function buildDeck(){let d=[];for(let c of COLORS){for(let k=0;k<2;k++)for(let c
 function valid(c){return state&&c&&(c.type==="wild"||c.type==="bet"||c.color===state.color||c.char===state.top?.char)}
 function startTimer(){clearInterval(timerId);let t=20;$("hTimer").textContent=t;timerId=setInterval(()=>{t--;$("hTimer").textContent=t;if(t<=0)clearInterval(timerId)},1000)}
 function startPlayerTimer(){let t=20;clearInterval(window.pt);$("pTimer").textContent=t;window.pt=setInterval(()=>{t--;$("pTimer").textContent=t;if(t<=0)clearInterval(window.pt)},1000)}
-function hostStart(){if(waiting.length<2)return;state={round:1,players:waiting.map(p=>({...p,points:500,cards:[]})),turn:0,direction:1,color:null,top:null,draw:buildDeck(),discard:[],pendingWild:null,betActive:{}};waiting=[];state.players.forEach(p=>{for(let i=0;i<8;i++)p.cards.push(state.draw.pop())});show("hostBoard");$("hCode").textContent=room;renderHost();modal('<div class="bigTitle">GET READY FOR GAME NIGHT!</div><div class="eventText">Opening wheel chooses the first player.</div>');setTimeout(()=>{closeOverlay();openingWheel()},1400)}
+function hostStart(){
+  const roster = state ? state.players.slice() : waiting.slice();
+  if(roster.length<2){toast("Need at least 2 players to start.");return}
+  try{
+    state={round:1,players:roster.map(p=>({...p,points:500,cards:[]})),turn:0,direction:1,color:null,top:null,draw:buildDeck(),discard:[],pendingWild:null,betActive:{}};
+    waiting=[];
+    state.players.forEach(p=>{for(let i=0;i<8;i++)p.cards.push(state.draw.pop())});
+    show("hostBoard");
+    $("hCode").textContent=room||"----";
+    renderHost();
+    modal('<div class="bigTitle">GET READY FOR GAME NIGHT!</div><div class="eventText">Opening wheel chooses the first player.</div>');
+    setTimeout(()=>{closeOverlay();openingWheel()},1400);
+  }catch(e){
+    console.error("BET YOUR HAND start error",e);
+    toast("Game could not start. Please try START GAME NIGHT again.");
+  }
+}
 function openingWheel(){let i=Math.floor(Math.random()*state.players.length);state.turn=i;$("hostWheel").classList.add("spin");setTimeout(()=>{$("hostWheel").classList.remove("spin");modal('<div class="bigTitle">🔥 '+state.players[i].name+'</div><div class="eventText">YOU ARE GOING FIRST!</div>');setTimeout(()=>{closeOverlay();openingCard()},1200)},2400)}
 function openingCard(){let c=state.draw.pop();if(c.type==="bet"){state.draw.unshift(c);return openingCard()}state.top=c;if(c.type==="wild"){state.color=COLORS[Math.floor(Math.random()*4)];sendTo(state.players[state.turn].id,{type:"chooseColor"});modal('<div class="bigTitle">WILD!</div><div class="eventText">Choose the starting color on your phone.</div>');}else{state.color=c.color;if(c.type==="skip")state.turn=next(2);else if(c.type==="reverse")state.direction*=-1;renderHost();broadcast()}startTimer()}
 function next(n=1){return (state.turn+n*state.direction+state.players.length*10)%state.players.length}
