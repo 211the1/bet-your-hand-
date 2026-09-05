@@ -260,13 +260,40 @@ function setConn(text,kind){
 }
 
 function showMode(m){
+  if(mode===m) return;
+
+  manualClose=true;
+
+  if(ws){
+    try{ws.close()}catch(e){}
+  }
+
+  ws=null;
+  state=null;
+  myId='';
+  roomCode='';
+  resumeToken='';
+  myName='';
+  clearSession();
+
   mode=m;
+  manualClose=false;
+
   $('hostTab').classList.toggle('active',m==='host');
   $('playerTab').classList.toggle('active',m==='player');
   $('hostSetup').classList.toggle('hidden',m!=='host');
   $('playerSetup').classList.toggle('hidden',m!=='player');
 
-  if(state) render();
+  $('setup').classList.remove('hidden');
+  $('room').classList.add('hidden');
+  $('game').classList.add('hidden');
+  $('feedPanel').classList.add('hidden');
+
+  setConn('NOT CONNECTED','bad');
+
+  if(m==='player'){
+    $('playerConnection').textContent='';
+  }
 }
 
 function saveSession(){
