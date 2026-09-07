@@ -65,7 +65,7 @@
       const p=ps[i],el=document.createElement('div');
       if(!p){el.className='p wait';el.textContent='WAITING…';grid.appendChild(el);continue}
       el.className='p'+(p.id===state.turnPlayerId?' active':'');
-      const im=document.createElement('img');im.src='/'+(PHOTO[p.character]||'Bug.jpg');im.alt=p.character||'';im.style.setProperty('--c',COLORS[p.character]||'#743cff');el.appendChild(im);
+      const im=document.createElement('img');im.src=(location.pathname.indexOf('/bet-your-hand-')===0?'/bet-your-hand-/':'/')+(PHOTO[p.character]||'Bug.jpg');im.alt=p.character||'';im.style.setProperty('--c',COLORS[p.character]||'#743cff');el.appendChild(im);
       const name=document.createElement('div');name.className='pn';name.textContent=p.name||'Player';el.appendChild(name);
       const ch=document.createElement('div');ch.className='pc';ch.textContent=p.character||'Character';el.appendChild(ch);
       const pts=document.createElement('div');pts.className='pp';pts.textContent='★ '+Number(p.points||0).toLocaleString();el.appendChild(pts);

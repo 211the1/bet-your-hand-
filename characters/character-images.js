@@ -6,7 +6,8 @@
     'The One':'The_One.jpg','Boone':'Boone.jpg','Chicken Joe':'Chicken_Joe.jpg',
     'Juby':'Juby.jpg','Meemaw':'Meemaw.jpg'
   };
-  function src(name){ return '/' + (files[name] || 'Bug.jpg'); }
+  function base(){ return location.pathname.indexOf('/bet-your-hand-')===0 ? '/bet-your-hand-/' : '/'; }
+  function src(name){ return base() + (files[name] || 'Bug.jpg'); }
   function addPhoto(parent,name,cls){
     if(!parent || !name) return;
     let img=parent.querySelector('.'+cls);
@@ -37,14 +38,14 @@
 
   if(new URLSearchParams(location.search).has('host')){
     const s=document.createElement('script');
-    s.src='/host-tv-lobby.js?v=2';
+    s.src=base()+'host-tv-lobby.js?v=4';
     document.head.appendChild(s);
   }
 
   const arcade=document.createElement('script');
-  arcade.src='/arcade-ui-v2.js?v=3';
+  arcade.src=base()+'arcade-ui-v2.js?v=4';
   document.head.appendChild(arcade);
   const call=document.createElement('script');
-  call.src='/call-button.js?v=1';
+  call.src=base()+'call-button.js?v=2';
   document.head.appendChild(call);
 })();
