@@ -48,7 +48,8 @@ header{text-align:center;padding:8px 0 14px}
 .roomcode{font-size:42px;font-weight:900;color:#ffd21c;text-align:center;letter-spacing:8px}
 .feed{max-height:180px;overflow:auto;background:#07052d;border-radius:13px;padding:9px}
 .feed div{padding:5px;border-bottom:1px solid #252060}
-.connection{display:inline-block;padding:6px 10px;border-radius:10px;font-weight:900}
+.connection{display:inline-block;padding:6px 10px;border-radius:10px;font-weight:900}.charGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.charPick{min-height:72px;border:2px solid #4031b9;border-radius:14px;background:#09083b;color:#fff;padding:8px;font-weight:900;cursor:pointer}.charPick.selected{border-color:#ffd21c;box-shadow:0 0 14px #ffd21c66;background:#17104f}.charPick:disabled{opacity:.45;cursor:not-allowed}.charName{display:block;font-size:14px}@media(max-width:700px){.charGrid{grid-template-columns:repeat(2,1fr)}}
+
 .ok{background:#0b6b39}
 .bad{background:#7d1f2c}
 .wait{background:#5c4a12}
@@ -100,6 +101,7 @@ header{text-align:center;padding:8px 0 14px}
 <div class="actions">
 <button class="btn primary big" onclick="joinRoom()">JOIN GAME</button>
 </div>
+<h3>Choose Your Character</h3><div id="charChoices" class="charGrid"></div><div id="charSelected" class="small center">Choose 1 of the 9 characters before joining.</div>
 <p class="small">Your cards stay private on your phone. If the connection drops, the game will try to reconnect.</p>
 </div>
 
@@ -237,13 +239,28 @@ let reconnectDelay=1500;
 let manualClose=false;
 let pendingChallenge=false;
 
-const COLORS=['red','blue','green','yellow'];
+const COLORS=['red','blue','green','yellow'];const CHARACTERS=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];
+let selectedCharacter='';
+
 
 // Normal link opens directly to PLAYER'S PHONE. Add ?host for the host/TV screen.
 if(new URLSearchParams(location.search).has('host')) mode='host';
 if(!new URLSearchParams(location.search).has('host')) mode='player';
 if(mode!=='host' && mode!=='player') mode='player';
 applyRoleUI();
+renderCharacterChoices();
+
+function renderCharacterChoices(){
+  const box=$('charChoices'); if(!box)return; box.innerHTML='';
+  const taken=new Set((state?.players||[]).map(p=>p.character).filter(Boolean));
+  CHARACTERS.forEach(ch=>{
+    const b=document.createElement('button'); b.type='button'; b.className='charPick'+(selectedCharacter===ch?' selected':''); b.disabled=taken.has(ch);
+    const n=document.createElement('span'); n.className='charName'; n.textContent=ch; b.appendChild(n);
+    if(taken.has(ch)){const small=document.createElement('span');small.className='small';small.textContent='TAKEN';b.appendChild(small)}
+    b.addEventListener('click',()=>{selectedCharacter=ch;renderCharacterChoices();$('charSelected').textContent='Selected: '+ch;});
+    box.appendChild(b);
+  });
+}
 
 function toast(t){
   $('toast').textContent=t;
@@ -358,7 +375,7 @@ function connect(){
         send({type:'resumePlayer',code:roomCode,token:resumeToken});
       }else if(roomCode && myName){
         setConn('JOINING GAME…','wait');
-        send({type:'join',code:roomCode,name:myName});
+        send({type:'join',code:roomCode,name:myName,character:selectedCharacter});
       }
     }
   };
@@ -421,6 +438,8 @@ function createRoom(){
 }
 
 function joinRoom(){
+  if(!selectedCharacter){toast('Choose a character first.');return;}
+
   mode='player';
 
   myName=($('playerName').value||'Player').trim().slice(0,16)||'Player';
