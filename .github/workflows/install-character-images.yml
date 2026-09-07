@@ -1,52 +1,33 @@
-name: Install approved character photos
+name: Install character images
 on:
   push:
     branches: [main]
 jobs:
   patch:
-    if: github.event.head_commit.message == 'Install approved character photos'
+    if: github.event.head_commit.message == 'Install character images'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Install approved character photos
-        env:
-          SPRITE_B64: >-
-            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
+      - name: Install image display
         run: |
           python3 - <<'PY'
-          import base64, os
           from pathlib import Path
-          data=base64.b64decode(''.join(os.environ['SPRITE_B64'].split()))
-          Path('characters').mkdir(exist_ok=True)
-          Path('characters/approved-character-sprite.webp').write_bytes(data)
-          Path('characters/character-images.js').write_text("""/* BET YOUR HAND — exact approved face-focused character photos. */
-(function(){
-  const SPRITE='/characters/approved-character-sprite.webp';
-  const chars=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];
-  const pos={}; chars.forEach((c,i)=>{pos[c]=((i%3)*50)+'% '+(Math.floor(i/3)*50)+'%';});
-  function apply(){
-    document.querySelectorAll('.charPick').forEach(function(b){
-      const n=b.querySelector('.charName'); if(!n)return; const ch=n.textContent.trim();
-      let im=b.querySelector('.charImg'); if(!im){im=document.createElement('span');im.className='charImg';b.insertBefore(im,b.firstChild);}
-      im.style.backgroundImage='url("'+SPRITE+'")'; im.style.backgroundSize='300% 300%'; im.style.backgroundPosition=pos[ch]||'50% 50%';
-    });
-    document.querySelectorAll('#players .player,#gamePlayers .player').forEach(function(d){
-      const smalls=d.querySelectorAll('.small'); if(smalls.length<1)return; const ch=smalls[0].textContent.trim(); if(chars.indexOf(ch)<0)return;
-      let im=d.querySelector('.playerCharImg'); if(!im){im=document.createElement('span');im.className='playerCharImg';d.insertBefore(im,d.firstChild);}
-      im.style.backgroundImage='url("'+SPRITE+'")'; im.style.backgroundSize='300% 300%'; im.style.backgroundPosition=pos[ch];
-    });
-  }
-  window.addEventListener('load',apply); setInterval(apply,700);
-})();
-""")
-          p=Path('index.html'); s=p.read_text(); s=s.replace('height:100px','height:140px').replace('min-height:150px','min-height:190px'); p.write_text(s)
+          p=Path('index.html')
+          s=p.read_text()
+          css='.charImg{display:block;width:100%;height:100px;border-radius:10px;background-repeat:no-repeat;background-color:#07052d;background-position:center;box-shadow:0 0 10px #0008;margin-bottom:6px}.charPick{overflow:hidden;min-height:150px}.playerCharImg{display:block;width:58px;height:58px;border-radius:50%;background-repeat:no-repeat;background-color:#07052d;background-position:center;background-size:300% 300%;border:2px solid #743cff;margin-bottom:6px}.player.active .playerCharImg{border-color:#ffd21c;box-shadow:0 0 12px #ffd21c88}'
+          marker='.connection{display:inline-block;padding:6px 10px;border-radius:10px;font-weight:900}'
+          if marker not in s: raise SystemExit('CSS marker not found')
+          if '.charImg{' not in s: s=s.replace(marker,marker+css,1)
+          tag='<script src="/characters/character-images.js"></script>'
+          if tag not in s: s=s.replace('</body>',tag+'\n</body>',1)
+          p.write_text(s)
           PY
       - name: Commit
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add characters/approved-character-sprite.webp characters/character-images.js index.html
-          git commit -m 'Apply approved character photos'
+          git add index.html
+          git commit -m 'Install character images' || exit 0
           git push
