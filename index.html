@@ -848,7 +848,7 @@ var n=0,t=setInterval(function(){if(typeof render==='function'){var old=render;w
     var h=window.myHand||[],b=document.getElementById('lastCardBtn'); if(!b)return;
     if(h.length!==1)lastCardActive=false;
     var turn=state&&state.players&&state.players[state.turn]&&state.players[state.turn].id===myId;
-    var show=mode==='player'&&turn&&h.length===1&&!lastCardActive&&!(state&&state.pending)&&state&&state.phase==='playing';
+    var show=mode==='player'&&turn&&h.length===1&&!(state&&state.pending)&&state&&state.phase==='playing';
     b.classList.toggle('hidden',!show); b.disabled=!show;
     b.textContent=lastCardActive?'🔥 LAST CARD +'+lastCardAmount+' ACTIVE':'🔥 LAST CARD';
   }
