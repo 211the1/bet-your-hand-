@@ -1,0 +1,1 @@
+The real character sprite is installed via the Git data API; this note is temporary.
