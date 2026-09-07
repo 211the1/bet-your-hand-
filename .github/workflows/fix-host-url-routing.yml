@@ -34,3 +34,5 @@ jobs:
           git add server.js
           git commit -m 'Fix host URL routing' || exit 0
           git push
+
+# Trigger the routing fix after the workflow is present on main.
