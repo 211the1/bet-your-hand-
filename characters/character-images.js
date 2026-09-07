@@ -35,15 +35,13 @@
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',refresh); else refresh();
   new MutationObserver(refresh).observe(document.documentElement,{subtree:true,childList:true});
 
-  // Host/TV lobby: load the approved full-screen lobby once, without changing the player phone.
   if(new URLSearchParams(location.search).has('host')){
     const s=document.createElement('script');
-    s.src='/host-tv-lobby.js';
+    s.src='/host-tv-lobby.js?v=2';
     document.head.appendChild(s);
   }
 
-  // Load the complete Modern Arcade game UI after the original game code exists.
   const arcade=document.createElement('script');
-  arcade.src='/arcade-ui.js?v=1';
+  arcade.src='/arcade-ui-v2.js?v=2';
   document.head.appendChild(arcade);
 })();
