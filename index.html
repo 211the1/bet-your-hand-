@@ -77,8 +77,7 @@ header{text-align:center;padding:8px 0 14px}
 </header>
 
 <div id="roleHeader" class="tabs">
-<button id="playerTab" class="tab active" onclick="showMode('player')">PLAYER'S PHONE</button>
-<button id="hostTab" class="tab" onclick="showMode('host')">HOST / TV</button>
+<div id="roleTitle" class="tab active">PLAYER'S PHONE</div>
 </div>
 
 <section id="setup" class="panel">
@@ -225,7 +224,7 @@ header{text-align:center;padding:8px 0 14px}
 <script>
 const $=id=>document.getElementById(id);
 
-let mode=localStorage.getItem('byhMode')||'player';
+let mode='player';
 let ws=null;
 let state=null;
 let myId='';
@@ -242,6 +241,7 @@ const COLORS=['red','blue','green','yellow'];
 
 // Normal link opens directly to PLAYER'S PHONE. Add ?host for the host/TV screen.
 if(new URLSearchParams(location.search).has('host')) mode='host';
+if(!new URLSearchParams(location.search).has('host')) mode='player';
 if(mode!=='host' && mode!=='player') mode='player';
 applyRoleUI();
 
@@ -267,14 +267,16 @@ function setConn(text,kind){
 function applyRoleUI(){
   const isPlayer=mode==='player';
   $('roleHeader').classList.toggle('hidden', false);
-  $('hostTab').classList.toggle('hidden', isPlayer);
-  $('playerTab').classList.toggle('active', isPlayer);
-  $('hostTab').classList.toggle('active', !isPlayer);
+  $('roleTitle').textContent=isPlayer?"PLAYER'S PHONE":"HOST / TV";
   $('hostSetup').classList.toggle('hidden', isPlayer);
   $('playerSetup').classList.toggle('hidden', !isPlayer);
 }
 
 function showMode(m){
+  if(m==='host'){ location.search='?host'; return; }
+  location.search='';
+  return;
+
   if(mode===m){ applyRoleUI(); return; }
 
   manualClose=true;
