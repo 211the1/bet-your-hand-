@@ -90,3 +90,5 @@ EOF
             git commit -m "Use approved character photos in game"
             git push
           fi
+
+# Trigger installation after approved photo upload
