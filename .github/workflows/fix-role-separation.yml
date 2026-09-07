@@ -1,0 +1,48 @@
+name: Fix Role Separation
+on:
+  push:
+
+jobs:
+  patch:
+    if: ${{ github.event.head_commit.message == 'Fix role separation' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keep host on refresh and hide host from players
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+
+          old="let mode='player';"
+          new="let mode=(new URLSearchParams(location.search).has('host') || localStorage.getItem('byhMode')==='host')?'host':'player';"
+          if old in s:
+              s=s.replace(old,new,1)
+
+          # The normal URL is player-first, but an existing host session stays host.
+          old2="if(new URLSearchParams(location.search).has('host')) mode='host';"
+          s=s.replace(old2,"",1)
+
+          # Persist the selected role immediately, so refreshing does not change roles.
+          old3="  mode=m;\n  manualClose=false;"
+          new3="  mode=m;\n  localStorage.setItem('byhMode',mode);\n  manualClose=false;"
+          if old3 in s:
+              s=s.replace(old3,new3,1)
+
+          # Make sure the role UI is applied after the page initializes.
+          if "applyRoleUI();" not in s:
+              marker="const COLORS=['red','blue','green','yellow'];"
+              s=s.replace(marker,marker+"\napplyRoleUI();",1)
+
+          p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Fix role separation" || exit 0
+          git push
