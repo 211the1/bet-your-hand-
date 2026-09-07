@@ -190,7 +190,7 @@ function resumePlayer(ws,code,token){
   const r=rooms.get(code);if(!r)return send(ws,{type:'error',text:'ROOM SESSION EXPIRED.'});
   const p=r.players.find(x=>x.token===token);if(!p)return send(ws,{type:'error',text:'PLAYER SESSION EXPIRED. Join the room again.'});
   if(p.timer){clearTimeout(p.timer);p.timer=null;}p.ws=ws;p.disconnectedAt=null;ws.role='player';ws.roomCode=code;ws.playerId=p.id;ws.resumeToken=p.token;ws.isAlive=true;
-  send(ws,{type:'playerResumed',id:p.id,token,state,hand:p.hand,log:r.log});log(r,`${p.name} reconnected.`);broadcast(r);
+  send(ws,{type:'playerResumed',id:p.id,token,state:pub(r),hand:p.hand,log:r.log});log(r,`${p.name} reconnected.`);broadcast(r);
 }
 function handle(ws,m){
   if(!m||typeof m!=='object')return;
