@@ -8,7 +8,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:#08052a;color:#fff;font-family:Arial,Helvetica,sans-serif}
 button,input{font:inherit}
-.wrap{max-width:1150px;margin:auto;padding:14px}
+.wrap{width:100%;max-width:none;min-height:100vh;margin:0;padding:14px}
 .hidden{display:none!important}
 header{text-align:center;padding:8px 0 14px}
 .logo{font-size:clamp(34px,7vw,68px);font-weight:900;color:#ffd21c;text-shadow:0 4px #e54b19,0 0 18px #7c28ff;letter-spacing:-2px}
@@ -21,7 +21,7 @@ header{text-align:center;padding:8px 0 14px}
 .panel{background:linear-gradient(180deg,#17105c,#0d0a49);border:3px solid #713bff;border-radius:22px;padding:16px;box-shadow:0 0 25px #4d24ff33;margin-bottom:14px}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .players{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.player{border:2px solid #4031b9;border-radius:15px;padding:10px;background:#09083b}
+.player{border:2px solid #4031b9;border-radius:15px;padding:10px;background:#09083b;min-height:145px}
 .player.active{border-color:#ffd21c;box-shadow:0 0 14px #ffd21c55}
 .name{font-size:19px;font-weight:900}
 .coins{color:#ffd21c;font-weight:900;margin-top:4px}
@@ -643,7 +643,7 @@ function render(){
   ps.forEach((p,i)=>{
     const d=document.createElement('div');
 
-    d.className='player '+(i===state.turn?'active':'');
+    d.className='player '+(i===state.turn?'active':''); d.dataset.character=p.character||'';
     d.innerHTML=
       '<div class="name">'+escapeHtml(p.name)+'</div>'+
       '<div class="small">'+escapeHtml(p.character||'No character')+'</div>'+
