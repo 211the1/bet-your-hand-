@@ -1,0 +1,33 @@
+name: Install character images
+on:
+  push:
+    branches: [main]
+jobs:
+  patch:
+    if: github.event.head_commit.message == 'Install character images'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install image display
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          css='.charImg{display:block;width:100%;height:100px;border-radius:10px;background-repeat:no-repeat;background-color:#07052d;background-position:center;box-shadow:0 0 10px #0008;margin-bottom:6px}.charPick{overflow:hidden;min-height:150px}.playerCharImg{display:block;width:58px;height:58px;border-radius:50%;background-repeat:no-repeat;background-color:#07052d;background-position:center;background-size:300% 300%;border:2px solid #743cff;margin-bottom:6px}.player.active .playerCharImg{border-color:#ffd21c;box-shadow:0 0 12px #ffd21c88}'
+          marker='.connection{display:inline-block;padding:6px 10px;border-radius:10px;font-weight:900}'
+          if marker not in s: raise SystemExit('CSS marker not found')
+          if '.charImg{' not in s: s=s.replace(marker,marker+css,1)
+          tag='<script src="/characters/character-images.js"></script>'
+          if tag not in s: s=s.replace('</body>',tag+'\n</body>',1)
+          p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git commit -m 'Install character images' || exit 0
+          git push
