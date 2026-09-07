@@ -255,7 +255,7 @@ function renderCharacterChoices(){
   const taken=new Set((state?.players||[]).map(p=>p.character).filter(Boolean));
   CHARACTERS.forEach(ch=>{
     const b=document.createElement('button'); b.type='button'; b.className='charPick'+(selectedCharacter===ch?' selected':''); b.disabled=taken.has(ch);
-    b.dataset.character=ch; b.dataset.character=ch; const n=document.createElement('span'); n.className='charName'; n.textContent=ch; b.appendChild(n);
+    b.dataset.character=ch; b.dataset.character=ch; b.dataset.character=ch; const n=document.createElement('span'); n.className='charName'; n.textContent=ch; b.appendChild(n);
     if(taken.has(ch)){const small=document.createElement('span');small.className='small';small.textContent='TAKEN';b.appendChild(small)}
     b.addEventListener('click',()=>{selectedCharacter=ch;renderCharacterChoices();$('charSelected').textContent='Selected: '+ch;});
     box.appendChild(b);
