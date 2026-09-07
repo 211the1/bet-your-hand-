@@ -76,9 +76,9 @@ header{text-align:center;padding:8px 0 14px}
 <div class="tag">GAME NIGHT • 2–6 PLAYERS • FICTIONAL GAME POINTS</div>
 </header>
 
-<div class="tabs">
-<button id="hostTab" class="tab active" onclick="showMode('host')">HOST / TV</button>
-<button id="playerTab" class="tab" onclick="showMode('player')">PLAYER PHONE</button>
+<div id="roleHeader" class="tabs">
+<button id="playerTab" class="tab active" onclick="showMode('player')">PLAYER'S PHONE</button>
+<button id="hostTab" class="tab" onclick="showMode('host')">HOST / TV</button>
 </div>
 
 <section id="setup" class="panel">
@@ -225,7 +225,7 @@ header{text-align:center;padding:8px 0 14px}
 <script>
 const $=id=>document.getElementById(id);
 
-let mode='host';
+let mode='player';
 let ws=null;
 let state=null;
 let myId='';
@@ -239,6 +239,10 @@ let manualClose=false;
 let pendingChallenge=false;
 
 const COLORS=['red','blue','green','yellow'];
+
+// Normal link opens directly to PLAYER'S PHONE. Add ?host for the host/TV screen.
+if(new URLSearchParams(location.search).has('host')) mode='host';
+applyRoleUI();
 
 function toast(t){
   $('toast').textContent=t;
@@ -259,8 +263,18 @@ function setConn(text,kind){
   $('connection').className='connection '+kind;
 }
 
+function applyRoleUI(){
+  const isPlayer=mode==='player';
+  $('roleHeader').classList.toggle('hidden', false);
+  $('hostTab').classList.toggle('hidden', isPlayer);
+  $('playerTab').classList.toggle('active', isPlayer);
+  $('hostTab').classList.toggle('active', !isPlayer);
+  $('hostSetup').classList.toggle('hidden', isPlayer);
+  $('playerSetup').classList.toggle('hidden', !isPlayer);
+}
+
 function showMode(m){
-  if(mode===m) return;
+  if(mode===m){ applyRoleUI(); return; }
 
   manualClose=true;
 
@@ -279,10 +293,7 @@ function showMode(m){
   mode=m;
   manualClose=false;
 
-  $('hostTab').classList.toggle('active',m==='host');
-  $('playerTab').classList.toggle('active',m==='player');
-  $('hostSetup').classList.toggle('hidden',m!=='host');
-  $('playerSetup').classList.toggle('hidden',m!=='player');
+  applyRoleUI();
 
   $('setup').classList.remove('hidden');
   $('room').classList.add('hidden');
@@ -792,7 +803,7 @@ function escapeHtml(s){
 }
 
 window.addEventListener('load',()=>{
-  const savedMode=localStorage.getItem('byhMode');
+  const savedMode=new URLSearchParams(location.search).has('host')?'host':'player';
   const savedRoom=localStorage.getItem('byhRoom');
   const savedToken=localStorage.getItem('byhToken');
   const savedName=localStorage.getItem('byhName');
