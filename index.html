@@ -817,5 +817,13 @@ window.addEventListener('load',()=>{
   }
 });
 </script>
+<script>/* LAST_CARD_UI_V1 */
+(function(){
+function lastCardModal(){if(document.getElementById('lastCardPanel'))return;var d=document.createElement('div');d.id='lastCardPanel';d.className='modalbg hidden';d.innerHTML='<div class="modal"><h2>🔥 LAST CARD</h2><p>One card left. Choose a bonus. Successfully play your final card to earn it.</p><div class="actions"><button class="btn" onclick="activateLast(100)">SAFE<br>+100</button><button class="btn primary" onclick="activateLast(250)">BOLD<br>+250</button><button class="btn" style="background:linear-gradient(135deg,#f3bd18,#ff7b00);color:#17110b" onclick="activateLast(500)">BIG<br>+500</button></div><div class="actions"><button class="btn" onclick="closeLast()">CANCEL</button></div></div>';document.body.appendChild(d)}
+window.closeLast=function(){var d=document.getElementById('lastCardPanel');if(d)d.classList.add('hidden')};
+window.activateLast=function(a){closeLast();if(!ws||ws.readyState!==WebSocket.OPEN){toast('Not connected yet. Reconnecting…');return}send({type:'lastCard',amount:a});};
+function syncLast(){lastCardModal();var b=document.getElementById('betBtn');if(b)b.classList.add('hidden');var wrap=document.querySelector('#playerGameArea .actions');if(!wrap)return;var h=window.myHand||[];var x=document.getElementById('lastCardBtn');if(!x){x=document.createElement('button');x.id='lastCardBtn';x.className='btn big';x.textContent='🔥 LAST CARD';x.onclick=function(){if(h.length!==1){toast('LAST CARD appears with exactly 1 card.');return}document.getElementById('lastCardPanel').classList.remove('hidden')};wrap.appendChild(x)}x.classList.toggle('hidden',h.length!==1);x.disabled=!(state&&state.players&&state.players[state.turn]&&state.players[state.turn].id===myId)||!!state.pending||state.phase!=='playing';}
+var n=0,t=setInterval(function(){if(typeof render==='function'){var old=render;window.render=function(){old.apply(this,arguments);syncLast()};clearInterval(t)}syncLast();if(++n>100)clearInterval(t)},100);
+})();</script>
 </body>
 </html>
