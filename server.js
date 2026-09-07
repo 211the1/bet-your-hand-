@@ -90,7 +90,7 @@ function awardStart(r){
 }
 function advance(r,steps=1){
   const n=r.players.length; if(!n)return;
-  r.turn=(r.turn+r.direction*steps+n*100)%n; r.pendingColor=null; awardStart(r);
+  r.turn=(r.turn+r.direction*steps+n*100)%n; awardStart(r);
 }
 function deal(r){
   r.deck=deck(); r.discard=[]; r.pending=null; r.pendingColor=null; r.direction=1; r.turn=0; r.winner=null;
@@ -111,7 +111,7 @@ function play(r,p,i){
   if(r.players[r.turn]?.id!==p.id)return send(p.ws,{type:'toast',text:'It is not your turn.'});
   const c=p.hand[i]; if(!c)return;
   if(!playable(r,c))return send(p.ws,{type:'toast',text:'That card cannot be played.'});
-  p.hand.splice(i,1);r.discard.push(c);log(r,`${p.name} played ${c.action==='BET'?'BET YOUR HAND':c.action||c.ch}.`);
+  p.hand.splice(i,1);r.discard.push(c);r.pendingColor=null;log(r,`${p.name} played ${c.action==='BET'?'BET YOUR HAND':c.action||c.ch}.`);
   if(p.hand.length===0)return finish(r,p);
   if(c.action==='WILD'){
     r.pending={type:'color',playerId:p.id,playerName:p.name};broadcast(r);return;
