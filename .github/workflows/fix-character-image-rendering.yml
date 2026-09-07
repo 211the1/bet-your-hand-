@@ -15,28 +15,26 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Fix sprite rendering
+      - name: Lock face-focused character framing
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('characters/character-images.js')
           s=p.read_text()
+          s=s.replace("im.style.backgroundPosition=(pos[ch]||'50% 50%').replace(/ (\\d+)%$/, ' 22%');", "im.style.backgroundPosition=(pos[ch]||'50% 50%');")
+          s=s.replace("im.style.backgroundPosition=pos[ch]||'50% 50%';", "im.style.backgroundPosition=(pos[ch]||'50% 50%');")
           s=s.replace("im.style.backgroundSize='300% 300%';", "im.style.backgroundSize='300% auto';")
-          s=s.replace("im.style.backgroundPosition=pos[ch]||'50% 50%';", "im.style.backgroundPosition=(pos[ch]||'50% 50%').replace(/ (\\d+)%$/, ' 22%');")
-          s=s.replace("im.style.backgroundSize='300% 300%'; im.style.backgroundPosition=pos[ch];", "im.style.backgroundSize='300% auto'; im.style.backgroundPosition=pos[ch];")
           p.write_text(s)
           PY
-      - name: Improve character picker layout
+      - name: Keep character picker clean and centered
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('index.html')
           s=p.read_text()
-          old=".connection{display:inline-block;padding:6px 10px;border-radius:10px;font-weight:900}.charImg{display:block;width:100%;height:100px;border-radius:10px;background-repeat:no-repeat;background-color:#07052d;background-position:center;box-shadow:0 0 10px #0008;margin-bottom:6px}.charPick{overflow:hidden;min-height:150px}"
-          new=".connection{display:inline-block;padding:6px 10px;border-radius:10px;font-weight:900}.charImg{display:block;width:100%;height:110px;border-radius:10px;background-repeat:no-repeat;background-color:#07052d;background-position:center 22%;box-shadow:0 0 10px #0008;margin-bottom:6px}.charPick{overflow:hidden;min-height:160px}"
-          if old in s: s=s.replace(old,new)
+          s=s.replace(".charImg{display:block;width:100%;height:110px;border-radius:10px;background-repeat:no-repeat;background-color:#07052d;background-position:center 22%;", ".charImg{display:block;width:100%;height:110px;border-radius:10px;background-repeat:no-repeat;background-color:#07052d;background-position:center;")
           p.write_text(s)
           PY
       - name: Commit fixes
