@@ -1,0 +1,36 @@
+name: Fix Host URL Routing
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  fix:
+    if: github.event.head_commit.message == 'Fix host URL routing'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fix root query routing
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('server.js')
+          s=p.read_text()
+          old="let f=req.url==='/'?'/index.html':req.url.split('?')[0]"
+          new="let f=(req.url.split('?')[0]==='/')?'/index.html':req.url.split('?')[0]"
+          if old not in s:
+              raise SystemExit('Expected server route text not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add server.js
+          git commit -m 'Fix host URL routing' || exit 0
+          git push
