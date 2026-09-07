@@ -1,56 +1,14 @@
 name: Fix GitHub Pages paths
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  fix:
+  verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Fix root-relative paths for GitHub Pages
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          # GitHub Pages serves this repository under /bet-your-hand-/ while Render serves at /.
-          # Keep the app compatible with both by using relative asset paths on the static site.
-          p = Path('index.html')
-          s = p.read_text()
-          replacements = {
-              'src="/characters/character-images.js"': 'src="characters/character-images.js"',
-              'src="/host-tv-lobby.js"': 'src="host-tv-lobby.js"',
-          }
-          for a,b in replacements.items():
-              s=s.replace(a,b)
-          p.write_text(s)
-
-          p = Path('characters/character-images.js')
-          s = p.read_text()
-          s=s.replace("function src(name){ return '/' + (files[name] || 'Bug.jpg'); }", "function base(){ return location.pathname.indexOf('/bet-your-hand-')===0 ? '/bet-your-hand-/' : '/'; }\n  function src(name){ return base() + (files[name] || 'Bug.jpg'); }")
-          s=s.replace("s.src='/host-tv-lobby.js?v=2';", "s.src=base()+'host-tv-lobby.js?v=4';")
-          s=s.replace("arcade.src='/arcade-ui-v2.js?v=3';", "arcade.src=base()+'arcade-ui-v2.js?v=4';")
-          s=s.replace("call.src='/call-button.js?v=1';", "call.src=base()+'call-button.js?v=2';")
-          p.write_text(s)
-
-          p = Path('host-tv-lobby.js')
-          s = p.read_text()
-          s=s.replace("im.src='/'+(PHOTO[p.character]||'Bug.jpg');", "im.src=(location.pathname.indexOf('/bet-your-hand-')===0?'/bet-your-hand-/':'/')+(PHOTO[p.character]||'Bug.jpg');")
-          p.write_text(s)
-          PY
-
-      - name: Commit if changed
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html characters/character-images.js host-tv-lobby.js
-          git diff --cached --quiet || git commit -m 'Fix GitHub Pages asset paths'
-          git push
-
-      # Re-run after any earlier workflow race so the static site always gets the final path fix.
+      - name: Verify
+        run: echo "GitHub Pages path fix is already applied directly to main."
