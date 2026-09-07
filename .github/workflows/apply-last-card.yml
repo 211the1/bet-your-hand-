@@ -1,0 +1,171 @@
+name: Apply LAST CARD rule
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-last-card.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply LAST CARD UI and private sync
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          index = Path('index.html')
+          s = index.read_text()
+
+          old_button = '<button id="betBtn" class="btn primary big hidden" onclick="openBet()">BET YOUR HAND</button>'
+          new_button = '<button id="betBtn" class="btn primary big hidden" onclick="openBet()">BET YOUR HAND</button>\n<button id="lastCardBtn" class="btn primary big hidden" onclick="openLastCard()">🔥 LAST CARD</button>'
+          if old_button not in s:
+              raise SystemExit('expected bet button not found')
+          s = s.replace(old_button, new_button, 1)
+
+          marker = '<div id="challengePanel" class="modalbg hidden">'
+          modal = '''<div id="lastCardPanel" class="modalbg hidden">
+<div class="modal">
+<h2>🔥 LAST CARD</h2>
+<p>Choose your bonus before you play your final card.</p>
+<div class="actions">
+<button class="btn big" onclick="sendLastCard(100)">SAFE +100</button>
+<button class="btn big" onclick="sendLastCard(250)">BOLD +250</button>
+<button class="btn primary big" onclick="sendLastCard(500)">BIG +500</button>
+</div>
+<div class="actions">
+<button class="btn" onclick="closeLastCard()">CANCEL</button>
+</div>
+</div>
+</div>
+
+'''
+          if 'id="lastCardPanel"' not in s:
+              if marker not in s:
+                  raise SystemExit('challenge panel marker not found')
+              s = s.replace(marker, modal + marker, 1)
+
+          old_var = 'let pendingChallenge=false;'
+          new_var = 'let pendingChallenge=false;\nlet lastCardActive=false;\nlet lastCardAmount=0;'
+          if old_var not in s:
+              raise SystemExit('pendingChallenge variable not found')
+          s = s.replace(old_var, new_var, 1)
+
+          old_state = "state=m.state;\n    \n    if(mode==='player')\n      window.myHand=m.hand||[];"
+          new_state = "state=m.state;\n\n    if(mode==='player')\n      window.myHand=m.hand||[];\n\n    if(mode==='player' && m.lastCardBonus!=null){\n      lastCardActive=Number(m.lastCardBonus)>0;\n      lastCardAmount=Number(m.lastCardBonus)||0;\n    }"
+          if old_state not in s:
+              raise SystemExit('state handler block not found')
+          s = s.replace(old_state, new_state, 1)
+
+          old_hand = '''  $('betBtn').classList.toggle(
+    'hidden',
+    h.length!==2
+  );'''
+          new_hand = '''  // The old 2-card BET YOUR HAND button is no longer used.
+  $('betBtn').classList.add('hidden');
+
+  const lastBtn=$('lastCardBtn');
+  if(lastBtn){
+    const showLast=isTurn && h.length===1 && !lastCardActive && !state.pending && state.phase==='playing';
+    lastBtn.classList.toggle('hidden',!showLast);
+    lastBtn.disabled=!showLast;
+    lastBtn.textContent=lastCardActive ? '🔥 LAST CARD +'+lastCardAmount+' ACTIVE' : '🔥 LAST CARD';
+  }'''
+          if old_hand not in s:
+              raise SystemExit('old hand button block not found')
+          s = s.replace(old_hand, new_hand, 1)
+
+          old_open = '''function openBet(){
+  if((window.myHand||[]).length!==2){
+    toast('BET YOUR HAND appears when you have exactly 2 cards.');
+    return;
+  }
+
+  betAmount=50;
+  updateBet();
+  $('betPanel').classList.remove('hidden');
+}'''
+          new_open = '''function openBet(){
+  // Kept only so any stale page code cannot activate the removed 2-card mechanic.
+  toast('The 2-card BET YOUR HAND mechanic has been removed.');
+}'''
+          if old_open not in s:
+              raise SystemExit('openBet block not found')
+          s = s.replace(old_open, new_open, 1)
+
+          marker2 = 'function sendChallenge(){'
+          last_js = '''function openLastCard(){
+  if((window.myHand||[]).length!==1){
+    toast('LAST CARD is available only with 1 card.');
+    return;
+  }
+  if(state?.players?.[state.turn]?.id!==myId){
+    toast('It is not your turn.');
+    return;
+  }
+  if(lastCardActive){
+    toast('LAST CARD bonus is already active.');
+    return;
+  }
+  $('lastCardPanel').classList.remove('hidden');
+}
+
+function closeLastCard(){
+  $('lastCardPanel').classList.add('hidden');
+}
+
+function sendLastCard(amount){
+  amount=Number(amount);
+  if(![100,250,500].includes(amount)) return;
+  send({type:'lastCard',amount});
+  closeLastCard();
+}
+
+'''
+          if marker2 not in s:
+              raise SystemExit('sendChallenge marker not found')
+          s = s.replace(marker2, last_js + marker2, 1)
+
+          # Remove any visible old 2-card wording from the stale modal without deleting the BET challenge card flow.
+          s = s.replace("<p>You're down to 2 cards. Choose a fictional game-point wager.</p>", "<p>The old 2-card wager is no longer used.</p>", 1)
+          s = s.replace('<button class="btn primary big" onclick="sendBet()">PLACE WAGER</button>', '<button class="btn primary big" onclick="closeBet()">CLOSE</button>', 1)
+          s = s.replace('<button class="btn" onclick="changeBet(-50)">−50</button>\n<button class="btn" onclick="changeBet(50)">+50</button>\n<button class="btn" onclick="betAll()">ALL</button>', '', 1)
+
+          # Server already enforces LAST CARD. Make the client aware of the private bonus state on state/welcome/resume messages.
+          s = s.replace("window.myHand=m.hand||[];\n\n    saveSession();", "window.myHand=m.hand||[];\n    lastCardActive=Number(m.lastCardBonus||0)>0;\n    lastCardAmount=Number(m.lastCardBonus||0);\n\n    saveSession();", 2)
+
+          index.write_text(s)
+
+          server = Path('server.js')
+          ss = server.read_text()
+          old = "send(p.ws,{type:'state',state:pub(r),hand:p.hand,me:p.id,log:r.log})"
+          new = "send(p.ws,{type:'state',state:pub(r),hand:p.hand,me:p.id,lastCardBonus:p.lastCardBonus||null,log:r.log})"
+          if old not in ss:
+              raise SystemExit('server broadcast state line not found')
+          ss = ss.replace(old,new,1)
+          old2 = "else if(p)send(ws,{type:'state',state:pub(r),hand:p.hand,me:p.id,log:r.log})"
+          new2 = "else if(p)send(ws,{type:'state',state:pub(r),hand:p.hand,me:p.id,lastCardBonus:p.lastCardBonus||null,log:r.log})"
+          if old2 not in ss:
+              raise SystemExit('server sync state line not found')
+          ss = ss.replace(old2,new2,1)
+          server.write_text(ss)
+
+          # Ensure no second/2-card bonus implementation is present.
+          if 'bonus2' in ss or 'bonus2' in s:
+              raise SystemExit('unexpected 2-card bonus code found')
+
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html server.js .github/workflows/apply-last-card.yml
+          git rm .github/workflows/apply-last-card.yml
+          git commit -m 'Replace 2-card mechanic with LAST CARD' || exit 0
+          git push
