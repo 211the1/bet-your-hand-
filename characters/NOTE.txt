@@ -1,1 +1,0 @@
-Character images are supplied as the game's centered 3x3 sprite asset. Each square is one of the nine characters in this order: Bug, Face, Ling Ling, Beanz, The One, Boone, Chicken Joe, Juby, Meemaw.
