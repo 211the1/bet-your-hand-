@@ -42,6 +42,9 @@
   }
 
   const arcade=document.createElement('script');
-  arcade.src='/arcade-ui-v2.js?v=2';
+  arcade.src='/arcade-ui-v2.js?v=3';
   document.head.appendChild(arcade);
+  const call=document.createElement('script');
+  call.src='/call-button.js?v=1';
+  document.head.appendChild(call);
 })();
