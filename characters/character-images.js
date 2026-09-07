@@ -9,8 +9,8 @@
       let im=b.querySelector('.charImg');
       if(!im){im=document.createElement('span');im.className='charImg';b.insertBefore(im,b.firstChild);}
       im.style.backgroundImage='url("'+SPRITE+'")';
-      im.style.backgroundSize='300% 300%';
-      im.style.backgroundPosition=pos[ch]||'50% 50%';
+      im.style.backgroundSize='300% auto';
+      im.style.backgroundPosition=(pos[ch]||'50% 50%').replace(/ (\d+)%$/, ' 22%');
       im.setAttribute('aria-label',ch);
     });
   }
@@ -20,7 +20,7 @@
       const ch=smalls[0].textContent.trim(); if(chars.indexOf(ch)<0)return;
       let im=d.querySelector('.playerCharImg');
       if(!im){im=document.createElement('span');im.className='playerCharImg';d.insertBefore(im,d.firstChild);}
-      im.style.backgroundImage='url("'+SPRITE+'")'; im.style.backgroundSize='300% 300%'; im.style.backgroundPosition=pos[ch];
+      im.style.backgroundImage='url("'+SPRITE+'")'; im.style.backgroundSize='300% auto'; im.style.backgroundPosition=pos[ch];
     });
   }
   function apply(){stylePick();patchPlayerCards();}
