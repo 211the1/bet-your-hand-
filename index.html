@@ -646,6 +646,7 @@ function render(){
     d.className='player '+(i===state.turn?'active':'');
     d.innerHTML=
       '<div class="name">'+escapeHtml(p.name)+'</div>'+
+      '<div class="small">'+escapeHtml(p.character||'No character')+'</div>'+
       '<div class="coins">⭐ '+Number(p.points).toLocaleString()+'</div>'+
       '<div class="small">'+p.handCount+' cards'+
       (p.connected===false?' • reconnecting…':'')+
