@@ -1,0 +1,45 @@
+name: Player Phone UI
+on:
+  push:
+
+jobs:
+  patch:
+    if: ${{ github.event.head_commit.message == 'Run player UI patch' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make player phone the default screen
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          old='''<div class="tabs">\n<button id="hostTab" class="tab active" onclick="showMode(\'host\')">HOST / TV</button>\n<button id="playerTab" class="tab" onclick="showMode(\'player\')">PLAYER PHONE</button>\n</div>'''
+          new='''<div id="roleHeader" class="tabs">\n<button id="playerTab" class="tab active" onclick="showMode(\'player\')">PLAYER'S PHONE</button>\n<button id="hostTab" class="tab" onclick="showMode(\'host\')">HOST / TV</button>\n</div>'''
+          if old not in s:
+              raise SystemExit('tabs block not found')
+          s=s.replace(old,new,1)
+          s=s.replace("let mode='host';","let mode='player';",1)
+          marker="function showMode(m){\n"
+          if marker not in s:
+              raise SystemExit('showMode not found')
+          s=s.replace(marker, "function applyRoleUI(){\n  const isPlayer=mode==='player';\n  $('roleHeader').classList.toggle('hidden', false);\n  $('hostTab').classList.toggle('hidden', isPlayer);\n  $('playerTab').classList.toggle('active', isPlayer);\n  $('hostTab').classList.toggle('active', !isPlayer);\n  $('hostSetup').classList.toggle('hidden', isPlayer);\n  $('playerSetup').classList.toggle('hidden', !isPlayer);\n}\n\n"+marker,1)
+          s=s.replace("  if(mode===m) return;\n\n  manualClose=true;", "  if(mode===m){ applyRoleUI(); return; }\n\n  manualClose=true;",1)
+          s=s.replace("  $('hostTab').classList.toggle('active',m==='host');\n  $('playerTab').classList.toggle('active',m==='player');\n  $('hostSetup').classList.toggle('hidden',m!=='host');\n  $('playerSetup').classList.toggle('hidden',m!=='player');", "  applyRoleUI();",1)
+          # Allow the host to use ?host while the normal URL is player-only.
+          init_marker="const COLORS=['red','blue','green','yellow'];"
+          init_add="""const COLORS=['red','blue','green','yellow'];\n\n// Normal link opens directly to PLAYER'S PHONE. Add ?host for the host/TV screen.\nif(new URLSearchParams(location.search).has('host')) mode='host';\napplyRoleUI();"""
+          s=s.replace(init_marker,init_add,1)
+          # If an old saved host mode exists on a player phone, don't resurrect it unless ?host is present.
+          s=s.replace("const savedMode=localStorage.getItem('byhMode');", "const savedMode=new URLSearchParams(location.search).has('host')?'host':'player';",1) if "const savedMode=localStorage.getItem('byhMode');" in s else s
+          p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Make player phone the default entry screen" || exit 0
+          git push
