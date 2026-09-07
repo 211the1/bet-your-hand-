@@ -1,33 +1,64 @@
-name: Install character images
+name: Install approved character photos
 on:
   push:
     branches: [main]
 jobs:
   patch:
-    if: github.event.head_commit.message == 'Install character images'
+    if: github.event.head_commit.message == 'Install approved character photos'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Install image display
+      - name: Install approved sprite and wire character images
+        env:
+          SPRITE_B64: >-
+            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
         run: |
           python3 - <<'PY'
+          import base64, os
           from pathlib import Path
-          p=Path('index.html')
-          s=p.read_text()
-          css='.charImg{display:block;width:100%;height:100px;border-radius:10px;background-repeat:no-repeat;background-color:#07052d;background-position:center;box-shadow:0 0 10px #0008;margin-bottom:6px}.charPick{overflow:hidden;min-height:150px}.playerCharImg{display:block;width:58px;height:58px;border-radius:50%;background-repeat:no-repeat;background-color:#07052d;background-position:center;background-size:300% 300%;border:2px solid #743cff;margin-bottom:6px}.player.active .playerCharImg{border-color:#ffd21c;box-shadow:0 0 12px #ffd21c88}'
-          marker='.connection{display:inline-block;padding:6px 10px;border-radius:10px;font-weight:900}'
-          if marker not in s: raise SystemExit('CSS marker not found')
-          if '.charImg{' not in s: s=s.replace(marker,marker+css,1)
-          tag='<script src="/characters/character-images.js"></script>'
-          if tag not in s: s=s.replace('</body>',tag+'\n</body>',1)
+          data=base64.b64decode(''.join(os.environ['SPRITE_B64'].split()))
+          Path('characters').mkdir(exist_ok=True)
+          Path('characters/approved-character-sprite.webp').write_bytes(data)
+          js='''/* BET YOUR HAND — exact approved face-focused character photos. */
+(function(){
+  const SPRITE='/characters/approved-character-sprite.webp';
+  const chars=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];
+  const pos={}; chars.forEach((c,i)=>{pos[c]=((i%3)*50)+'% '+(Math.floor(i/3)*50)+'%';});
+  function stylePick(){
+    document.querySelectorAll('.charPick').forEach(function(b){
+      const n=b.querySelector('.charName'); if(!n)return; const ch=n.textContent.trim();
+      let im=b.querySelector('.charImg');
+      if(!im){im=document.createElement('span');im.className='charImg';b.insertBefore(im,b.firstChild);}
+      im.style.backgroundImage='url("'+SPRITE+'")';
+      im.style.backgroundSize='300% 300%';
+      im.style.backgroundPosition=(pos[ch]||'50% 50%');
+      im.setAttribute('aria-label',ch);
+    });
+  }
+  function patchPlayerCards(){
+    document.querySelectorAll('#players .player,#gamePlayers .player').forEach(function(d){
+      const smalls=d.querySelectorAll('.small'); if(smalls.length<1)return;
+      const ch=smalls[0].textContent.trim(); if(chars.indexOf(ch)<0)return;
+      let im=d.querySelector('.playerCharImg');
+      if(!im){im=document.createElement('span');im.className='playerCharImg';d.insertBefore(im,d.firstChild);}
+      im.style.backgroundImage='url("'+SPRITE+'")'; im.style.backgroundSize='300% 300%'; im.style.backgroundPosition=pos[ch];
+    });
+  }
+  function apply(){stylePick();patchPlayerCards();}
+  window.addEventListener('load',apply); setInterval(apply,700);
+})();
+'''
+          Path('characters/character-images.js').write_text(js)
+          p=Path('index.html'); s=p.read_text()
+          s=s.replace('height:100px','height:140px').replace('min-height:150px','min-height:190px')
           p.write_text(s)
           PY
       - name: Commit
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add index.html
-          git commit -m 'Install character images' || exit 0
+          git add characters/approved-character-sprite.webp characters/character-images.js index.html
+          git commit -m 'Apply approved character photos'
           git push
