@@ -1,0 +1,92 @@
+name: Install approved character photos
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Move approved photos into characters folder
+        shell: bash
+        run: |
+          set -e
+          mkdir -p characters
+          for f in Bug Face Ling_Ling Beanz The_One Boone Chicken_Joe Juby Meemaw; do
+            if [ -f "$f.jpg" ]; then
+              mv "$f.jpg" "characters/$f.jpg"
+            fi
+          done
+
+      - name: Connect game to individual character photos
+        shell: bash
+        run: |
+          cat > characters/character-images.js <<'EOF'
+/* BET YOUR HAND — approved character photos */
+(function(){
+  const chars = ['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];
+  const files = {
+    'Bug':'Bug.jpg', 'Face':'Face.jpg', 'Ling Ling':'Ling_Ling.jpg',
+    'Beanz':'Beanz.jpg', 'The One':'The_One.jpg', 'Boone':'Boone.jpg',
+    'Chicken Joe':'Chicken_Joe.jpg', 'Juby':'Juby.jpg', 'Meemaw':'Meemaw.jpg'
+  };
+  const pathFor = name => 'characters/' + (files[name] || 'Bug.jpg');
+
+  function install(el, name, player){
+    if(!el || !name) return;
+    const src = pathFor(name);
+    el.style.backgroundImage = 'url("' + src + '")';
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center center';
+    el.style.backgroundRepeat = 'no-repeat';
+    el.classList.add(player ? 'playerCharImg' : 'charImg');
+    el.setAttribute('aria-label', name);
+  }
+
+  function refresh(){
+    document.querySelectorAll('.charPick').forEach(function(btn){
+      const name = btn.dataset.char || btn.dataset.character || btn.getAttribute('data-name') || btn.textContent.trim();
+      if(!name) return;
+      let img = btn.querySelector('.charImg');
+      if(!img){ img = document.createElement('div'); img.className='charImg'; btn.prepend(img); }
+      install(img, name, false);
+    });
+
+    document.querySelectorAll('[data-character]').forEach(function(el){
+      const name = el.dataset.character;
+      if(!name || el.classList.contains('charPick')) return;
+      let img = el.querySelector('.playerCharImg');
+      if(!img){ img = document.createElement('div'); img.className='playerCharImg'; el.prepend(img); }
+      install(img, name, true);
+    });
+  }
+
+  const css = document.createElement('style');
+  css.textContent = '.charImg,.playerCharImg{display:block;width:100%;aspect-ratio:1/1;min-height:0;border-radius:12px;background-color:#111;overflow:hidden;background-position:center center;background-repeat:no-repeat;background-size:cover;} .charImg{margin-bottom:6px;} .playerCharImg{width:72px;height:72px;aspect-ratio:1/1;flex:0 0 72px;}';
+  document.head.appendChild(css);
+  window.BYHCharacterImages = { chars, pathFor, refresh };
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', refresh); else refresh();
+  new MutationObserver(refresh).observe(document.documentElement,{subtree:true,childList:true});
+})();
+EOF
+
+      - name: Commit installed photos and wiring
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add characters
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "Use approved character photos in game"
+            git push
+          fi
