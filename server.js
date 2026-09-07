@@ -56,6 +56,12 @@ function playable(r,c){
   return false;
 }
 function hasPlayable(r,p){ return p.hand.some(c=>playable(r,c)); }
+function hasColorOrCharacterMatch(r,p){
+  const t=top(r);
+  if(!t) return true;
+  const color=effectiveColor(r);
+  return p.hand.some(c=>(c.color && c.color===color)||(c.ch && t.ch && c.ch===t.ch));
+}
 function pub(r){
   return {
     phase:r.phase, round:r.round, turn:r.turn, direction:r.direction, discard:r.discard,
@@ -155,9 +161,9 @@ function color(r,p,c){
 function draw(r,p){
   if(r.phase!=='playing'||r.pending)return send(p.ws,{type:'toast',text:'Finish the current action first.'});
   if(r.players[r.turn]?.id!==p.id)return send(p.ws,{type:'toast',text:'It is not your turn.'});
-  if(hasPlayable(r,p))return send(p.ws,{type:'toast',text:'You have a playable card. Play it.'});
-  let count=0;while(!hasPlayable(r,p)&&count<150){if(!drawOne(r,p))break;count++;}
-  log(r,`${p.name} drew ${count} card${count===1?'':'s'} until a playable card was found.`);broadcast(r);
+  if(hasColorOrCharacterMatch(r,p))return send(p.ws,{type:'toast',text:'You have a card matching the current color or character. Play it or use a special card.'});
+  let count=0;while(!hasColorOrCharacterMatch(r,p)&&count<150){if(!drawOne(r,p))break;count++;}
+  log(r,`${p.name} drew ${count} card${count===1?'':'s'} until a color or character match was found.`);broadcast(r);
 }
 function roomCode(){let c;do{c=String(Math.floor(1000+Math.random()*9000));}while(rooms.has(c));return c;}
 function create(ws,name){
@@ -184,7 +190,7 @@ function resumePlayer(ws,code,token){
   const r=rooms.get(code);if(!r)return send(ws,{type:'error',text:'ROOM SESSION EXPIRED.'});
   const p=r.players.find(x=>x.token===token);if(!p)return send(ws,{type:'error',text:'PLAYER SESSION EXPIRED. Join the room again.'});
   if(p.timer){clearTimeout(p.timer);p.timer=null;}p.ws=ws;p.disconnectedAt=null;ws.role='player';ws.roomCode=code;ws.playerId=p.id;ws.resumeToken=p.token;ws.isAlive=true;
-  send(ws,{type:'playerResumed',id:p.id,token,state:pub(r),hand:p.hand,log:r.log});log(r,`${p.name} reconnected.`);broadcast(r);
+  send(ws,{type:'playerResumed',id:p.id,token,state,hand:p.hand,log:r.log});log(r,`${p.name} reconnected.`);broadcast(r);
 }
 function handle(ws,m){
   if(!m||typeof m!=='object')return;
@@ -212,8 +218,8 @@ const CLIENT_PATCH=`
 <script>
 (function(){
   function syncPending(){
-    if(!window.state)return;
-    var p=window.state.pending;
+    if(typeof state==='undefined')return;
+    var p=state.pending;
     var bet=document.getElementById('betPanel');
     var challenge=document.getElementById('challengePanel');
     var color=document.getElementById('colorPanel');
@@ -224,12 +230,12 @@ const CLIENT_PATCH=`
     wheel.classList.add('hidden');
     if(!p)return;
     if(p.type==='bet'){
-      if(window.myId===p.playerId){
+      if(myId===p.playerId){
         bet.classList.add('hidden');
         var label=document.getElementById('myTurnLabel');
         if(label)label.textContent='BET YOUR HAND ACTIVE — WAITING FOR CHALLENGE';
-        if(window.toast)toast('BET YOUR HAND is active — waiting 12 seconds for a challenge.');
-      }else if(window.mode==='player'){
+        if(typeof toast==='function')toast('BET YOUR HAND is active — waiting 12 seconds for a challenge.');
+      }else if(mode==='player'){
         var txt=document.getElementById('challengeText');
         if(txt)txt.textContent=p.playerName+' played BET YOUR HAND. Enter fictional game points to challenge.';
         var amt=document.getElementById('challengeAmount');
@@ -237,23 +243,30 @@ const CLIENT_PATCH=`
         challenge.classList.remove('hidden');
       }
     }else if(p.type==='color'){
-      if(window.mode==='player'&&window.myId===p.playerId)color.classList.remove('hidden');
+      if(mode==='player'&&myId===p.playerId)color.classList.remove('hidden');
     }else if(p.type==='wheel'){
       var wt=document.getElementById('wheelText');
       if(wt)wt.textContent=p.playerName+' won '+Number(p.amount||0).toLocaleString()+' fictional game points. Wheel: '+(p.wheel||'—')+(p.wheelAmount!=null?' • '+Number(p.wheelAmount).toLocaleString():'');
       wheel.classList.remove('hidden');
     }
   }
+  function syncDraw(){
+    if(typeof state==='undefined')return;
+    var b=document.getElementById('drawBtn');
+    if(!b||mode!=='player'||!state||state.phase!=='playing'||state.pending)return;
+    var me=state.players&&state.players.find(function(x){return x.id===myId;});
+    if(me&&state.players[state.turn]&&state.players[state.turn].id===myId)b.disabled=false;
+  }
   var tries=0;
   var timer=setInterval(function(){
-    if(typeof window.render==='function'){
-      var old=window.render;
-      window.render=function(){old.apply(this,arguments);syncPending();};
-      clearInterval(timer);syncPending();
+    if(typeof render==='function'){
+      var old=render;
+      render=function(){old.apply(this,arguments);syncPending();syncDraw();};
+      clearInterval(timer);syncPending();syncDraw();
     }
     if(++tries>100)clearInterval(timer);
   },50);
-  window.addEventListener('load',function(){setTimeout(syncPending,100);});
+  window.addEventListener('load',function(){setTimeout(function(){syncPending();syncDraw();},100);});
 })();
 </script>`;
 
