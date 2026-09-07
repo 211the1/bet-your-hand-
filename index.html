@@ -225,7 +225,7 @@ header{text-align:center;padding:8px 0 14px}
 <script>
 const $=id=>document.getElementById(id);
 
-let mode='player';
+let mode=localStorage.getItem('byhMode')||'player';
 let ws=null;
 let state=null;
 let myId='';
@@ -242,6 +242,7 @@ const COLORS=['red','blue','green','yellow'];
 
 // Normal link opens directly to PLAYER'S PHONE. Add ?host for the host/TV screen.
 if(new URLSearchParams(location.search).has('host')) mode='host';
+if(mode!=='host' && mode!=='player') mode='player';
 applyRoleUI();
 
 function toast(t){
