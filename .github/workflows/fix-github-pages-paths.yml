@@ -52,3 +52,5 @@ jobs:
           git add index.html characters/character-images.js host-tv-lobby.js
           git diff --cached --quiet || git commit -m 'Fix GitHub Pages asset paths'
           git push
+
+      # Re-run after any earlier workflow race so the static site always gets the final path fix.
