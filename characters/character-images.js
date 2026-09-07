@@ -41,4 +41,9 @@
     s.src='/host-tv-lobby.js';
     document.head.appendChild(s);
   }
+
+  // Load the complete Modern Arcade game UI after the original game code exists.
+  const arcade=document.createElement('script');
+  arcade.src='/arcade-ui.js?v=1';
+  document.head.appendChild(arcade);
 })();
