@@ -825,5 +825,53 @@ window.activateLast=function(a){closeLast();if(!ws||ws.readyState!==WebSocket.OP
 function syncLast(){lastCardModal();var b=document.getElementById('betBtn');if(b)b.classList.add('hidden');var wrap=document.querySelector('#playerGameArea .actions');if(!wrap)return;var h=window.myHand||[];var x=document.getElementById('lastCardBtn');if(!x){x=document.createElement('button');x.id='lastCardBtn';x.className='btn big';x.textContent='🔥 LAST CARD';x.onclick=function(){if(h.length!==1){toast('LAST CARD appears with exactly 1 card.');return}document.getElementById('lastCardPanel').classList.remove('hidden')};wrap.appendChild(x)}x.classList.toggle('hidden',h.length!==1);x.disabled=!(state&&state.players&&state.players[state.turn]&&state.players[state.turn].id===myId)||!!state.pending||state.phase!=='playing';}
 var n=0,t=setInterval(function(){if(typeof render==='function'){var old=render;window.render=function(){old.apply(this,arguments);syncLast()};clearInterval(t)}syncLast();if(++n>100)clearInterval(t)},100);
 })();</script>
+<!-- BYH_LAST_CARD_PATCH -->
+<script>
+(function(){
+  var lastCardActive=false,lastCardAmount=0;
+  function ensureLastCardUI(){
+    var old=document.getElementById('betBtn'); if(old) old.classList.add('hidden');
+    var area=document.querySelector('#playerGameArea .actions');
+    if(area && !document.getElementById('lastCardBtn')){
+      var b=document.createElement('button');
+      b.id='lastCardBtn'; b.className='btn primary big hidden'; b.type='button';
+      b.textContent='🔥 LAST CARD'; b.onclick=openLastCard; area.appendChild(b);
+    }
+    if(!document.getElementById('lastCardPanel')){
+      var bg=document.createElement('div'); bg.id='lastCardPanel'; bg.className='modalbg hidden';
+      bg.innerHTML='<div class="modal"><h2>🔥 LAST CARD</h2><p>Choose your fictional game-point bonus before playing your final card.</p><div class="actions"><button class="btn big" onclick="sendLastCard(100)">SAFE +100</button><button class="btn big" onclick="sendLastCard(250)">BOLD +250</button><button class="btn primary big" onclick="sendLastCard(500)">BIG +500</button></div><div class="actions"><button class="btn" onclick="closeLastCard()">CANCEL</button></div></div>';
+      document.body.appendChild(bg);
+    }
+  }
+  function refreshLastCard(){
+    ensureLastCardUI();
+    var h=window.myHand||[],b=document.getElementById('lastCardBtn'); if(!b)return;
+    if(h.length!==1)lastCardActive=false;
+    var turn=state&&state.players&&state.players[state.turn]&&state.players[state.turn].id===myId;
+    var show=mode==='player'&&turn&&h.length===1&&!lastCardActive&&!(state&&state.pending)&&state&&state.phase==='playing';
+    b.classList.toggle('hidden',!show); b.disabled=!show;
+    b.textContent=lastCardActive?'🔥 LAST CARD +'+lastCardAmount+' ACTIVE':'🔥 LAST CARD';
+  }
+  window.openLastCard=function(){
+    refreshLastCard();
+    var h=window.myHand||[];
+    if(h.length!==1){toast('LAST CARD is available only with 1 card.');return;}
+    if(lastCardActive){toast('LAST CARD bonus is already active.');return;}
+    document.getElementById('lastCardPanel').classList.remove('hidden');
+  };
+  window.closeLastCard=function(){var x=document.getElementById('lastCardPanel');if(x)x.classList.add('hidden');};
+  window.sendLastCard=function(amount){amount=Number(amount);if([100,250,500].indexOf(amount)<0)return;send({type:'lastCard',amount:amount});closeLastCard();};
+  var oldRender=render;
+  render=function(){oldRender.apply(this,arguments);refreshLastCard();};
+  var oldHandle=handle;
+  handle=function(m){
+    if(m&&m.type==='lastCardPlaced'){lastCardActive=true;lastCardAmount=Number(m.amount)||0;toast('LAST CARD bonus activated: +'+lastCardAmount);}
+    oldHandle.apply(this,arguments);refreshLastCard();
+  };
+  window.addEventListener('load',function(){refreshLastCard();});
+  setInterval(refreshLastCard,500);
+})();
+</script>
+
 </body>
 </html>
