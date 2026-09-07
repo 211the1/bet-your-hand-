@@ -1,0 +1,47 @@
+name: Apply final-card bonus rule
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-last-card.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch game
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('server.js')
+          s=p.read_text()
+          marker='LAST_CARD_RULE_V1'
+          if marker not in s:
+              s=s.replace("function pub(r){return{", "// LAST_CARD_RULE_V1\nfunction lastCard(r,p,amount){if(r.phase!=='playing'||r.pending)return send(p.ws,{type:'toast',text:'Finish the current action first.'});if(r.players[r.turn]?.id!==p.id)return send(p.ws,{type:'toast',text:'It is not your turn.'});if(p.hand.length!==1)return send(p.ws,{type:'toast',text:'LAST CARD is available only with 1 card.'});if(p.lastCardBonus)return send(p.ws,{type:'toast',text:'LAST CARD bonus is already active.'});amount=Math.floor(Number(amount)||0);if(![100,250,500].includes(amount))return send(p.ws,{type:'toast',text:'Choose SAFE, BOLD, or BIG.'});p.lastCardBonus=amount;log(r,`${p.name} activated LAST CARD for a possible +${amount} bonus.`);send(p.ws,{type:'lastCardPlaced',amount});broadcast(r)}\nfunction pub(r){return{")
+              s=s.replace("p.hand.splice(i,1);r.discard.push(c);log(r,`${p.name} played ${c.action==='BET'?'BET YOUR HAND':c.action||c.ch}.`);if(p.hand.length===0)", "p.hand.splice(i,1);r.discard.push(c);log(r,`${p.name} played ${c.action==='BET'?'BET YOUR HAND':c.action||c.ch}.`);if(p.lastCardBonus){const b=p.lastCardBonus;p.lastCardBonus=null;p.points+=b;log(r,`${p.name} completed LAST CARD and earned +${b} bonus points.`)}if(p.hand.length===0)")
+              s=s.replace("if(hasColorOrCharacterMatch(r,p))return send(p.ws,{type:'toast',text:'You have a card matching the current color or character.'});let count=0;", "if(hasColorOrCharacterMatch(r,p))return send(p.ws,{type:'toast',text:'You have a card matching the current color or character.'});p.lastCardBonus=null;let count=0;")
+              s=s.replace("hand:[],ws,disconnectedAt:null,timer:null};", "hand:[],ws,disconnectedAt:null,timer:null,lastCardBonus:null};")
+              s=s.replace("else if(m.type==='bet')challenge(r,p,m.amount);else if(m.type==='color')color(r,p,m.color)", "else if(m.type==='bet')challenge(r,p,m.amount);else if(m.type==='lastCard')lastCard(r,p,m.amount);else if(m.type==='color')color(r,p,m.color)")
+              p.write_text(s)
+          i=Path('index.html')
+          h=i.read_text()
+          if 'LAST_CARD_UI_V1' not in h:
+              patch='''<script>/* LAST_CARD_UI_V1 */\n(function(){\nfunction lastCardModal(){if(document.getElementById('lastCardPanel'))return;var d=document.createElement('div');d.id='lastCardPanel';d.className='modalbg hidden';d.innerHTML='<div class="modal"><h2>🔥 LAST CARD</h2><p>One card left. Choose a bonus. Successfully play your final card to earn it.</p><div class="actions"><button class="btn" onclick="activateLast(100)">SAFE<br>+100</button><button class="btn primary" onclick="activateLast(250)">BOLD<br>+250</button><button class="btn" style="background:linear-gradient(135deg,#f3bd18,#ff7b00);color:#17110b" onclick="activateLast(500)">BIG<br>+500</button></div><div class="actions"><button class="btn" onclick="closeLast()">CANCEL</button></div></div>';document.body.appendChild(d)}\nwindow.closeLast=function(){var d=document.getElementById('lastCardPanel');if(d)d.classList.add('hidden')};\nwindow.activateLast=function(a){closeLast();if(!ws||ws.readyState!==WebSocket.OPEN){toast('Not connected yet. Reconnecting…');return}send({type:'lastCard',amount:a});};\nfunction syncLast(){lastCardModal();var b=document.getElementById('betBtn');if(b)b.classList.add('hidden');var wrap=document.querySelector('#playerGameArea .actions');if(!wrap)return;var h=window.myHand||[];var x=document.getElementById('lastCardBtn');if(!x){x=document.createElement('button');x.id='lastCardBtn';x.className='btn big';x.textContent='🔥 LAST CARD';x.onclick=function(){if(h.length!==1){toast('LAST CARD appears with exactly 1 card.');return}document.getElementById('lastCardPanel').classList.remove('hidden')};wrap.appendChild(x)}x.classList.toggle('hidden',h.length!==1);x.disabled=!(state&&state.players&&state.players[state.turn]&&state.players[state.turn].id===myId)||!!state.pending||state.phase!=='playing';}\nvar n=0,t=setInterval(function(){if(typeof render==='function'){var old=render;window.render=function(){old.apply(this,arguments);syncLast()};clearInterval(t)}syncLast();if(++n>100)clearInterval(t)},100);\n})();</script>'''
+              h=h.replace('</body>',patch+'\n</body>')
+              i.write_text(h)
+          PY
+          node --check server.js
+      - name: Commit patched game
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add server.js index.html
+          git commit -m 'Replace two-card mechanic with final-card bonus' || exit 0
+          git push
+      - name: Remove patch workflow
+        run: |
+          git rm .github/workflows/apply-last-card.yml
+          git commit -m 'Remove temporary final-card patch workflow' || exit 0
+          git push
