@@ -10,7 +10,7 @@
       if(!im){im=document.createElement('span');im.className='charImg';b.insertBefore(im,b.firstChild);}
       im.style.backgroundImage='url("'+SPRITE+'")';
       im.style.backgroundSize='300% auto';
-      im.style.backgroundPosition=(pos[ch]||'50% 50%').replace(/ (\d+)%$/, ' 22%');
+      im.style.backgroundPosition=(pos[ch]||'50% 50%');
       im.setAttribute('aria-label',ch);
     });
   }
