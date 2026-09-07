@@ -1,0 +1,51 @@
+name: Finish Host TV
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/finish-host-tv.yml'
+permissions:
+  contents: write
+jobs:
+  finish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Attach host TV lobby and remove one-time workflow
+        run: |
+          set -e
+          git fetch origin main
+          git reset --hard origin/main
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          tag='<script src="/host-tv-lobby.js"></script>\n'
+          if tag not in s:
+              marker='</body>'
+              if marker not in s:
+                  raise SystemExit('Could not find </body> in index.html')
+              s=s.replace(marker,tag+marker,1)
+              p.write_text(s)
+          PY
+          git rm -f .github/workflows/finish-host-tv.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Attach Host TV lobby' || true
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort; git reset --hard origin/main; git fetch origin main; }
+            if git push origin HEAD:main; then exit 0; fi
+            git reset --hard origin/main
+            python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text(); tag='<script src="/host-tv-lobby.js"></script>\n'
+          if tag not in s and '</body>' in s: p.write_text(s.replace('</body>',tag+'</body>',1))
+          PY
+            git add index.html
+            git commit -m 'Attach Host TV lobby' || true
+          done
+          exit 1
