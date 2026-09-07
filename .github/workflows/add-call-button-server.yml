@@ -1,0 +1,36 @@
+name: Enable multiplayer call button
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add call message handling
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('server.js')
+          s=p.read_text()
+          needle="if(m.type==='play')play(r,p,Number(m.index));"
+          insert="if(m.type==='call'){const a=currentPlayer(r);if(a&&a.id!==p.id){send(a.ws,{type:'toast',text:p.name+' is calling you to play.'});log(r,p.name+' called '+a.name+' to play.')}return;}"+needle
+          if "if(m.type==='call')" not in s and needle in s:
+              s=s.replace(needle,insert,1)
+              p.write_text(s)
+          PY
+
+      - name: Commit server patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add server.js
+          git diff --cached --quiet || git commit -m 'Enable multiplayer call button'
+          git push
