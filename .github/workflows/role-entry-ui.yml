@@ -1,0 +1,49 @@
+name: Separate Host and Player Entry
+on:
+  push:
+
+jobs:
+  patch:
+    if: ${{ github.event.head_commit.message == 'Separate host and player entry' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Separate host and player entry screens
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          old='''<div id="roleHeader" class="tabs">\n<button id="playerTab" class="tab active" onclick="showMode('player')">PLAYER'S PHONE</button>\n<button id="hostTab" class="tab" onclick="showMode('host')">HOST / TV</button>\n</div>'''
+          new='''<div id="roleHeader" class="tabs">\n<div id="roleTitle" class="tab active">PLAYER'S PHONE</div>\n</div>'''
+          if old in s:
+              s=s.replace(old,new,1)
+          else:
+              raise SystemExit('role header block not found')
+          old_js="""function applyRoleUI(){\n  const isPlayer=mode==='player';\n  $('roleHeader').classList.toggle('hidden', false);\n  $('hostTab').classList.toggle('hidden', isPlayer);\n  $('playerTab').classList.toggle('active', isPlayer);\n  $('hostTab').classList.toggle('active', !isPlayer);\n  $('hostSetup').classList.toggle('hidden', isPlayer);\n  $('playerSetup').classList.toggle('hidden', !isPlayer);\n}"""
+          new_js="""function applyRoleUI(){\n  const isPlayer=mode==='player';\n  $('roleHeader').classList.toggle('hidden', false);\n  $('roleTitle').textContent=isPlayer?\"PLAYER'S PHONE\":\"HOST / TV\";\n  $('hostSetup').classList.toggle('hidden', isPlayer);\n  $('playerSetup').classList.toggle('hidden', !isPlayer);\n}"""
+          if old_js in s:
+              s=s.replace(old_js,new_js,1)
+          else:
+              raise SystemExit('applyRoleUI block not found')
+          # The clean public URL is player-only. Host uses the explicit ?host entry URL.
+          marker="if(new URLSearchParams(location.search).has('host')) mode='host';"
+          if marker not in s:
+              raise SystemExit('host query marker not found')
+          # Remove the device-local role as a source of the initial role. The URL decides the entry role.
+          s=s.replace("let mode=localStorage.getItem('byhMode')||'player';", "let mode='player';",1)
+          # Keep ?host authoritative on every fresh load, while normal URL is always player.
+          s=s.replace(marker, marker+"\nif(!new URLSearchParams(location.search).has('host')) mode='player';",1)
+          # showMode is no longer an entry selector, but keep it safe for any existing callers.
+          s=s.replace("function showMode(m){\n  if(mode===m){ applyRoleUI(); return; }", "function showMode(m){\n  if(m==='host'){ location.search='?host'; return; }\n  location.search='';\n  return;\n\n  if(mode===m){ applyRoleUI(); return; }",1)
+          p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Separate host and player entry" || exit 0
+          git push
