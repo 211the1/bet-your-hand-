@@ -1,14 +1,8 @@
 name: Fix GitHub Pages paths
-
 on:
   workflow_dispatch:
-
-permissions:
-  contents: write
-
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify
-        run: echo "GitHub Pages path fix is already applied directly to main."
+      - run: echo "Pages path fix is already committed."
