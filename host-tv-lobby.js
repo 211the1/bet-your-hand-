@@ -28,7 +28,9 @@
     .count{text-align:center;font-size:clamp(12px,1.2vw,22px);font-weight:1000;margin-bottom:5px;color:#fff}
     .players{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:6px;flex:1;min-height:0}
     .p{border:2px solid #2670ff;border-radius:12px;background:linear-gradient(145deg,#08082bf5,#030318f5);display:grid;grid-template-columns:clamp(48px,5.1vw,82px) 1fr;grid-template-rows:auto auto auto;gap:1px 7px;align-content:center;padding:6px;overflow:hidden;min-height:0}
-    .p.active{border-color:#ffd21c;box-shadow:0 0 24px #ffd21caa,0 0 5px #fff inset}
+    .p.active{border-color:#ffd21c;box-shadow:0 0 24px #ffd21caa,0 0 5px #fff inset;animation:htvFlame .8s ease-in-out infinite alternate}
+    .p.active:after{content:'🔥 YOUR TURN';position:absolute;inset:0;box-shadow:inset 0 0 18px #ff7a1f66;pointer-events:none;border-radius:10px}
+    @keyframes htvFlame{to{filter:brightness(1.18);transform:translateY(-1px)}}
     .p img{grid-row:1/4;width:clamp(48px,5.1vw,82px);height:clamp(48px,5.1vw,82px);object-fit:cover;object-position:center;border-radius:10px;border:3px solid var(--c);box-shadow:0 0 12px var(--c)}
     .pn{font-weight:1000;font-size:clamp(12px,1.15vw,21px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;align-self:end}
     .pc{font-size:clamp(8px,.78vw,14px);color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -39,8 +41,8 @@
     .start{display:block;margin:5px auto 1px;width:min(38%,390px);font-size:clamp(16px,1.45vw,28px)!important;padding:7px 14px!important;border:3px solid #fff!important;box-shadow:0 0 25px #a33cff!important}
     .htvRules{padding:8px}
     .htvRules h3{text-align:center;color:#fff;font-size:clamp(12px,1.3vw,24px);margin:2px 0 5px}
-    .wheel{width:min(120px,8vw);height:min(120px,8vw);margin:0 auto 6px;border-radius:50%;border:4px solid #fff;background:conic-gradient(#ffd21c 0 12.5%,#236cff 12.5% 25%,#24d77a 25% 37.5%,#ff3145 37.5% 50%,#713bff 50% 62.5%,#24d77a 62.5% 75%,#236cff 75% 87.5%,#ffbd19 87.5%);position:relative;box-shadow:0 0 18px #246dff88}
-    .wheel:after{content:'BET\\A YOUR\\A HAND';white-space:pre;text-align:center;position:absolute;inset:28%;border-radius:50%;background:#08082b;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:clamp(6px,.55vw,10px);font-weight:1000}
+    .wheel{width:min(120px,8vw);height:min(120px,8vw);margin:0 auto 6px;border-radius:50%;border:4px solid #fff;background:conic-gradient(#ffd21c 0 11.11%,#236cff 11.11% 22.22%,#24d77a 22.22% 33.33%,#ff3145 33.33% 44.44%,#713bff 44.44% 55.55%,#24d77a 55.55% 66.66%,#236cff 66.66% 77.77%,#ffbd19 77.77% 88.88%,#ff3145 88.88%);position:relative;box-shadow:0 0 18px #246dff88}
+    .wheel:after{content:'POWER\\A WHEEL';white-space:pre;text-align:center;position:absolute;inset:28%;border-radius:50%;background:#08082b;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:clamp(6px,.55vw,10px);font-weight:1000}
     .rule{font-size:clamp(7px,.72vw,13px);line-height:1.13;margin:6px 0;color:#eee}
     .rule b{color:#ffd21c}
     .bottom{grid-column:1/-1;border-top:2px solid #15164d;background:#010109;display:flex;justify-content:space-around;align-items:center;font-size:clamp(7px,.68vw,13px);font-weight:900;white-space:nowrap;overflow:hidden}
@@ -75,7 +77,7 @@
     const table=document.createElement('div');table.className='table';const deck=document.createElement('div');deck.className='deck';deck.textContent='BET YOUR HAND';table.appendChild(deck);main.appendChild(table);
     const start=document.createElement('button');start.className='btn primary big start';start.textContent='START GAME';start.disabled=ps.length<2;start.onclick=startGame;main.appendChild(start);
     const rules=document.createElement('div');rules.className='htvRules';
-    rules.innerHTML='<h3>BET WHEEL PREVIEW</h3><div class="wheel"></div><h3>QUICK RULES</h3><div class="rule">🃏 Match <b>color or character.</b></div><div class="rule">🔄 Action cards can change the game.</div><div class="rule">⭐ <b>+150</b> when a turn starts with a playable card.</div><div class="rule">🔥 <b>LAST CARD</b> appears at 1 card.</div><div class="rule">🎡 <b>BET YOUR HAND</b> can trigger the challenge wheel.</div><div class="rule">🏆 First player to 0 cards wins the round.</div><div class="rule">🏁 <b>Two rounds.</b> Highest total wins.</div>';
+    rules.innerHTML='<h3>POWER WHEEL PREVIEW</h3><div class="wheel"></div><h3>QUICK RULES</h3><div class="rule">🃏 Match <b>color or character.</b></div><div class="rule">🔄 Action cards can change the game.</div><div class="rule">⭐ <b>+150</b> when a turn starts with a playable card.</div><div class="rule">🔥 <b>LAST CARD</b> appears at 1 card.</div><div class="rule">🎡 <b>BET YOUR HAND</b> triggers the power wheel.</div><div class="rule">🏆 First player to 0 cards wins the round.</div><div class="rule">🏁 <b>Two rounds.</b> Highest total wins.</div>';
     const bottom=document.createElement('div');bottom.className='bottom';bottom.innerHTML='<div><b>👥</b>2–6 PLAYERS</div><div><b>🃏</b>UNO STYLE GAMEPLAY</div><div><b>♛</b>IT’S A GAME NIGHT!</div><div><b>🏆</b>TWO ROUNDS</div><div><b>⚙</b>SETTINGS</div>';
     root.append(side,main,rules,bottom);room.appendChild(root);return true;
   }
