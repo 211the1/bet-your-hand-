@@ -1,8 +1,0 @@
-name: Fix GitHub Pages paths
-on:
-  workflow_dispatch:
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Pages path fix is already committed."
