@@ -18,6 +18,22 @@
     img.style.backgroundRepeat='no-repeat';
     img.setAttribute('aria-label',name);
   }
+  function fixArcadeImages(){
+    document.querySelectorAll('.plA').forEach(function(el){
+      const name=el.querySelector('.pcA')?.textContent?.trim();
+      const image=el.querySelector('img');
+      if(name && image) image.src=src(name);
+    });
+    document.querySelectorAll('.meA').forEach(function(el){
+      const name=el.querySelector('small')?.textContent?.trim();
+      const image=el.querySelector('img');
+      if(name && image) image.src=src(name);
+    });
+    document.querySelectorAll('.charsA img').forEach(function(image){
+      const name=image.getAttribute('title');
+      if(name) image.src=src(name);
+    });
+  }
   function refresh(){
     document.querySelectorAll('.charPick').forEach(function(el){
       const name=el.dataset.char||el.dataset.character||el.getAttribute('data-name');
@@ -28,9 +44,10 @@
       const name=el.dataset.character;
       if(name) addPhoto(el,name,'playerCharImg');
     });
+    fixArcadeImages();
   }
   const style=document.createElement('style');
-  style.textContent='.charImg,.playerCharImg{display:block;width:100%;aspect-ratio:1/1;min-height:0;border-radius:12px;overflow:hidden;background-color:#111;background-position:center center;background-repeat:no-repeat;background-size:cover}.charImg{margin-bottom:6px}.playerCharImg{width:72px;height:72px;flex:0 0 72px}';
+  style.textContent='.charImg,.playerCharImg{display:block;width:100%;aspect-ratio:1/1;min-height:0;border-radius:12px;overflow:hidden;background-color:#111;background-position:center center;background-repeat:no-repeat;background-size:cover}.charImg{margin-bottom:6px}.playerCharImg{width:72px;height:72px;flex:0 0 72px}.plA.active:after{content:''!important}.plA.active{box-shadow:0 0 24px #ff9a1faa,inset 0 0 18px #ff6a1f44!important}';
   document.head.appendChild(style);
   window.BYHCharacterImages={chars,src,refresh};
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',refresh); else refresh();
