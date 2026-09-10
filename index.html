@@ -26,7 +26,7 @@
 <div id="toast" class="hidden" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#ffd21c;color:#15102f;padding:12px 18px;border-radius:15px;font-weight:1000;z-index:100"></div>
 </main></div>
 <script>
-const $=id=>document.getElementById(id);let mode=new URLSearchParams(location.search).has('host')?'host':'player';let ws=null,state=null,myId='',myName='',roomCode='',resumeToken='',selectedCharacter='',manualClose=false,reconnectTimer=null,reconnectDelay=1500;
+const $=id=>document.getElementById(id);const hostMode=new URLSearchParams(location.search).has('host')||location.hash==='#host';let mode=hostMode?'host':'player';let ws=null,state=null,myId='',myName='',roomCode='',resumeToken='',selectedCharacter='',manualClose=false,reconnectTimer=null,reconnectDelay=1500;
 const CHARACTERS=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];
 const photo={Bug:'Bug.jpg',Face:'Face.jpg','Ling Ling':'Ling_Ling.jpg',Beanz:'Beanz.jpg','The One':'The_One.jpg',Boone:'Boone.jpg','Chicken Joe':'Chicken_Joe.jpg',Juby:'Juby.jpg',Meemaw:'Meemaw.jpg'};
 function base(){return location.pathname.startsWith('/bet-your-hand-')?'/bet-your-hand-/':'./'}
@@ -46,8 +46,19 @@ function joinRoom(){if(!selectedCharacter)return toast('Choose a character first
 function startGame(){send({type:'start'})}
 function handle(m){if(m.type==='hostRoom'||m.type==='hostResumed'){mode='host';roomCode=m.code;resumeToken=m.token||resumeToken;state=m.state;save();setConn('ROOM ACTIVE');render();return}if(m.type==='welcome'||m.type==='playerResumed'){mode='player';myId=m.id||myId;resumeToken=m.token||resumeToken;state=m.state;window.myHand=m.hand||[];save();setConn('CONNECTED TO SERVER');render();return}if(m.type==='state'){state=m.state;if(mode==='player')window.myHand=m.hand||[];render();return}if(m.type==='toast'){toast(m.text);return}if(m.type==='error'){toast(m.text||'Unable to connect to that game.');if(/SESSION EXPIRED|ROOM NOT FOUND|already started/i.test(m.text||'')){manualClose=true;try{ws&&ws.close()}catch(e){}manualClose=false;clearSession()}return}if(m.type==='hostDisconnected'){toast('Host connection temporarily lost.');return}if(m.type==='playerDisconnected'){render();return}}
 function save(){localStorage.setItem('byhMode',mode);localStorage.setItem('byhRoom',roomCode);localStorage.setItem('byhToken',resumeToken);localStorage.setItem('byhName',myName)}
-window.addEventListener('load',()=>{renderCharacterChoices();if(mode==='host'){$('playerSetup').classList.add('hidden');$('hostSetup').classList.remove('hidden')}const sm=localStorage.getItem('byhMode'),sr=localStorage.getItem('byhRoom'),st=localStorage.getItem('byhToken'),sn=localStorage.getItem('byhName');if(sr&&st&&sn&&((mode==='host'&&sm==='host')||(mode==='player'&&sm==='player'))){roomCode=sr;resumeToken=st;myName=sn;$('setup').classList.add('hidden');$('room').classList.remove('hidden');connect()}});
+window.addEventListener('load',()=>{
+  renderCharacterChoices();
+  if(hostMode){
+    mode='host';
+    localStorage.removeItem('byhMode');localStorage.removeItem('byhRoom');localStorage.removeItem('byhToken');localStorage.removeItem('byhName');
+    roomCode='';resumeToken='';myId='';state=null;
+    $('setup').classList.remove('hidden');$('room').classList.add('hidden');$('playerSetup').classList.add('hidden');$('hostSetup').classList.remove('hidden');setConn('READY');
+    return;
+  }
+  if(mode==='host'){$('playerSetup').classList.add('hidden');$('hostSetup').classList.remove('hidden')}
+  const sm=localStorage.getItem('byhMode'),sr=localStorage.getItem('byhRoom'),st=localStorage.getItem('byhToken'),sn=localStorage.getItem('byhName');if(sr&&st&&sn&&((mode==='host'&&sm==='host')||(mode==='player'&&sm==='player'))){roomCode=sr;resumeToken=st;myName=sn;$('setup').classList.add('hidden');$('room').classList.remove('hidden');connect()}
+});
 </script>
-<script src="./characters/character-images.js?v=5"></script>
+<script src="./characters/character-images.js?v=6"></script>
 </body>
 </html>
