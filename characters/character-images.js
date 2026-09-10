@@ -36,9 +36,10 @@
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',refresh); else refresh();
   new MutationObserver(refresh).observe(document.documentElement,{subtree:true,childList:true});
 
-  if(new URLSearchParams(location.search).has('host')){
+  const hostPage=new URLSearchParams(location.search).has('host')||location.hash==='#host';
+  if(hostPage){
     const s=document.createElement('script');
-    s.src=base()+'host-tv-lobby.js?v=4';
+    s.src=base()+'host-tv-lobby.js?v=5';
     document.head.appendChild(s);
   }
 
