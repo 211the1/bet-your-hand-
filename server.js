@@ -57,6 +57,18 @@ function createServer({ roomServer = new RoomServer() } = {}) {
         s = sessions.get(ws);
         if (!s) throw new Error('Not connected to a room');
         const room = roomServer.getRoom(s.code);
+        if (type === 'RESET_ROOM') {
+          if (s.playerId !== room.hostId) throw new Error('Only the host can start over');
+          for (const socket of room.sockets.values()) send(socket, { type: 'RESET_ROOM' });
+          for (const [socket, session] of sessions.entries()) {
+            if (session.code === room.code) sessions.delete(socket);
+          }
+          for (const socket of room.sockets.values()) {
+            try { socket.close(); } catch (_) {}
+          }
+          roomServer.rooms.delete(room.code);
+          return;
+        }
         if (type === 'START_GAME') {
           if (s.playerId !== room.hostId) throw new Error('Only the host can start the game');
           roomServer.startGame(s.code);
