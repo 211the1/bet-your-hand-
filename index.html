@@ -1,60 +1,27 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>BET YOUR HAND — Phone Test</title>
-<style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#10131a;color:#fff;font-family:Arial,sans-serif;display:flex;justify-content:center}main{width:min(100%,520px);padding:24px 18px 40px;text-align:center}h1{margin:8px 0 6px;font-size:34px}p{color:#b9c0cc}.panel{background:#191e28;border:1px solid #303847;border-radius:18px;padding:20px;margin-top:18px}input{width:100%;padding:15px;border-radius:12px;border:1px solid #465064;background:#0f131b;color:#fff;font-size:18px;margin:7px 0}button{width:100%;padding:16px;margin:7px 0;border:0;border-radius:12px;background:#1687ff;color:#fff;font-size:18px;font-weight:700}button.secondary{background:#303847}button:disabled{opacity:.45}.hidden{display:none}.code{font-size:42px;letter-spacing:8px;font-weight:800;margin:15px 0}.status{min-height:24px;color:#8ee6b1;margin:10px 0}.players{text-align:left;margin-top:16px}.player{padding:10px;border-bottom:1px solid #303847}.hand{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px}.card{padding:16px 8px;border-radius:14px;border:2px solid #1687ff;background:#172b48;min-height:90px;display:flex;flex-direction:column;justify-content:center}.small{font-size:13px;color:#aeb7c7}.danger{color:#ff8b8b}
-</style>
-</head>
-<body><main>
-<h1>BET YOUR HAND</h1><p>Phone-to-phone test build</p>
-<div id="home" class="panel">
-<input id="name" placeholder="Your name" maxlength="20" autocomplete="name">
-<button id="hostBtn">CREATE ROOM</button>
-<div class="small">or</div>
-<input id="code" placeholder="ROOM CODE" maxlength="4" autocapitalize="characters">
-<button id="joinBtn" class="secondary">JOIN ROOM</button>
-</div>
-<div id="room" class="panel hidden">
-<div id="role"></div><div class="code" id="roomCode"></div>
-<div class="status" id="status">Connected</div>
-<div class="players" id="players"></div>
-<button id="startBtn">START GAME</button>
-</div>
-<div id="game" class="panel hidden">
-<div id="turn"></div><div class="small" id="top"></div>
-<div class="hand" id="hand"></div>
-<button id="drawBtn" class="secondary">DRAW</button>
-</div>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>BET YOUR HAND</title><style>
+:root{--blue:#1687ff;--purple:#713cff;--green:#08b978;--gold:#d4af37;--red:#ff3048;--bg:#090d15;--panel:#141b28;--text:#fff;--muted:#aab4c5}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#16233a 0,#090d15 55%);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}main{width:min(100%,720px);margin:auto;padding:20px 14px 40px}h1{font-size:clamp(34px,9vw,58px);margin:8px 0 2px;text-align:center;letter-spacing:1px}h2{margin:8px 0 14px}.sub{text-align:center;color:var(--muted);margin:0 0 18px}.panel{background:rgba(20,27,40,.96);border:1px solid #2b3850;border-radius:22px;padding:18px;margin:14px 0;box-shadow:0 12px 35px #0007}.hidden{display:none!important}input,button{font:inherit}input{width:100%;padding:15px;margin:7px 0;border-radius:13px;border:1px solid #46546d;background:#0c121c;color:white}button{width:100%;padding:15px;margin:7px 0;border:0;border-radius:14px;background:var(--blue);color:#fff;font-weight:800;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#303b4e}.purple{background:var(--purple)}.gold{background:#8d7317}.status{min-height:24px;text-align:center;color:#8ee6b1;margin:8px 0}.code{font-size:44px;font-weight:900;letter-spacing:10px;text-align:center}.picker{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.char{background:#17243a;border:2px solid #30445f;border-radius:16px;padding:7px;min-height:140px}.char.selected{border-color:var(--blue);box-shadow:0 0 20px #1687ff88}.char img{width:100%;height:92px;object-fit:cover;object-position:50% 25%;border-radius:10px}.char b{display:block;margin-top:6px}.players{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.player{background:#1b2638;border-radius:14px;padding:10px;display:flex;gap:9px;align-items:center}.player img{width:42px;height:42px;object-fit:cover;border-radius:50%}.player.me{outline:2px solid var(--blue)}.turn{font-size:25px;font-weight:900;text-align:center}.your{color:#5ce0a2}.wait{color:#c5cbd6}.current{display:flex;justify-content:center;margin:15px 0}.cardface{width:min(240px,60vw);aspect-ratio:2/2.8;border-radius:20px;border:4px solid white;padding:16px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;box-shadow:0 15px 35px #0009}.cardface .name{font-size:30px;font-weight:900}.cardface .type{font-size:18px}.red{background:#c72f3f}.blue{background:#1c69d9}.green{background:#078c62}.yellow{background:#c79d18;color:#111}.wild{background:linear-gradient(135deg,#d7263d,#1687ff,#08b978,#d4af37);color:#fff}.special{background:linear-gradient(145deg,#d4af37,#713cff);color:#fff}.info{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#dce3ee}.hand{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.hand button{min-height:112px;background:#172b48;border:2px solid var(--blue);display:flex;flex-direction:column;justify-content:center;gap:5px}.hand button.playable{box-shadow:0 0 18px #1687ff66}.hand .cname{font-size:19px}.hand small{color:#d4def0}.actions{display:flex;gap:8px}.actions button{flex:1}.modal{position:fixed;inset:0;background:#050812eF;display:flex;align-items:center;justify-content:center;padding:18px;z-index:20}.modalbox{width:min(520px,100%);background:#172033;border:2px solid var(--blue);border-radius:24px;padding:20px;text-align:center}.colors{display:grid;grid-template-columns:1fr 1fr;gap:10px}.colors button{height:76px}.wheel{width:min(300px,70vw);aspect-ratio:1;border-radius:50%;margin:10px auto;border:10px solid #fff;background:conic-gradient(#1687ff 0 11.11%,#713cff 11.11% 22.22%,#08b978 22.22% 33.33%,#d4af37 33.33% 44.44%,#1687ff 44.44% 55.55%,#08b978 55.55% 66.66%,#713cff 66.66% 77.77%,#d4af37 77.77% 88.88%,#ff3048 88.88%);display:grid;place-items:center;font-weight:900;transition:transform 2s cubic-bezier(.1,.75,.2,1)}.wheel.spin{transform:rotate(1260deg)}.power{font-size:24px;font-weight:900}.finish{text-align:center;padding:30px 10px}.finish .big{font-size:40px;font-weight:900;color:#ffd94a}.flame{filter:drop-shadow(0 0 9px #ff8a00);animation:pulse .8s infinite alternate}@keyframes pulse{to{transform:scale(1.03);filter:drop-shadow(0 0 20px #ff3048)}}@media(min-width:620px){.hand{grid-template-columns:repeat(4,1fr)}.picker{grid-template-columns:repeat(5,1fr)}}
+</style></head><body><main><h1>BET YOUR HAND</h1><p class="sub">Game Night</p>
+<section id="home" class="panel"><h2>Join Game Night</h2><input id="name" maxlength="20" placeholder="Your name"><h3>Choose your character</h3><div id="picker" class="picker"></div><input id="code" maxlength="4" placeholder="Room code to join"><button id="join">JOIN GAME</button><div id="status" class="status"></div><p style="color:#8895a8;text-align:center">The host creates the room. The host is not a player.</p></section>
+<section id="lobby" class="panel hidden"><div class="sub">ROOM CODE</div><div id="roomCode" class="code"></div><div id="lobbyStatus" class="status"></div><div id="lobbyPlayers" class="players"></div><p style="text-align:center;color:#9eabc0">Waiting for the host to start when at least 2 players are ready.</p><button id="reset" class="purple">LEAVE GAME</button></section>
+<section id="game" class="panel hidden"><div id="turn" class="turn"></div><div id="info" class="info"></div><div id="current" class="current"></div><div id="powerNotice"></div><div id="hand" class="hand"></div><div class="actions"><button id="draw" class="secondary">DRAW</button><button id="leave" class="purple">LEAVE</button></div></section>
+<section id="finish" class="panel hidden finish"><div id="finishText"></div><button id="finishLeave" class="purple">RETURN TO START</button></section></main>
+<div id="modal" class="modal hidden"><div class="modalbox"><h2 id="modalTitle"></h2><div id="modalBody"></div></div></div>
 <script>
-const WS_URL='wss://bet-your-hand.onrender.com';
-let ws,session=null,state=null;
-const $=id=>document.getElementById(id);
-function show(id){$(id).classList.remove('hidden')}
-function hide(id){$(id).classList.add('hidden')}
-function send(type,extra={}){if(!ws||ws.readyState!==WebSocket.OPEN){$('status').textContent='Not connected';return}ws.send(JSON.stringify({type,...extra}))}
-function connect(){
-  ws=new WebSocket(WS_URL);
-  ws.onopen=()=>$('status').textContent='Connected to game server';
-  ws.onerror=()=>$('status').textContent='Could not connect to game server';
-  ws.onclose=()=>$('status').textContent='Disconnected';
-  ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='ERROR'){$('status').textContent=m.error;$('status').classList.add('danger');return}if(['ROOM_CREATED','ROOM_JOINED','RECONNECTED'].includes(m.type)){session=m;$('roomCode').textContent=m.code;$('role').textContent=m.type==='ROOM_CREATED'?'HOST':'PLAYER';hide('home');show('room');if(m.type!=='ROOM_CREATED')hide('startBtn');}if(m.type==='STATE'){state=m.state;renderState()}};
-}
-function renderState(){
- if(!state)return;
- $('players').innerHTML='<b>Players: '+state.players.length+'</b>'+state.players.map(p=>'<div class="player">'+escapeHtml(p.name)+'</div>').join('');
- if(state.started||state.phase==='playing'){hide('room');show('game');renderGame()}
-}
-function renderGame(){
- const me=state.me;const current=state.players[state.turnIndex];$('turn').textContent=current&&me&&current.id===me.id?'YOUR TURN':'Waiting for '+(current?escapeHtml(current.name):'player');$('top').textContent='Cards in hand: '+(me?me.hand.length:0)+' • Current color: '+(state.currentColor||'—');
- $('hand').innerHTML=(me?.hand||[]).map((c,i)=>'<button class="card" data-i="'+i+'"><b>'+escapeHtml(c.character||c.action||c.type)+'</b><span class="small">'+escapeHtml(c.color||'special')+'</span></button>').join('');
- document.querySelectorAll('.card').forEach(b=>b.onclick=()=>send('PLAY_CARD',{handIndex:Number(b.dataset.i)}));
-}
-function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-$('hostBtn').onclick=()=>{const name=$('name').value.trim()||'Host';connect();setTimeout(()=>send('CREATE_ROOM',{name}),250)};
-$('joinBtn').onclick=()=>{const name=$('name').value.trim()||'Player';const code=$('code').value.trim().toUpperCase();if(code.length!==4){$('status').textContent='Enter the 4-character room code';return}connect();setTimeout(()=>send('JOIN_ROOM',{name,code}),250)};
-$('startBtn').onclick=()=>send('START_GAME');
-$('drawBtn').onclick=()=>send('DRAW');
-</script></main></body></html>
+const WS='wss://bet-your-hand.onrender.com',BASE='';const chars=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];const img=c=>BASE+c.replaceAll(' ','_')+'.jpg';let selected='Bug',ws=null,me=null,state=null,reconnectTimer=null,spinning=false,lastRound=1;const $=id=>document.getElementById(id);
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function show(id){$(id).classList.remove('hidden')}function hide(id){$(id).classList.add('hidden')}function setStatus(s){$('status').textContent=s;$('lobbyStatus').textContent=s}
+$('picker').innerHTML=chars.map(c=>`<button class="char ${c===selected?'selected':''}" data-c="${esc(c)}"><img src="${img(c)}"><b>${esc(c)}</b></button>`).join('');document.querySelectorAll('.char').forEach(b=>b.onclick=()=>{selected=b.dataset.c;document.querySelectorAll('.char').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')});
+function connect(mode,payload){if(ws&&ws.readyState<2)return;ws=new WebSocket(WS);ws.onopen=()=>ws.send(JSON.stringify({type:mode,...payload}));ws.onclose=()=>{if(me&&me.code)reconnectTimer=setTimeout(()=>reconnect(),1500)};ws.onerror=()=>setStatus('Connection problem — retrying');ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='ERROR'){setStatus(m.error);if(m.error==='Room not found'||m.error==='Invalid reconnect credentials'){localStorage.removeItem('byhSession');me=null}}else if(m.type==='ROOM_JOINED'||m.type==='RECONNECTED'){me={...me,...m};localStorage.setItem('byhSession',JSON.stringify(me));hide('home');show('lobby')}else if(m.type==='STATE'){state=m;render() }else if(m.type==='RESET_ROOM'){localStorage.removeItem('byhSession');me=null;location.reload()}}}
+function reconnect(){if(!me)return;connect('RECONNECT',{code:me.code,playerId:me.playerId,reconnectToken:me.reconnectToken})}
+function send(type,data={}){if(ws?.readyState===1)ws.send(JSON.stringify({type,...data}));}
+$('join').onclick=()=>{const name=$('name').value.trim()||'Player';const code=$('code').value.trim().toUpperCase();if(code.length!==4){setStatus('Enter the 4-character room code');return}me={name,character:selected,code};connect('JOIN_ROOM',{code,name,character:selected})};
+$('draw').onclick=()=>send('DRAW');$('leave').onclick=()=>{localStorage.removeItem('byhSession');location.reload()};$('reset').onclick=()=>{localStorage.removeItem('byhSession');if(ws)ws.close();location.reload()};$('finishLeave').onclick=()=>{localStorage.removeItem('byhSession');location.reload()};
+function cardClass(c){return c?.type==='SPECIAL_POWER'?'special':c?.type==='WILD'?'wild':c?.color||'blue'}function cardName(c){return c?.character||c?.action||'—'}function renderCard(c){return `<div class="cardface ${cardClass(c)}"><div class="type">${esc(c?.type==='SPECIAL_POWER'?'BET YOUR HAND':c?.action||'CHARACTER')}</div><div class="name">${esc(cardName(c))}</div><div>${esc((c?.color||'special').toUpperCase())}</div></div>`}
+function render(){if(!state)return;const g=state.game;if(!g){show('lobby');hide('game');hide('finish');$('roomCode').textContent=state.roomCode;renderLobby();return}hide('lobby');if(g.phase==='finished'){hide('game');show('finish');const w=g.players.find(p=>p.id===g.winnerId);$('finishText').innerHTML=`<div class="big">GAME OVER</div><h2>${esc(w?.name||'Winner')}</h2><p>Congratulations! Highest total after Round 2.</p>`;return}show('game');hide('finish');renderGame(g)}
+function renderLobby(){ $('lobbyPlayers').innerHTML=state.players.map(p=>`<div class="player ${p.id===me?.playerId?'me':''}"><img src="${img(p.character||'Bug')}"><div><b>${esc(p.name)}</b><div class="small">${esc(p.character||'')}</div></div></div>`).join('')}
+function renderGame(g){const mine=g.players.find(p=>p.id===me?.playerId),cur=g.players.find(p=>p.id===g.turnPlayerId);$('turn').innerHTML=cur?.id===mine?.id?'<span class="your flame">🔥 YOUR TURN</span>':`<span class="wait">Waiting for ${esc(cur?.name||'player')}</span>`;$('info').innerHTML=`<span>Round ${g.round}</span><span>Points: ${mine?.points??0}</span><span>Cards: ${mine?.handCount??0}</span><span>Color: ${(g.currentColor||'—').toUpperCase()}</span>`;$('current').innerHTML=renderCard(g.topCard);$('hand').innerHTML=(g.viewerHand||[]).map((c,i)=>`<button class="${isPlayableLocal(g,c)?'playable':''}" onclick="play(${i})"><span class="cname">${esc(cardName(c))}</span><small>${esc((c.color||'special').toUpperCase())}</small></button>`).join('');if(g.pendingAction==='WILD_COLOR'&&cur?.id===mine?.id)showColor('Choose a color');else if(g.pendingAction==='COLOR_CHOICE'&&cur?.id===mine?.id)showColor('Power Wheel: choose a color');else if(g.pendingAction==='POWER_WHEEL'&&cur?.id===mine?.id&&!spinning){spinning=true;showWheel();setTimeout(()=>send('SPIN_WHEEL'),900)}else if(g.wheelResult&&!g.pendingAction)showWheelResult(g.wheelResult)}
+function isPlayableLocal(g,c){const t=g.topCard;if(c.type==='WILD'||c.type==='SPECIAL_POWER')return true;return c.color===g.currentColor||(c.character&&t.character===c.character)}function play(i){send('PLAY_CARD',{handIndex:i})}
+function showColor(title){$('modalTitle').textContent=title;$('modalBody').innerHTML='<div class="colors">'+['red','blue','green','yellow'].map(c=>`<button class="${c}" onclick="choose('${c}')">${c.toUpperCase()}</button>`).join('')+'</div>';$('modal').classList.remove('hidden')}function choose(c){$('modal').classList.add('hidden');send('CHOOSE_COLOR',{color:c})}
+function showWheel(){hide('modal');$('modalTitle').textContent='POWER WHEEL';$('modalBody').innerHTML='<div id="wheel" class="wheel">SPINNING</div><p>Power is chosen randomly.</p>';$('modal').classList.remove('hidden');setTimeout(()=>$('wheel')?.classList.add('spin'),20)}function showWheelResult(r){if(!$('modal').classList.contains('hidden'))return;$('modalTitle').textContent='POWER WHEEL RESULT';$('modalBody').innerHTML=`<div class="power">${esc(r.character)}<br>${esc(r.power)}</div><button onclick="$('modal').classList.add('hidden')">CONTINUE</button>`;$('modal').classList.remove('hidden')}
+(function(){try{me=JSON.parse(localStorage.getItem('byhSession')||'null')}catch(_){me=null}if(me?.code&&me.playerId)reconnect()})();
+</script></body></html>
