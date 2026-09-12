@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BET YOUR HAND — Phone Test</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#10131a;color:#fff;font-family:Arial,sans-serif;display:flex;justify-content:center}main{width:min(100%,520px);padding:24px 18px 40px;text-align:center}h1{margin:8px 0 6px;font-size:34px}p{color:#b9c0cc}.panel{background:#191e28;border:1px solid #303847;border-radius:18px;padding:20px;margin-top:18px}input{width:100%;padding:15px;border-radius:12px;border:1px solid #465064;background:#0f131b;color:#fff;font-size:18px;margin:7px 0}button{width:100%;padding:16px;margin:7px 0;border:0;border-radius:12px;background:#1687ff;color:#fff;font-size:18px;font-weight:700}button.secondary{background:#303847}button:disabled{opacity:.45}.hidden{display:none}.code{font-size:42px;letter-spacing:8px;font-weight:800;margin:15px 0}.status{min-height:24px;color:#8ee6b1;margin:10px 0}.players{text-align:left;margin-top:16px}.player{padding:10px;border-bottom:1px solid #303847}.hand{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px}.card{padding:16px 8px;border-radius:14px;border:2px solid #1687ff;background:#172b48;min-height:90px;display:flex;flex-direction:column;justify-content:center}.small{font-size:13px;color:#aeb7c7}.danger{color:#ff8b8b}
+</style>
+</head>
+<body><main>
+<h1>BET YOUR HAND</h1><p>Phone-to-phone test build</p>
+<div id="home" class="panel">
+<input id="name" placeholder="Your name" maxlength="20" autocomplete="name">
+<button id="hostBtn">CREATE ROOM</button>
+<div class="small">or</div>
+<input id="code" placeholder="ROOM CODE" maxlength="4" autocapitalize="characters">
+<button id="joinBtn" class="secondary">JOIN ROOM</button>
+</div>
+<div id="room" class="panel hidden">
+<div id="role"></div><div class="code" id="roomCode"></div>
+<div class="status" id="status">Connected</div>
+<div class="players" id="players"></div>
+<button id="startBtn">START GAME</button>
+</div>
+<div id="game" class="panel hidden">
+<div id="turn"></div><div class="small" id="top"></div>
+<div class="hand" id="hand"></div>
+<button id="drawBtn" class="secondary">DRAW</button>
+</div>
+<script>
+const WS_URL='wss://bet-your-hand.onrender.com';
+let ws,session=null,state=null;
+const $=id=>document.getElementById(id);
+function show(id){$(id).classList.remove('hidden')}
+function hide(id){$(id).classList.add('hidden')}
+function send(type,extra={}){if(!ws||ws.readyState!==WebSocket.OPEN){$('status').textContent='Not connected';return}ws.send(JSON.stringify({type,...extra}))}
+function connect(){
+  ws=new WebSocket(WS_URL);
+  ws.onopen=()=>$('status').textContent='Connected to game server';
+  ws.onerror=()=>$('status').textContent='Could not connect to game server';
+  ws.onclose=()=>$('status').textContent='Disconnected';
+  ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='ERROR'){$('status').textContent=m.error;$('status').classList.add('danger');return}if(['ROOM_CREATED','ROOM_JOINED','RECONNECTED'].includes(m.type)){session=m;$('roomCode').textContent=m.code;$('role').textContent=m.type==='ROOM_CREATED'?'HOST':'PLAYER';hide('home');show('room');if(m.type!=='ROOM_CREATED')hide('startBtn');}if(m.type==='STATE'){state=m.state;renderState()}};
+}
+function renderState(){
+ if(!state)return;
+ $('players').innerHTML='<b>Players: '+state.players.length+'</b>'+state.players.map(p=>'<div class="player">'+escapeHtml(p.name)+'</div>').join('');
+ if(state.started||state.phase==='playing'){hide('room');show('game');renderGame()}
+}
+function renderGame(){
+ const me=state.me;const current=state.players[state.turnIndex];$('turn').textContent=current&&me&&current.id===me.id?'YOUR TURN':'Waiting for '+(current?escapeHtml(current.name):'player');$('top').textContent='Cards in hand: '+(me?me.hand.length:0)+' • Current color: '+(state.currentColor||'—');
+ $('hand').innerHTML=(me?.hand||[]).map((c,i)=>'<button class="card" data-i="'+i+'"><b>'+escapeHtml(c.character||c.action||c.type)+'</b><span class="small">'+escapeHtml(c.color||'special')+'</span></button>').join('');
+ document.querySelectorAll('.card').forEach(b=>b.onclick=()=>send('PLAY_CARD',{handIndex:Number(b.dataset.i)}));
+}
+function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+$('hostBtn').onclick=()=>{const name=$('name').value.trim()||'Host';connect();setTimeout(()=>send('CREATE_ROOM',{name}),250)};
+$('joinBtn').onclick=()=>{const name=$('name').value.trim()||'Player';const code=$('code').value.trim().toUpperCase();if(code.length!==4){$('status').textContent='Enter the 4-character room code';return}connect();setTimeout(()=>send('JOIN_ROOM',{name,code}),250)};
+$('startBtn').onclick=()=>send('START_GAME');
+$('drawBtn').onclick=()=>send('DRAW');
+</script></main></body></html>
