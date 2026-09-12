@@ -1,7 +1,13 @@
 'use strict';
-const http=require('http');const {WebSocketServer}=require('ws');const {RoomServer}=require('./server/room-server');const {executeGameAction}=require('./server/game-actions');
+const http=require('http');const fs=require('fs');const path=require('path');const {WebSocketServer}=require('ws');const {RoomServer}=require('./server/room-server');const {executeGameAction}=require('./server/game-actions');
+const ROOT=__dirname;
+const TYPES={'.html':'text/html; charset=utf-8','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8'};
+function serveFile(req,res){let pathname;try{pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname)}catch(_){res.writeHead(400);return res.end('Bad request')}
+ if(pathname==='/health'){res.writeHead(200,{'content-type':'application/json'});return res.end(JSON.stringify({ok:true,service:'bet-your-hand',version:'3.1'}))}
+ if(pathname==='/')pathname='/index.html';const file=path.normalize(path.join(ROOT,pathname));if(!file.startsWith(ROOT+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404,{'content-type':'text/plain; charset=utf-8'});return res.end('File not found')}
+ res.writeHead(200,{'content-type':TYPES[path.extname(file).toLowerCase()]||'application/octet-stream','cache-control':'no-cache'});fs.createReadStream(file).pipe(res)}
 function createServer({roomServer=new RoomServer()}={}){
- const httpServer=http.createServer((req,res)=>{if(req.url==='/'||req.url==='/health'){res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({ok:true,service:'bet-your-hand',version:'3.0'}));return}res.writeHead(404);res.end()});
+ const httpServer=http.createServer(serveFile);
  const wss=new WebSocketServer({server:httpServer}),sessions=new Map();
  const send=(ws,m)=>{if(ws.readyState===1)ws.send(JSON.stringify(m))};const fail=(ws,e)=>send(ws,{type:'ERROR',error:e?.message||String(e)});
  wss.on('connection',ws=>{ws.on('message',raw=>{try{const msg=JSON.parse(raw.toString()),type=String(msg.type||'').toUpperCase();let s,room;
