@@ -17,7 +17,7 @@ body{margin:0;background:#10131a;color:white;font:18px Arial;text-align:center}m
 const WS='wss://bet-your-hand.onrender.com';let socket=null,me=null,reconnectTimer=null,reconnectAttempt=0,reconnecting=false,pingTimer=null;
 const $=x=>document.getElementById(x);
 function status(x){if($('status'))$('status').textContent=x;if($('homeStatus'))$('homeStatus').textContent=x}
-function saveSession(){if(me?.code&&me?.playerId&&me?.reconnectToken)localStorage.setItem('byhSession',JSON.stringify(me))}
+function saveSession(){if(!me?.code||!me?.reconnectToken)return;const hostSession=me.host?{code:me.code,hostId:me.hostId||me.playerId,hostToken:me.hostToken||me.reconnectToken,host:true,name:me.name}:{...me};localStorage.setItem('byhSession',JSON.stringify(hostSession))}
 function loadSession(){try{me=JSON.parse(localStorage.getItem('byhSession')||'null')}catch(_){me=null}}
 function clearSession(){me=null;localStorage.removeItem('byhSession')}
 function resetLocal(){clearSession();if(reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null}reconnecting=false;reconnectAttempt=0;stopPing();if(socket){socket.onclose=null;try{socket.close()}catch(_){}}socket=null;$('home').classList.remove('hidden');$('room').classList.add('hidden');$('game').classList.add('hidden');$('name').value='';$('code').value='';$('homeStatus').textContent='Ready for a new test'}
@@ -26,11 +26,11 @@ function startOver(){
   resetLocal();
 }
 function startPing(){clearInterval(pingTimer);pingTimer=setInterval(()=>{if(socket?.readyState===WebSocket.OPEN)socket.send(JSON.stringify({type:'PING'}))},15000)}
-function scheduleReconnect(){if(!me?.code||!me?.playerId||!me?.reconnectToken||reconnectTimer)return;const delay=Math.min(1000*Math.pow(1.5,reconnectAttempt),5000);reconnectTimer=setTimeout(()=>{reconnectTimer=null;reconnectAttempt++;reconnecting=true;connect('reconnect')},delay)}
+function scheduleReconnect(){if(!me?.code||(!me?.playerId&&!me?.hostId)||!me?.reconnectToken&&!me?.hostToken||reconnectTimer)return;const delay=Math.min(1000*Math.pow(1.5,reconnectAttempt),5000);reconnectTimer=setTimeout(()=>{reconnectTimer=null;reconnectAttempt++;reconnecting=true;connect('reconnect')},delay)}
 function connect(mode='new'){
   if(socket&&(socket.readyState===WebSocket.OPEN||socket.readyState===WebSocket.CONNECTING))return;
   socket=new WebSocket(WS);
-  socket.onopen=()=>{reconnectAttempt=0;startPing();status(reconnecting?'Reconnecting...':'Connected');if(mode==='reconnect'&&me)send('RECONNECT',{code:me.code,playerId:me.playerId,reconnectToken:me.reconnectToken});else if(mode==='host')send('CREATE_ROOM',{name:me?.name||$('name').value.trim()||'Host'});else if(mode==='join')send('JOIN_ROOM',{code:$('code').value.trim().toUpperCase(),name:$('name').value.trim()||'Player'})};
+  socket.onopen=()=>{reconnectAttempt=0;startPing();status(reconnecting?'Reconnecting...':'Connected');if(mode==='reconnect'&&me){send('RECONNECT',{code:me.code,playerId:me.playerId,hostId:me.hostId,reconnectToken:me.reconnectToken,hostToken:me.hostToken})}else if(mode==='host')send('CREATE_ROOM',{name:me?.name||$('name').value.trim()||'Host'});else if(mode==='join')send('JOIN_ROOM',{code:$('code').value.trim().toUpperCase(),name:$('name').value.trim()||'Player'})};
   socket.onerror=()=>status('Connection error');
   socket.onclose=()=>{stopPing();if(me){status('Disconnected — reconnecting');scheduleReconnect()}};
   socket.onmessage=e=>{
@@ -38,10 +38,12 @@ function connect(mode='new'){
     if(m.type==='PONG')return;
     if(m.type==='RESET_ROOM'){resetLocal();return}
     if(m.type==='ERROR'){
-      if(reconnecting){reconnecting=false;clearSession();resetLocal()}else status(m.error);return;
+      if(reconnecting){reconnecting=false;clearSession();resetLocal()}else status(m.error);return
     }
     if(m.type==='ROOM_CREATED'||m.type==='ROOM_JOINED'||m.type==='RECONNECTED'){
-      if(m.type==='ROOM_CREATED'||m.type==='ROOM_JOINED')me={...me,...m,host:m.type==='ROOM_CREATED'};else me={...me,...m,host:!!m.host};
+      if(m.type==='ROOM_CREATED')me={...me,...m,host:true,hostId:m.hostId,hostToken:m.hostToken};
+      else if(m.type==='ROOM_JOINED')me={...me,...m,host:false};
+      else me={...me,...m,host:!!m.host};
       saveSession();reconnecting=false;$('home').classList.add('hidden');$('room').classList.remove('hidden');$('role').textContent=me.host?'HOST':'PLAYER';$('roomCode').textContent=me.code;if(!me.host)$('start').classList.add('hidden');status(m.type==='RECONNECTED'?'Reconnected':'Connected')
     }
     if(m.type==='STATE')render(m)
@@ -51,7 +53,7 @@ function stopPing(){clearInterval(pingTimer);pingTimer=null}
 function send(type,data={}){if(socket?.readyState===WebSocket.OPEN)socket.send(JSON.stringify({type,...data}));else status('Not connected')}
 function host(){const name=$('name').value.trim()||'Host';me={name,host:true};connect('host')}
 function join(){const code=$('code').value.trim().toUpperCase();if(code.length!==4){status('Enter the 4-character room code');return}const name=$('name').value.trim()||'Player';me={name,host:false};connect('join')}
-function render(m){let g=m.game;if(!g){$('players').innerHTML=m.players.map(p=>'<p class="'+(p.connected?'':'offline')+'">'+safe(p.name)+(p.connected?'':' (offline)')+'</p>').join('');return}$('room').classList.add('hidden');$('game').classList.remove('hidden');let mine=g.players.find(p=>p.id===me?.playerId),current=g.players.find(p=>p.id===g.turnPlayerId);$('turn').textContent=current?.id===mine?.id?'YOUR TURN':'Waiting for '+safe(current?.name||'player');$('info').textContent='Your cards: '+(mine?.handCount||0)+' | Color: '+(g.currentColor||'—');$('cards').innerHTML=(g.viewerHand||[]).map((c,i)=>'<button class="card" onclick="send(\'PLAY_CARD\',{handIndex:'+i+'})"><b>'+safe(c.character||c.action||c.type)+'</b><br><small>'+safe(c.color||'special')+'</small></button>').join('')}
+function render(m){let g=m.game;if(!g){$('players').innerHTML=m.players.map(p=>'<p class="'+(p.connected?'':'offline')+'">'+safe(p.name)+(p.connected?'':' (offline)')+'</p>').join('');return}$('room').classList.add('hidden');$('game').classList.remove('hidden');let mine=g.players.find(p=>p.id===me?.playerId),current=g.players.find(p=>p.id===g.turnPlayerId);$('turn').textContent=me?.host?'HOST / GAME CONTROL':(current?.id===mine?.id?'YOUR TURN':'Waiting for '+safe(current?.name||'player'));$('info').textContent=me?.host?'Players: '+g.players.length+' | Color: '+(g.currentColor||'—'):'Your cards: '+(mine?.handCount||0)+' | Color: '+(g.currentColor||'—');$('cards').innerHTML=me?.host?'':(g.viewerHand||[]).map((c,i)=>'<button class="card" onclick="send(\'PLAY_CARD\',{handIndex:'+i+'})"><b>'+safe(c.character||c.action||c.type)+'</b><br><small>'+safe(c.color||'special')+'</small></button>').join('')}
 function safe(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-loadSession();if(me?.code&&me?.playerId&&me?.reconnectToken){$('home').classList.add('hidden');$('room').classList.remove('hidden');$('role').textContent=me.host?'HOST':'PLAYER';$('roomCode').textContent=me.code;connect('reconnect')}
+loadSession();if(me?.code&&((me?.playerId&&me?.reconnectToken)||(me?.hostId&&me?.hostToken))){$('home').classList.add('hidden');$('room').classList.remove('hidden');$('role').textContent=me.host?'HOST':'PLAYER';$('roomCode').textContent=me.code;connect('reconnect')}
 </script></body></html>
