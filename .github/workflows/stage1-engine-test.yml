@@ -1,4 +1,4 @@
-name: Stage 1 Card Engine Test
+name: BET YOUR HAND CI
 
 on:
   push:
@@ -6,9 +6,14 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: bet-your-hand-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test-engine:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -16,5 +21,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Run Stage 1 tests
+          cache: npm
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Run complete test suite
         run: npm test
