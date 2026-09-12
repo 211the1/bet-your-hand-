@@ -1,9 +1,9 @@
 {
   "name": "bet-your-hand-engine",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
-  "description": "BET YOUR HAND Stage 1 card engine",
+  "description": "BET YOUR HAND Stage 2 room connection layer",
   "scripts": {
-    "test": "node --test engine/card-engine.test.js"
+    "test": "node --test engine/card-engine.test.js server/room-server.test.js"
   }
 }
