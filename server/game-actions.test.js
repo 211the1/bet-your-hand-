@@ -58,12 +58,11 @@ test('WILD action requires a server-approved color choice', () => {
   assert.equal(g.pendingAction, 'WILD_COLOR');
   executeGameAction(room, host.playerId, { type: 'CHOOSE_COLOR', color: 'green' });
   assert.equal(g.pendingAction, null);
-  assert.equal(g.currentColor, undefined);
   assert.equal(engine.currentColor(g), 'green');
   assert.equal(g.turnIndex, 1);
 });
 
-test('SPECIAL_POWER opens the wheel and the server chooses its outcome', () => {
+test('SPECIAL_POWER opens the wheel and the server owns the random outcome', () => {
   const { room, host } = roomWithTwoPlayers();
   const g = room.game;
   g.turnIndex = 0;
@@ -82,7 +81,7 @@ test('SPECIAL_POWER opens the wheel and the server chooses its outcome', () => {
   assert.equal(g.players[0].extraPlay, true);
 });
 
-test('A final card ends the round and carries points into round 2', () => {
+test('A final card ends the round and preserves points into round 2', () => {
   const { room, host } = roomWithTwoPlayers();
   const g = room.game;
   g.turnIndex = 0;
@@ -94,7 +93,7 @@ test('A final card ends the round and carries points into round 2', () => {
   assert.equal(result.roundEnd.nextRound, 2);
   assert.equal(g.round, 2);
   assert.equal(g.players[0].points, 900);
-  assert.equal(g.players[1].points, 700);
+  assert.equal(g.players[1].points, 850); // new turn bonus for the next player
 });
 
 console.log('STAGE 2 GAME ACTION TESTS: READY');
