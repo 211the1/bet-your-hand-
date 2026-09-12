@@ -22,7 +22,7 @@
   </div>
   <div id="hostSetup" class="hidden"><h2>HOST / TV</h2><p class="small">Create the bright game-night room. All scoring uses fictional game points only.</p><input id="hostName" class="input" maxlength="16" placeholder="Host name (optional)"><div class="actions"><button class="btn primary big" onclick="createRoom()">CREATE GAME</button></div></div>
 </section>
-<section id="room" class="hidden"><div class="center"><div class="small">GAME CODE</div><div id="code" class="roomcode">----</div><div id="connection" class="status">READY</div></div><div id="players" class="players"></div><div id="hostControls" class="actions"><button class="btn primary big" onclick="startGame()">START GAME</button></div><div id="playerWaiting" class="small center">Waiting for the host to start the game…</div></section>
+<section id="room" class="hidden"><div class="center"><div class="small">GAME CODE</div><div id="code" class="roomcode">----</div><div id="connection" class="status">READY</div></div><div id="players" class="players"></div><div id="hostControls" class="actions hidden"><button class="btn primary big" onclick="startGame()">START GAME</button></div><div id="playerWaiting" class="small center">Waiting for the host to start the game…</div></section>
 <div id="toast" class="hidden" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#ffd21c;color:#15102f;padding:12px 18px;border-radius:15px;font-weight:1000;z-index:100"></div>
 </main></div>
 <script>
