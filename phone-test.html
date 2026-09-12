@@ -20,10 +20,33 @@ function status(x){if($('status'))$('status').textContent=x;if($('homeStatus'))$
 function saveSession(){if(me?.code&&me?.playerId&&me?.reconnectToken)localStorage.setItem('byhSession',JSON.stringify(me))}
 function loadSession(){try{me=JSON.parse(localStorage.getItem('byhSession')||'null')}catch(_){me=null}}
 function clearSession(){me=null;localStorage.removeItem('byhSession')}
-function startOver(){clearSession();if(reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null}reconnecting=false;reconnectAttempt=0;if(socket){socket.onclose=null;try{socket.close()}catch(_){}}socket=null;clearInterval(pingTimer);pingTimer=null;$('home').classList.remove('hidden');$('room').classList.add('hidden');$('game').classList.add('hidden');$('name').value='';$('code').value='';$('homeStatus').textContent='Ready for a new test'}
+function resetLocal(){clearSession();if(reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null}reconnecting=false;reconnectAttempt=0;stopPing();if(socket){socket.onclose=null;try{socket.close()}catch(_){}}socket=null;$('home').classList.remove('hidden');$('room').classList.add('hidden');$('game').classList.add('hidden');$('name').value='';$('code').value='';$('homeStatus').textContent='Ready for a new test'}
+function startOver(){
+  if(me?.host&&socket?.readyState===WebSocket.OPEN){status('Resetting all phones...');send('RESET_ROOM');return}
+  resetLocal();
+}
 function startPing(){clearInterval(pingTimer);pingTimer=setInterval(()=>{if(socket?.readyState===WebSocket.OPEN)socket.send(JSON.stringify({type:'PING'}))},15000)}
 function scheduleReconnect(){if(!me?.code||!me?.playerId||!me?.reconnectToken||reconnectTimer)return;const delay=Math.min(1000*Math.pow(1.5,reconnectAttempt),5000);reconnectTimer=setTimeout(()=>{reconnectTimer=null;reconnectAttempt++;reconnecting=true;connect('reconnect')},delay)}
-function connect(mode='new'){if(socket&&(socket.readyState===WebSocket.OPEN||socket.readyState===WebSocket.CONNECTING))return;socket=new WebSocket(WS);socket.onopen=()=>{reconnectAttempt=0;startPing();status(reconnecting?'Reconnecting...':'Connected');if(mode==='reconnect'&&me)send('RECONNECT',{code:me.code,playerId:me.playerId,reconnectToken:me.reconnectToken});else if(mode==='host')send('CREATE_ROOM',{name:me?.name||$('name').value.trim()||'Host'});else if(mode==='join')send('JOIN_ROOM',{code:$('code').value.trim().toUpperCase(),name:$('name').value.trim()||'Player'})};socket.onerror=()=>status('Connection error');socket.onclose=()=>{stopPing();if(me){status('Disconnected — reconnecting');scheduleReconnect()}};socket.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='PONG')return;if(m.type==='ERROR'){if(reconnecting){reconnecting=false;clearSession();startOver()}else status(m.error);return}if(m.type==='ROOM_CREATED'||m.type==='ROOM_JOINED'||m.type==='RECONNECTED'){if(m.type==='ROOM_CREATED'||m.type==='ROOM_JOINED')me={...me,...m,host:m.type==='ROOM_CREATED'};else me={...me,...m,host:!!m.host};saveSession();reconnecting=false;$('home').classList.add('hidden');$('room').classList.remove('hidden');$('role').textContent=me.host?'HOST':'PLAYER';$('roomCode').textContent=me.code;if(!me.host)$('start').classList.add('hidden');status(m.type==='RECONNECTED'?'Reconnected':'Connected')}if(m.type==='STATE')render(m)}}
+function connect(mode='new'){
+  if(socket&&(socket.readyState===WebSocket.OPEN||socket.readyState===WebSocket.CONNECTING))return;
+  socket=new WebSocket(WS);
+  socket.onopen=()=>{reconnectAttempt=0;startPing();status(reconnecting?'Reconnecting...':'Connected');if(mode==='reconnect'&&me)send('RECONNECT',{code:me.code,playerId:me.playerId,reconnectToken:me.reconnectToken});else if(mode==='host')send('CREATE_ROOM',{name:me?.name||$('name').value.trim()||'Host'});else if(mode==='join')send('JOIN_ROOM',{code:$('code').value.trim().toUpperCase(),name:$('name').value.trim()||'Player'})};
+  socket.onerror=()=>status('Connection error');
+  socket.onclose=()=>{stopPing();if(me){status('Disconnected — reconnecting');scheduleReconnect()}};
+  socket.onmessage=e=>{
+    const m=JSON.parse(e.data);
+    if(m.type==='PONG')return;
+    if(m.type==='RESET_ROOM'){resetLocal();return}
+    if(m.type==='ERROR'){
+      if(reconnecting){reconnecting=false;clearSession();resetLocal()}else status(m.error);return;
+    }
+    if(m.type==='ROOM_CREATED'||m.type==='ROOM_JOINED'||m.type==='RECONNECTED'){
+      if(m.type==='ROOM_CREATED'||m.type==='ROOM_JOINED')me={...me,...m,host:m.type==='ROOM_CREATED'};else me={...me,...m,host:!!m.host};
+      saveSession();reconnecting=false;$('home').classList.add('hidden');$('room').classList.remove('hidden');$('role').textContent=me.host?'HOST':'PLAYER';$('roomCode').textContent=me.code;if(!me.host)$('start').classList.add('hidden');status(m.type==='RECONNECTED'?'Reconnected':'Connected')
+    }
+    if(m.type==='STATE')render(m)
+  }
+}
 function stopPing(){clearInterval(pingTimer);pingTimer=null}
 function send(type,data={}){if(socket?.readyState===WebSocket.OPEN)socket.send(JSON.stringify({type,...data}));else status('Not connected')}
 function host(){const name=$('name').value.trim()||'Host';me={name,host:true};connect('host')}
