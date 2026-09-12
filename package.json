@@ -1,14 +1,9 @@
 {
-  "name": "bet-your-hand-engine",
-  "version": "2.3.1",
-  "private": true,
-  "description": "BET YOUR HAND authoritative game server",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "test": "node --test engine/card-engine.test.js server/room-server.test.js server/game-actions.test.js server/game-actions-websocket.test.js server/full-game-stress.test.js server/websocket-server.test.js"
-  },
-  "dependencies": {
-    "ws": "^8.18.3"
-  }
+  "name":"bet-your-hand",
+  "version":"3.0.0",
+  "private":true,
+  "description":"BET YOUR HAND clean full-game build",
+  "main":"server.js",
+  "scripts":{"start":"node server.js","test":"node --test test/game.test.js"},
+  "dependencies":{"ws":"^8.18.3"}
 }
