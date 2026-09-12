@@ -1,0 +1,9 @@
+{
+  "name": "bet-your-hand-engine",
+  "version": "2.0.0-stage1",
+  "private": true,
+  "scripts": {
+    "test": "node engine/card-engine.test.js"
+  },
+  "description": "BET YOUR HAND Stage 1 card game engine only"
+}
