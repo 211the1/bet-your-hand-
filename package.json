@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "pretest": "npm install --ignore-scripts --no-audit --no-fund",
-    "test": "node --test engine/card-engine.test.js server/room-server.test.js server/game-actions.test.js server/game-actions-websocket.test.js server/websocket-server.test.js"
+    "test": "node --test engine/card-engine.test.js server/room-server.test.js server/game-actions.test.js server/game-actions-websocket.test.js server/full-game-stress.test.js server/websocket-server.test.js"
   },
   "dependencies": {
     "ws": "^8.18.3"
