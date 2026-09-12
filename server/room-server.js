@@ -1,5 +1,6 @@
 /* BET YOUR HAND — Stage 2 room/connection layer.
  * Owns rooms, host/player roles, join/reconnect, and authoritative game state.
+ * The host is NOT a player. Only joined players count toward the 2–6 player limit.
  * No UI, character images, or visual design.
  */
 'use strict';
@@ -50,7 +51,7 @@ class RoomServer {
       const suffix = String(this.nextRoomNumber++ % 10);
       code = code.slice(0, ROOM_CODE_LENGTH - 1) + suffix;
     }
-    const hostId = `p_${this.nextPlayerNumber++}`;
+    const hostId = `h_${this.nextPlayerNumber++}`;
     const token = makeToken(this.rng);
     const room = {
       code,
@@ -62,9 +63,8 @@ class RoomServer {
       game: null,
       started: false
     };
-    room.players.set(hostId, { id: hostId, name: hostName, token, host: true, connected: false });
     this.rooms.set(code, room);
-    return { code, playerId: hostId, reconnectToken: token };
+    return { code, hostId, hostToken: token };
   }
 
   getRoom(code) {
@@ -86,27 +86,32 @@ class RoomServer {
 
   reconnect(code, playerId, token) {
     const room = this.getRoom(code);
+    if (playerId === room.hostId) {
+      assert(room.hostToken === token, 'Invalid reconnect credentials');
+      return { code: room.code, playerId: room.hostId, host: true, name: room.hostName };
+    }
     const player = room.players.get(playerId);
     assert(player && player.token === token, 'Invalid reconnect credentials');
-    return { code: room.code, playerId: player.id, host: player.host, name: player.name };
+    return { code: room.code, playerId: player.id, host: false, name: player.name };
   }
 
-  attachSocket(code, playerId, socket) {
+  attachSocket(code, clientId, socket) {
     const room = this.getRoom(code);
-    const player = room.players.get(playerId);
-    assert(player, 'Player not found');
-    const previous = room.sockets.get(playerId);
+    const isHost = clientId === room.hostId;
+    const player = room.players.get(clientId);
+    assert(isHost || player, 'Player not found');
+    const previous = room.sockets.get(clientId);
     if (previous && previous !== socket && typeof previous.close === 'function') previous.close();
-    room.sockets.set(playerId, socket);
-    player.connected = true;
-    return this.snapshot(code, playerId);
+    room.sockets.set(clientId, socket);
+    if (player) player.connected = true;
+    return this.snapshot(code, isHost ? null : clientId);
   }
 
-  detachSocket(code, playerId, socket) {
+  detachSocket(code, clientId, socket) {
     const room = this.getRoom(code);
-    if (room.sockets.get(playerId) === socket) {
-      room.sockets.delete(playerId);
-      const player = room.players.get(playerId);
+    if (room.sockets.get(clientId) === socket) {
+      room.sockets.delete(clientId);
+      const player = room.players.get(clientId);
       if (player) player.connected = false;
     }
   }
@@ -131,7 +136,7 @@ class RoomServer {
       started: room.started,
       hostId: room.hostId,
       players: [...room.players.values()].map(p => ({
-        id: p.id, name: p.name, host: p.host, connected: p.connected
+        id: p.id, name: p.name, host: false, connected: p.connected
       })),
       game: game ? {
         phase: game.phase,
@@ -159,8 +164,11 @@ class RoomServer {
 
   sendState(code) {
     const room = this.getRoom(code);
-    for (const [playerId, socket] of room.sockets.entries()) {
-      if (socket && typeof socket.send === 'function') socket.send(JSON.stringify(this.snapshot(code, playerId)));
+    for (const [clientId, socket] of room.sockets.entries()) {
+      if (socket && typeof socket.send === 'function') {
+        const viewerId = clientId === room.hostId ? null : clientId;
+        socket.send(JSON.stringify(this.snapshot(code, viewerId)));
+      }
     }
   }
 }
