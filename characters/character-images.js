@@ -45,4 +45,7 @@
   const call=document.createElement('script');
   call.src=base()+'call-button.js?v=3';
   document.head.appendChild(call);
+  const restart=document.createElement('script');
+  restart.src=base()+'host-restart.js?v=1';
+  document.head.appendChild(restart);
 })();
