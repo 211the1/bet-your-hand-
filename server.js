@@ -1,6 +1,7 @@
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const { RoomServer } = require('./server/room-server');
+const { executeGameAction } = require('./server/game-actions');
 
 function createServer({ roomServer = new RoomServer() } = {}) {
   const httpServer = http.createServer((req, res) => {
@@ -59,6 +60,11 @@ function createServer({ roomServer = new RoomServer() } = {}) {
         if (type === 'START_GAME') {
           if (s.playerId !== room.hostId) throw new Error('Only the host can start the game');
           roomServer.startGame(s.code);
+          roomServer.sendState(s.code);
+          return;
+        }
+        if (['PLAY_CARD', 'DRAW', 'CHOOSE_COLOR', 'SPIN_WHEEL'].includes(type)) {
+          executeGameAction(room, s.playerId, msg);
           roomServer.sendState(s.code);
           return;
         }
