@@ -1,11 +1,12 @@
 {
   "name": "bet-your-hand-engine",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "private": true,
   "description": "BET YOUR HAND Stage 2 WebSocket server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "pretest": "npm install --ignore-scripts --no-audit --no-fund",
     "test": "node --test engine/card-engine.test.js server/room-server.test.js server/websocket-server.test.js"
   },
   "dependencies": {
