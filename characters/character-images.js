@@ -1,4 +1,3 @@
-/* BET YOUR HAND — approved character photos */
 (function(){
   const chars=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];
   const files={
@@ -66,4 +65,23 @@
   const call=document.createElement('script');
   call.src=base()+'call-button.js?v=2';
   document.head.appendChild(call);
+
+  function recoverConnection(){
+    try{
+      if(document.visibilityState!=='visible') return;
+      if(typeof roomCode==='undefined' || !roomCode || typeof connect!=='function') return;
+      if(typeof reconnectTimer!=='undefined') clearTimeout(reconnectTimer);
+      if(typeof manualClose!=='undefined') manualClose=true;
+      if(typeof ws!=='undefined' && ws && ws.readyState!==WebSocket.CLOSED) ws.close();
+      if(typeof ws!=='undefined') ws=null;
+      if(typeof manualClose!=='undefined') manualClose=false;
+      if(typeof reconnectDelay!=='undefined') reconnectDelay=1500;
+      if(typeof setConn==='function') setConn('RECONNECTING…');
+      connect();
+    }catch(e){}
+  }
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible') setTimeout(recoverConnection,100);
+  });
+  window.addEventListener('pageshow',function(){setTimeout(recoverConnection,100);});
 })();
