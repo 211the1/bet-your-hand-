@@ -40,12 +40,17 @@ class RoomServer {
   constructor({ rng = Math.random } = {}) {
     this.rng = rng;
     this.rooms = new Map();
+    this.nextPlayerNumber = 1;
+    this.nextRoomNumber = 1;
   }
 
   createRoom(hostName = 'Host') {
-    let code;
-    do code = makeCode(this.rng); while (this.rooms.has(code));
-    const hostId = `p_${makeToken(this.rng).slice(0, 10)}`;
+    let code = makeCode(this.rng);
+    while (this.rooms.has(code)) {
+      const suffix = String(this.nextRoomNumber++ % 10);
+      code = code.slice(0, ROOM_CODE_LENGTH - 1) + suffix;
+    }
+    const hostId = `p_${this.nextPlayerNumber++}`;
     const token = makeToken(this.rng);
     const room = {
       code,
@@ -73,7 +78,7 @@ class RoomServer {
     assert(!room.started, 'Game already started');
     assert(room.players.size < engine.MAX_PLAYERS, `Room is full (${engine.MAX_PLAYERS} players maximum)`);
     assert(typeof name === 'string' && name.trim().length > 0, 'Player name is required');
-    const playerId = `p_${makeToken(this.rng).slice(0, 10)}`;
+    const playerId = `p_${this.nextPlayerNumber++}`;
     const token = makeToken(this.rng);
     room.players.set(playerId, { id: playerId, name: name.trim(), token, host: false, connected: false });
     return { code: room.code, playerId, reconnectToken: token };
