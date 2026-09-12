@@ -41,6 +41,7 @@ function render(){if(!state)return;const ps=state.players||[];$('code').textCont
 function clearSession(){localStorage.removeItem('byhMode');localStorage.removeItem('byhRoom');localStorage.removeItem('byhToken');localStorage.removeItem('byhName');roomCode='';resumeToken='';myId='';state=null;ws=null;reconnectDelay=1500;$('setup').classList.remove('hidden');$('room').classList.add('hidden');if(mode==='host'){$('playerSetup').classList.add('hidden');$('hostSetup').classList.remove('hidden')}else{$('playerSetup').classList.remove('hidden');$('hostSetup').classList.add('hidden')}setConn('READY');renderCharacterChoices()}
 function connect(){if(ws&&(ws.readyState===WebSocket.OPEN||ws.readyState===WebSocket.CONNECTING))return;const target=serverSocket();if(!target){setConn('SERVER URL NEEDED');toast('Game server address is missing.');return}try{ws=new WebSocket(target)}catch(e){scheduleReconnect();return}ws.onopen=()=>{reconnectDelay=1500;if(mode==='host'){if(roomCode&&resumeToken)send({type:'resumeHost',code:roomCode,token:resumeToken});else send({type:'create',name:myName||'Host'})}else if(roomCode&&resumeToken){send({type:'resumePlayer',code:roomCode,token:resumeToken})}else if(roomCode&&myName){send({type:'join',code:roomCode,name:myName,character:selectedCharacter})}};ws.onmessage=e=>{try{handle(JSON.parse(e.data))}catch(err){}};ws.onclose=()=>{ws=null;if(manualClose)return;if(roomCode){setConn('DISCONNECTED — RECONNECTING…');scheduleReconnect()}else setConn('READY')};ws.onerror=()=>setConn('CONNECTION ERROR — RETRYING…')}
 function scheduleReconnect(){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,reconnectDelay);reconnectDelay=Math.min(reconnectDelay*1.6,3000)}
+function reconnectNow(){if(!roomCode||manualClose)return;clearTimeout(reconnectTimer);reconnectDelay=1500;if(ws){try{ws.close()}catch(e){}ws=null}setConn('RECONNECTING…');setTimeout(connect,100)}
 function createRoom(){mode='host';myName=($('hostName').value||'Host').trim().slice(0,16)||'Host';roomCode='';resumeToken='';$('setup').classList.add('hidden');$('room').classList.remove('hidden');setConn('CONNECTING…');connect()}
 function joinRoom(){if(!selectedCharacter)return toast('Choose a character first.');const code=($('joinCode').value||'').replace(/\D/g,'').slice(0,4);if(code.length!==4)return toast('Enter the 4-digit game code.');mode='player';myName=($('playerName').value||'Player').trim().slice(0,16)||'Player';roomCode=code;resumeToken='';$('setup').classList.add('hidden');$('room').classList.remove('hidden');setConn('CONNECTING…');connect()}
 function startGame(){send({type:'start'})}
@@ -65,7 +66,9 @@ window.addEventListener('load',()=>{
   if(mode==='host'){$('playerSetup').classList.add('hidden');$('hostSetup').classList.remove('hidden')}
   const sm=localStorage.getItem('byhMode'),sr=localStorage.getItem('byhRoom'),st=localStorage.getItem('byhToken'),sn=localStorage.getItem('byhName');if(sr&&st&&sn&&((mode==='host'&&sm==='host')||(mode==='player'&&sm==='player'))){roomCode=sr;resumeToken=st;myName=sn;$('setup').classList.add('hidden');$('room').classList.remove('hidden');connect()}
 });
+window.addEventListener('pageshow',()=>{if(document.visibilityState==='visible'&&roomCode)reconnectNow()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&roomCode)reconnectNow()});
 </script>
-<script src="./characters/character-images.js?v=6"></script>
+<script src="./characters/character-images.js?v=7"></script>
 </body>
 </html>
