@@ -29,7 +29,7 @@ function createServer({ roomServer = new RoomServer() } = {}) {
           if (sessions.has(ws)) throw new Error('Already connected');
           s = roomServer.createRoom(msg.name || 'Host');
           sessions.set(ws, s);
-          roomServer.attachSocket(s.code, s.playerId, ws);
+          roomServer.attachSocket(s.code, s.hostId, ws);
           send(ws, { type: 'ROOM_CREATED', ...s });
           roomServer.sendState(s.code);
           return;
@@ -45,8 +45,8 @@ function createServer({ roomServer = new RoomServer() } = {}) {
         }
         if (type === 'RECONNECT') {
           if (sessions.has(ws)) throw new Error('Already connected');
-          s = roomServer.reconnect(msg.code, msg.playerId, msg.reconnectToken);
-          s.reconnectToken = msg.reconnectToken;
+          s = roomServer.reconnect(msg.code, msg.playerId || msg.hostId, msg.reconnectToken || msg.hostToken);
+          s.reconnectToken = msg.reconnectToken || msg.hostToken;
           sessions.set(ws, s);
           roomServer.attachSocket(s.code, s.playerId, ws);
           send(ws, { type: 'RECONNECTED', ...s });
@@ -57,8 +57,9 @@ function createServer({ roomServer = new RoomServer() } = {}) {
         s = sessions.get(ws);
         if (!s) throw new Error('Not connected to a room');
         const room = roomServer.getRoom(s.code);
+        const isHost = s.host === true || s.playerId === room.hostId;
         if (type === 'RESET_ROOM') {
-          if (s.playerId !== room.hostId) throw new Error('Only the host can start over');
+          if (!isHost) throw new Error('Only the host can start over');
           for (const socket of room.sockets.values()) send(socket, { type: 'RESET_ROOM' });
           for (const [socket, session] of sessions.entries()) {
             if (session.code === room.code) sessions.delete(socket);
@@ -70,7 +71,7 @@ function createServer({ roomServer = new RoomServer() } = {}) {
           return;
         }
         if (type === 'START_GAME') {
-          if (s.playerId !== room.hostId) throw new Error('Only the host can start the game');
+          if (!isHost) throw new Error('Only the host can start the game');
           roomServer.startGame(s.code);
           roomServer.sendState(s.code);
           return;
