@@ -53,7 +53,7 @@ function beginTurn(g){g.turnBonusAwarded=false;return awardTurnBonus(g,currentPl
 function drawUntilPlayable(g,p){assert(currentPlayer(g)===p,'It is not this player turn');assert(!hasPlayableCard(g,p),'Player already has a playable card');let n=0;while(!hasPlayableCard(g,p)){if(!drawOne(g,p))break;if(++n>DECK_SIZE)throw new Error('Draw safety limit exceeded')}return n}
 function removeCard(p,i){assert(Number.isInteger(i)&&i>=0&&i<p.hand.length,'Invalid hand index');return p.hand.splice(i,1)[0]}
 
-function applyActionAndAdvance(g,c){let steps=1;if(c.action==='SKIP'){const target=g.players[nextIndex(g)];if(target.shield)target.shield=false;else steps=2}else if(c.action==='REVERSE'){g.direction*=-1;if(g.players.length===2)steps=2}g.turnIndex=nextIndex(g,steps);beginTurn(g)}
+function applyActionAndAdvance(g,c){let steps=1;if(c.action==='SKIP'){const target=g.players[nextIndex(g)];if(target.shield)target.shield=false;else steps=2}else if(c.action==='REVERSE'){g.direction*=-1;if(g.players.length===2)steps=1}g.turnIndex=nextIndex(g,steps);beginTurn(g)}
 
 function playCard(g,playerId,handIndex){
   const p=g.players.find(x=>x.id===playerId);assert(p,'Unknown player');assert(g.phase==='playing','Game is not playing');assert(currentPlayer(g)===p,'It is not this player turn');const c=p.hand[handIndex];assert(c,'Card not found');assert(isPlayable(g,c),'Card is not playable');removeCard(p,handIndex);g.discard.push({...c});g.pendingColor=null;g.pendingAction=null;g.wheelResult=null;
