@@ -1,35 +1,17 @@
-/* BET YOUR HAND — Stage 1 clean card/game engine.
- * No UI, character images, WebSocket/server, or network code.
- * The game uses points only.
- */
+/* BET YOUR HAND — clean authoritative card/game engine. */
 'use strict';
-
-const COLORS = Object.freeze(['red', 'blue', 'green', 'yellow']);
-const CHARACTERS = Object.freeze(['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw']);
-const POWER_WHEEL = Object.freeze([
-  {character:'Bug',power:'EXTRA PLAY'}, {character:'Face',power:'SHIELD'},
-  {character:'Ling Ling',power:'COLOR CHOICE'}, {character:'Beanz',power:'EXTRA PLAY'},
-  {character:'The One',power:'TURN SWITCH'}, {character:'Boone',power:'SHIELD'},
-  {character:'Chicken Joe',power:'COLOR CHOICE'}, {character:'Juby',power:'EXTRA PLAY'},
-  {character:'Meemaw',power:'TURN SWITCH'}
+const COLORS=Object.freeze(['red','blue','green','yellow']);
+const CHARACTERS=Object.freeze(['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw']);
+const POWER_WHEEL=Object.freeze([
+ {character:'Bug',power:'EXTRA PLAY'}, {character:'Face',power:'SHIELD'}, {character:'Ling Ling',power:'COLOR CHOICE'},
+ {character:'Beanz',power:'EXTRA PLAY'}, {character:'The One',power:'TURN SWITCH'}, {character:'Boone',power:'SHIELD'},
+ {character:'Chicken Joe',power:'COLOR CHOICE'}, {character:'Juby',power:'EXTRA PLAY'}, {character:'Meemaw',power:'TURN SWITCH'}
 ]);
-const STARTING_HAND=8, STARTING_POINTS=500, MIN_PLAYERS=2, MAX_PLAYERS=6, DECK_SIZE=108;
-const SPECIAL='SPECIAL_POWER';
-
+const STARTING_HAND=8,STARTING_POINTS=500,MIN_PLAYERS=2,MAX_PLAYERS=6,DECK_SIZE=108,SPECIAL='SPECIAL_POWER';
 function assert(ok,msg){if(!ok)throw new Error(msg)}
 function shuffle(cards,rng=Math.random){const a=cards.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-
-function buildDeck(rng=Math.random){
-  const d=[];
-  for(const color of COLORS)for(const character of CHARACTERS)for(let n=0;n<2;n++)d.push({type:'CHARACTER',color,character});
-  for(const color of COLORS)for(const action of ['SKIP','REVERSE'])for(let n=0;n<2;n++)d.push({type:'ACTION',color,action});
-  for(let n=0;n<8;n++)d.push({type:'WILD',color:'wild',action:'WILD'});
-  for(let n=0;n<12;n++)d.push({type:SPECIAL,color:null,action:SPECIAL});
-  assert(d.length===DECK_SIZE,`Deck must contain ${DECK_SIZE} cards; got ${d.length}`);
-  return shuffle(d,rng);
-}
-
-function createPlayer(id,name=`Player ${id}`){return {id,name,hand:[],points:STARTING_POINTS,shield:false,extraPlay:false,lastCardBonus:false}}
+function buildDeck(rng=Math.random){const d=[];for(const color of COLORS)for(const character of CHARACTERS)for(let n=0;n<2;n++)d.push({type:'CHARACTER',color,character});for(const color of COLORS)for(const action of ['SKIP','REVERSE'])for(let n=0;n<2;n++)d.push({type:'ACTION',color,action});for(let n=0;n<8;n++)d.push({type:'WILD',color:'wild',action:'WILD'});for(let n=0;n<12;n++)d.push({type:SPECIAL,color:null,action:SPECIAL});assert(d.length===DECK_SIZE,`Deck must contain ${DECK_SIZE} cards; got ${d.length}`);return shuffle(d,rng)}
+function createPlayer(id,name=`Player ${id}`){return{id,name,hand:[],points:STARTING_POINTS,shield:false,extraPlay:false}}
 function topCard(g){return g.discard.at(-1)||null}
 function currentColor(g){return g.pendingColor||topCard(g)?.color||null}
 function isPlayable(g,c){const t=topCard(g);if(!t)return true;if(c.type==='WILD'||c.type===SPECIAL)return true;return c.color===currentColor(g)||(c.character&&t.character&&c.character===t.character)}
@@ -38,42 +20,15 @@ function currentPlayer(g){return g.players[g.turnIndex]}
 function nextIndex(g,steps=1){let i=g.turnIndex;for(let n=0;n<steps;n++)i=(i+g.direction+g.players.length)%g.players.length;return i}
 function reshuffleDiscard(g){if(g.discard.length<=1)return;const t=g.discard.pop();g.deck=shuffle(g.discard,g.rng);g.discard=[t];g.pendingColor=null}
 function drawOne(g,p){if(!g.deck.length)reshuffleDiscard(g);if(!g.deck.length)return null;const c=g.deck.pop();p.hand.push(c);return c}
-
-function startRound(g,first=false){
-  g.deck=buildDeck(g.rng);g.discard=[];g.direction=1;g.pendingColor=null;g.pendingAction=null;g.wheelResult=null;g.winner=null;g.turnBonusAwarded=false;
-  for(const p of g.players){p.hand=[];p.shield=false;p.extraPlay=false;p.lastCardBonus=false}
-  for(const p of g.players)for(let n=0;n<STARTING_HAND;n++)drawOne(g,p);
-  const i=g.deck.findIndex(c=>c.color&&c.type!=='WILD'&&c.type!==SPECIAL);assert(i>=0,'No valid opening card');
-  g.discard.push(g.deck.splice(i,1)[0]);g.turnIndex=0;if(!first)g.round=2;
-}
-function createGame({rng=Math.random,playerIds=[]}={}){assert(playerIds.length>=MIN_PLAYERS&&playerIds.length<=MAX_PLAYERS,`Game requires ${MIN_PLAYERS}-${MAX_PLAYERS} players`);const g={rng,players:playerIds.map((id,i)=>createPlayer(id,`Player ${i+1}`)),deck:[],discard:[],turnIndex:0,direction:1,round:1,phase:'playing',pendingColor:null,pendingAction:null,wheelResult:null,winner:null,turnBonusAwarded:false};startRound(g,true);return g}
-
 function awardTurnBonus(g,p){if(g.turnBonusAwarded)return false;if(hasPlayableCard(g,p)){p.points+=150;g.turnBonusAwarded=true;return true}return false}
-function beginTurn(g){g.turnBonusAwarded=false;return awardTurnBonus(g,currentPlayer(g))?currentPlayer(g):currentPlayer(g)}
+function beginTurn(g){g.turnBonusAwarded=false;awardTurnBonus(g,currentPlayer(g));return currentPlayer(g)}
+function startRound(g,first=false){g.deck=buildDeck(g.rng);g.discard=[];g.direction=1;g.pendingColor=null;g.pendingAction=null;g.wheelResult=null;g.winner=null;g.turnBonusAwarded=false;for(const p of g.players){p.hand=[];p.shield=false;p.extraPlay=false}for(const p of g.players)for(let n=0;n<STARTING_HAND;n++)drawOne(g,p);const i=g.deck.findIndex(c=>c.color&&c.type!=='WILD'&&c.type!==SPECIAL);assert(i>=0,'No valid opening card');g.discard.push(g.deck.splice(i,1)[0]);g.turnIndex=0;if(!first)g.round=2;beginTurn(g)}
+function createGame({rng=Math.random,playerIds=[]}={}){assert(playerIds.length>=MIN_PLAYERS&&playerIds.length<=MAX_PLAYERS,`Game requires ${MIN_PLAYERS}-${MAX_PLAYERS} players`);const g={rng,players:playerIds.map((id,i)=>createPlayer(id,`Player ${i+1}`)),deck:[],discard:[],turnIndex:0,direction:1,round:1,phase:'playing',pendingColor:null,pendingAction:null,wheelResult:null,winner:null,turnBonusAwarded:false};startRound(g,true);return g}
 function drawUntilPlayable(g,p){assert(currentPlayer(g)===p,'It is not this player turn');assert(!hasPlayableCard(g,p),'Player already has a playable card');let n=0;while(!hasPlayableCard(g,p)){if(!drawOne(g,p))break;if(++n>DECK_SIZE)throw new Error('Draw safety limit exceeded')}return n}
-function removeCard(p,i){assert(Number.isInteger(i)&&i>=0&&i<p.hand.length,'Invalid hand index');return p.hand.splice(i,1)[0]}
-
-function applyActionAndAdvance(g,c){let steps=1;if(c.action==='SKIP'){const target=g.players[nextIndex(g)];if(target.shield)target.shield=false;else steps=2}else if(c.action==='REVERSE'){g.direction*=-1;if(g.players.length===2)steps=1}g.turnIndex=nextIndex(g,steps);beginTurn(g)}
-
-function playCard(g,playerId,handIndex){
-  const p=g.players.find(x=>x.id===playerId);assert(p,'Unknown player');assert(g.phase==='playing','Game is not playing');assert(currentPlayer(g)===p,'It is not this player turn');const c=p.hand[handIndex];assert(c,'Card not found');assert(isPlayable(g,c),'Card is not playable');removeCard(p,handIndex);g.discard.push({...c});g.pendingColor=null;g.pendingAction=null;g.wheelResult=null;
-  if(p.hand.length===1&&!p.lastCardBonus){p.points+=250;p.lastCardBonus=true}
-  if(c.type==='WILD'){g.pendingAction='WILD_COLOR';return{type:'WILD',player:p}}
-  if(c.type===SPECIAL){g.pendingAction='POWER_WHEEL';return{type:'SPECIAL_POWER',player:p}}
-  if(p.extraPlay){p.extraPlay=false;beginTurn(g);return{type:'EXTRA_TURN',player:p}}
-  applyActionAndAdvance(g,c);return{type:'NORMAL',player:p}
-}
-
-function chooseColor(g,playerId,color){const p=g.players.find(x=>x.id===playerId);assert(p,'Unknown player');assert(COLORS.includes(color),'Invalid color');assert(currentPlayer(g)===p,'It is not this player turn');assert(g.pendingAction==='WILD_COLOR'||g.pendingAction==='COLOR_CHOICE','No color choice pending');g.pendingColor=color;g.pendingAction=null;if(p.extraPlay){p.extraPlay=false;beginTurn(g)}else{g.turnIndex=nextIndex(g);beginTurn(g)}}
-
-function spinPowerWheel(g,playerId,forcedIndex=null){const p=g.players.find(x=>x.id===playerId);assert(p,'Unknown player');assert(currentPlayer(g)===p,'It is not this player turn');assert(g.pendingAction==='POWER_WHEEL','Power Wheel not pending');const i=forcedIndex===null?Math.floor(g.rng()*POWER_WHEEL.length):forcedIndex;assert(Number.isInteger(i)&&i>=0&&i<POWER_WHEEL.length,'Invalid wheel index');const r=POWER_WHEEL[i];g.wheelResult={...r,index:i};g.pendingAction=null;
-  if(r.power==='EXTRA PLAY'){p.extraPlay=true;beginTurn(g)}
-  else if(r.power==='SHIELD'){p.shield=true;g.turnIndex=nextIndex(g);beginTurn(g)}
-  else if(r.power==='COLOR CHOICE'){g.pendingAction='COLOR_CHOICE'}
-  else if(r.power==='TURN SWITCH'){g.direction*=-1;g.turnIndex=nextIndex(g);beginTurn(g)}
-  return r
-}
-
+function finishExtraOrAdvance(g,p,steps=1){if(p.extraPlay){p.extraPlay=false;beginTurn(g);return 'EXTRA_TURN'}g.turnIndex=nextIndex(g,steps);beginTurn(g);return 'NORMAL'}
+function applyCardAction(g,p,c){if(c.action==='SKIP'){const target=g.players[nextIndex(g)];if(target.shield)target.shield=false;else return finishExtraOrAdvance(g,p,2);return finishExtraOrAdvance(g,p,1)}if(c.action==='REVERSE'){g.direction*=-1;return finishExtraOrAdvance(g,p,1)}return finishExtraOrAdvance(g,p,1)}
+function playCard(g,playerId,handIndex){const p=g.players.find(x=>x.id===playerId);assert(p,'Unknown player');assert(g.phase==='playing','Game is not playing');assert(currentPlayer(g)===p,'It is not this player turn');const c=p.hand[handIndex];assert(c,'Card not found');assert(isPlayable(g,c),'Card is not playable');p.hand.splice(handIndex,1);g.discard.push({...c});g.pendingColor=null;g.pendingAction=null;g.wheelResult=null;if(c.type==='WILD'){g.pendingAction='WILD_COLOR';return{type:'WILD',player:p,card:c}}if(c.type===SPECIAL){g.pendingAction='POWER_WHEEL';return{type:'SPECIAL_POWER',player:p,card:c}}const type=applyCardAction(g,p,c);return{type,player:p,card:c}}
+function chooseColor(g,playerId,color){const p=g.players.find(x=>x.id===playerId);assert(p,'Unknown player');assert(COLORS.includes(color),'Invalid color');assert(currentPlayer(g)===p,'It is not this player turn');assert(g.pendingAction==='WILD_COLOR'||g.pendingAction==='COLOR_CHOICE','No color choice pending');g.pendingColor=color;g.pendingAction=null;const type=finishExtraOrAdvance(g,p,1);return{type:'COLOR_CHOSEN',player:p,color,typeAfter:type}}
+function spinPowerWheel(g,playerId){const p=g.players.find(x=>x.id===playerId);assert(p,'Unknown player');assert(currentPlayer(g)===p,'It is not this player turn');assert(g.pendingAction==='POWER_WHEEL','Power Wheel not pending');const i=Math.min(POWER_WHEEL.length-1,Math.floor(g.rng()*POWER_WHEEL.length));const r=POWER_WHEEL[i];g.wheelResult={...r,index:i};g.pendingAction=null;if(r.power==='EXTRA PLAY'){p.extraPlay=true;beginTurn(g);return r}if(r.power==='SHIELD'){p.shield=true;finishExtraOrAdvance(g,p,1);return r}if(r.power==='COLOR CHOICE'){g.pendingAction='COLOR_CHOICE';return r}g.direction*=-1;finishExtraOrAdvance(g,p,1);return r}
 function finishRound(g){const roundWinner=g.players.reduce((a,p)=>!a||p.points>a.points?p:a,null);if(g.round===1){g.round=2;startRound(g,false);return{roundWinner,nextRound:2}}g.phase='finished';g.winner=g.players.reduce((a,p)=>!a||p.points>a.points?p:a,null);return{roundWinner,winner:g.winner,nextRound:null}}
-
 module.exports={COLORS,CHARACTERS,POWER_WHEEL,STARTING_HAND,STARTING_POINTS,MIN_PLAYERS,MAX_PLAYERS,DECK_SIZE,SPECIAL,buildDeck,createPlayer,createGame,startRound,topCard,currentColor,currentPlayer,isPlayable,hasPlayableCard,drawOne,drawUntilPlayable,playCard,chooseColor,spinPowerWheel,awardTurnBonus,beginTurn,finishRound};
