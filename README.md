@@ -1,6 +1,6 @@
-# BET YOUR HAND — Fresh Build
+# PLAY YOUR HAND — Fresh Build
 
-This branch is a clean rebuild governed by `docs/GAME_MASTER_SPEC.md`.
+This branch is a clean rebuild governed by `GAME_MASTER_SPEC.md`.
 
 Layers:
 - `game/` pure rules engine
@@ -9,6 +9,6 @@ Layers:
 - `client/` player phone UI
 - `host/` host/TV UI
 - `assets/` production-asset boundary
-- `docs/` source-of-truth specification
+- `docs/` source-of-truth build notes
 
 The old prototype files are not used by the fresh architecture. The supplied character JPGs are retained separately.
