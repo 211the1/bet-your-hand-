@@ -9,7 +9,7 @@ This is the single source of truth for the complete PLAY YOUR HAND game. New cod
 - Platform: player phones + host/TV display
 - Players: 2–6 actual players
 - Host/TV is not a player
-- Game uses fictional game points only. No real-money wagering or gambling mechanics.
+- Game uses fictional game points only.
 
 ## 2. Locked core rules
 - Starting hand: 8 cards
@@ -172,7 +172,7 @@ Do not mix in obsolete designs that conflict with the locked rules.
 ## 11. Existing design references
 The project has previously created UI storyboard/mockup files covering host, player, lobby, TV gameplay, waiting/call, wheel, color choice, round end, winner, rules, and thank-you screens. These are visual references, not authority for gameplay rules where they conflict with this master spec.
 
-Important: older mockups that show wagering/risk choices such as “PLAY IT SAFE,” “PLAY IT BOLD,” or “GO BIG” are obsolete and must not be implemented.
+Important: older mockups that show risk-choice language such as “PLAY IT SAFE,” “PLAY IT BOLD,” or “GO BIG” are obsolete and must not be implemented.
 
 ## 12. Asset requirements
 Required character images:
