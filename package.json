@@ -1,1 +1,1 @@
-{"name":"bet-your-hand","version":"4.0.0-fresh","private":true,"main":"server.js","scripts":{"start":"node server.js","test":"node --test tests/*.test.js"},"dependencies":{"ws":"^8.18.3"}}
+{"name":"bet-your-hand","version":"4.1.0-fresh","private":true,"main":"server.js","scripts":{"start":"node server.js","test":"node --test tests/*.test.js"}}
