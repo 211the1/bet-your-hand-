@@ -1,1 +1,1 @@
-{"name":"play-your-hand","version":"4.1.1-fresh","private":true,"main":"server.js","scripts":{"start":"node server.js","test":"node --test tests/*.test.js"},"dependencies":{"ws":"^8.18.3"}}
+{"name":"play-your-hand","version":"4.1.1-fresh","private":true,"main":"server.js","scripts":{"start":"node server.js","test":"node --test tests/*.test.js"},"dependencies":{"ws":"^8.18.3","pg":"^8.16.3"}}
