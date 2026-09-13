@@ -1,10 +1,10 @@
-# BET YOUR HAND — GAME MASTER SPEC
+# PLAY YOUR HAND — GAME MASTER SPEC
 
 ## Purpose
-This is the single source of truth for the complete BET YOUR HAND game. New code, screens, art, audio, tests, and deployment must follow this document. Do not revive obsolete mechanics from older prototypes.
+This is the single source of truth for the complete PLAY YOUR HAND game. New code, screens, art, audio, tests, and deployment must follow this document. Do not revive obsolete mechanics from older prototypes.
 
 ## 1. Game identity
-- Title: BET YOUR HAND
+- Title: PLAY YOUR HAND
 - Presentation: Game Night / neon arcade
 - Platform: player phones + host/TV display
 - Players: 2–6 actual players
@@ -17,7 +17,7 @@ This is the single source of truth for the complete BET YOUR HAND game. New code
 - Deck: exactly 108 cards
 - Colors: Red, Blue, Green, Yellow
 - A normal card is playable when it matches the current color OR the current top-card character.
-- WILD and BET YOUR HAND special cards are playable when appropriate.
+- WILD and PLAY YOUR HAND special cards are playable when appropriate.
 - If a player has no playable card, the game automatically draws until a playable card is available. That turn receives no +150 bonus.
 - If a playable card exists at the start of a player's turn, award +150 points.
 - SKIP skips the next player's turn unless that player has SHIELD.
@@ -29,7 +29,7 @@ This is the single source of truth for the complete BET YOUR HAND game. New code
 - SKIP = 8
 - REVERSE = 8
 - WILD = 8
-- BET YOUR HAND / SPECIAL POWER = 12
+- PLAY YOUR HAND / SPECIAL POWER = 12
 - TOTAL = 108
 
 ## 4. Characters — locked order
@@ -45,8 +45,8 @@ This is the single source of truth for the complete BET YOUR HAND game. New code
 
 Use the supplied character images. Keep each character's image/name mapping correct and center the head/face appropriately without unwanted cropping.
 
-## 5. BET YOUR HAND special card / Power Wheel
-Playing a BET YOUR HAND card activates the Power Wheel. It is not a wager.
+## 5. PLAY YOUR HAND special card / Power Wheel
+Playing a PLAY YOUR HAND card activates the Power Wheel.
 
 The wheel has 9 equal sections. Every section has exactly a 1/9 chance on every spin. Spins are independent and cannot favor a player or remember previous results.
 
@@ -61,7 +61,7 @@ Wheel assignments:
 8. Juby → EXTRA PLAY
 9. Meemaw → TURN SWITCH
 
-All four powers are one-time-use powers. A power is consumed when used and is not available again until a new BET YOUR HAND card awards it.
+All four powers are one-time-use powers. A power is consumed when used and is not available again until a new PLAY YOUR HAND card awards it.
 
 ### EXTRA PLAY
 Immediately gives the current player another turn. Complete the current action, then take the extra turn. Normal turn order resumes afterward.
@@ -136,7 +136,7 @@ Required audio categories:
 - SKIP sound
 - REVERSE sound
 - WILD/color-choice sound
-- BET YOUR HAND activation sound
+- PLAY YOUR HAND activation sound
 - Power Wheel spin and result sound
 - EXTRA PLAY sound
 - SHIELD sound
@@ -192,7 +192,7 @@ Required additional production assets:
 - SKIP artwork
 - REVERSE artwork
 - WILD artwork
-- BET YOUR HAND artwork
+- PLAY YOUR HAND artwork
 - Power Wheel artwork
 - arcade backgrounds / table scene
 - buttons/icons
@@ -241,7 +241,7 @@ The game is ready for real user testing only when all of these work together:
 - SKIP / SHIELD works.
 - REVERSE works, including 2-player behavior.
 - WILD color choice works on phone and TV.
-- BET YOUR HAND activates the Power Wheel.
+- PLAY YOUR HAND activates the Power Wheel.
 - All 9 wheel sections are equally random.
 - All four powers work and are consumed correctly.
 - Round 1 ends correctly.
