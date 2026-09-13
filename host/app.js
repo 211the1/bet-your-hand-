@@ -1,81 +1,17 @@
 (() => {
   'use strict';
-
-  const createButton = document.getElementById('create');
-  const roomEl = document.getElementById('room');
-  const playersEl = document.getElementById('players');
-  const startButton = document.getElementById('start');
-  const gameEl = document.getElementById('game');
-
-  let ws = null;
-  let created = false;
-
-  function connect() {
-    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    ws = new WebSocket(`${protocol}//${location.host}`);
-
-    ws.addEventListener('open', () => {
-      createButton.disabled = false;
-    });
-
-    ws.addEventListener('message', event => {
-      let message;
-      try { message = JSON.parse(event.data); }
-      catch { return; }
-
-      if (message.type === 'ERROR') {
-        roomEl.innerHTML = `<h2>${escapeHtml(message.error || 'Something went wrong.')}</h2>`;
-        createButton.disabled = false;
-        return;
-      }
-
-      if (message.type === 'ROOM_CREATED') {
-        created = true;
-        createButton.disabled = true;
-        roomEl.innerHTML = `<h2>ROOM ${escapeHtml(message.code)}</h2>`;
-        startButton.hidden = false;
-        return;
-      }
-
-      if (message.type !== 'STATE') return;
-
-      playersEl.innerHTML = message.players.map(player =>
-        `<div>${escapeHtml(player.name)} — ${escapeHtml(player.character)} ${player.connected ? '🟢' : '⚪'}</div>`
-      ).join('');
-
-      if (message.game) {
-        gameEl.innerHTML = `<h2>ROUND ${message.game.round}</h2><h3>${escapeHtml(message.game.currentColor || '')}</h3>`;
-      }
-    });
-
-    ws.addEventListener('close', () => {
-      if (!created) createButton.disabled = false;
-    });
-  }
-
-  function send(message) {
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-      roomEl.innerHTML = '<h2>Connecting to game server…</h2>';
-      return;
-    }
-    ws.send(JSON.stringify(message));
-  }
-
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>'"]/g, character => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-    }[character]));
-  }
-
-  createButton.disabled = true;
-  startButton.hidden = true;
-  connect();
-
-  createButton.addEventListener('click', () => {
-    if (created) return;
-    createButton.disabled = true;
-    send({ type: 'CREATE_ROOM', name: 'Host' });
-  });
-
-  startButton.addEventListener('click', () => send({ type: 'START_GAME' }));
+  const createButton=document.getElementById('create'),roomEl=document.getElementById('room'),playersEl=document.getElementById('players'),startButton=document.getElementById('start'),restartButton=document.getElementById('restart'),gameEl=document.getElementById('game'),statusEl=document.getElementById('status');
+  let ws=null,connecting=false,created=Boolean(localStorage.getItem('byhHostSession')),retryTimer=null,pingTimer=null;
+  let session=null;try{session=JSON.parse(localStorage.getItem('byhHostSession')||'null')}catch{}
+  const setStatus=(x,bad=false)=>{statusEl.textContent=x;statusEl.style.color=bad?'#ff6b6b':'#21f17d'};
+  const saveSession=s=>localStorage.setItem('byhHostSession',JSON.stringify(s));
+  const clearSession=()=>{localStorage.removeItem('byhHostSession');session=null;created=false};
+  const send=m=>{if(ws?.readyState!==WebSocket.OPEN)return false;ws.send(JSON.stringify(m));return true};
+  function scheduleReconnect(){if(retryTimer||!session)return;retryTimer=setTimeout(()=>{retryTimer=null;connect()},1000)}
+  function connect(){if(connecting||ws?.readyState===WebSocket.OPEN)return;connecting=true;setStatus(session?'RECONNECTING TO GAME SERVER…':'CONNECTING TO GAME SERVER…');const protocol=location.protocol==='https:'?'wss:':'ws:';ws=new WebSocket(`${protocol}//${location.host}`);ws.addEventListener('open',()=>{connecting=false;setStatus(session?'HOST RECONNECTED':'CONNECTED');if(session){send({type:'RECONNECT',code:session.code,playerId:session.hostId,reconnectToken:session.hostToken})}else createButton.disabled=false;clearInterval(pingTimer);pingTimer=setInterval(()=>send({type:'PING'}),10000)});ws.addEventListener('message',event=>{let m;try{m=JSON.parse(event.data)}catch{return};if(m.type==='ERROR'){setStatus(m.error||'Server error',true);if(!session)createButton.disabled=false;return}if(m.type==='ROOM_CREATED'){session={code:m.code,hostId:m.hostId,hostToken:m.hostToken};saveSession(session);created=true;createButton.disabled=true;roomEl.innerHTML=`<h2>ROOM ${escapeHtml(m.code)}</h2>`;startButton.hidden=false;restartButton.hidden=false;setStatus('HOST CONNECTED');send({type:'PING'});return}if(m.type==='RECONNECTED'){created=true;createButton.disabled=true;setStatus('HOST RECONNECTED');return}if(m.type!=='STATE')return;roomEl.innerHTML=`<h2>ROOM ${escapeHtml(m.roomCode)}</h2>`;playersEl.innerHTML=m.players.map(p=>`<div>${escapeHtml(p.name)} — ${escapeHtml(p.character)} ${p.connected?'🟢':'⚪'}</div>`).join('');if(m.game){gameEl.innerHTML=`<h2>ROUND ${m.game.round}</h2><h3>${escapeHtml(m.game.currentColor||'')}</h3>`;startButton.hidden=true;restartButton.hidden=false}else{gameEl.innerHTML='<h2>WAITING FOR PLAYERS</h2>';startButton.hidden=m.players.length<2;restartButton.hidden=false}});ws.addEventListener('error',()=>setStatus('CONNECTION LOST — RETRYING…',true));ws.addEventListener('close',()=>{connecting=false;clearInterval(pingTimer);ws=null;setStatus(session?'CONNECTION LOST — RETRYING…':'NOT CONNECTED',true);scheduleReconnect()})}
+  function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+  createButton.disabled=true;startButton.hidden=true;restartButton.hidden=true;connect();
+  createButton.addEventListener('click',()=>{if(created||!ws||ws.readyState!==WebSocket.OPEN)return;createButton.disabled=true;send({type:'CREATE_ROOM',name:'Host'})});
+  startButton.addEventListener('click',()=>send({type:'START_GAME'}));
+  restartButton.addEventListener('click',()=>{if(confirm('Restart this game and return all players to the waiting room?'))send({type:'RESTART_GAME'})});
 })();
