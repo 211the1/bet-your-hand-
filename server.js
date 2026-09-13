@@ -21,4 +21,4 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
       throw Error('Unknown action');}catch(err){send(ws,{type:'ERROR',error:err.message||'Server error'})}});
     ws.on('close',()=>{const s=sessions.get(ws);if(s)rooms.detach(s.code,s.playerId,ws);sessions.delete(ws);if(s){try{rooms.sendState(s.code)}catch{}}});});
   const heartbeat=setInterval(()=>{wss.clients.forEach(ws=>{if(ws.isAlive===false)return ws.terminate();ws.isAlive=false;try{ws.ping()}catch{}})},20000);wss.on('close',()=>clearInterval(heartbeat));return{httpServer,wss}}
-if(require.main===module)createServer().httpServer.listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('BET YOUR HAND fresh server ready'));module.exports={createServer};
+if(require.main===module)createServer().httpServer.listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('PLAY YOUR HAND server ready'));module.exports={createServer};
