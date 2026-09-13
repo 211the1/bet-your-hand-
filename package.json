@@ -1,1 +1,1 @@
-{"name":"game-night","version":"3.0.1","private":true,"description":"Clean full-game build","main":"server.js","scripts":{"start":"node server.js","test":"node --test test/game.test.js test/realtime.test.js"},"dependencies":{"ws":"^8.18.3"}}
+{"name":"bet-your-hand","version":"4.0.0-fresh","private":true,"main":"server.js","scripts":{"start":"node server.js","test":"node --test tests/*.test.js"},"dependencies":{"ws":"^8.18.3"}}

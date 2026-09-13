@@ -1,48 +1,7 @@
 'use strict';
-const engine=require('../engine/card-engine');
-const ROOM_CODE_LENGTH=4,RECONNECT_TOKEN_LENGTH=32;
-function assert(ok,msg){if(!ok)throw new Error(msg)}
-function makeCode(rng=Math.random){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let out='';for(let i=0;i<ROOM_CODE_LENGTH;i++)out+=chars[Math.floor(rng()*chars.length)];return out}
-function makeToken(rng=Math.random){const chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';let out='';for(let i=0;i<RECONNECT_TOKEN_LENGTH;i++)out+=chars[Math.floor(rng()*chars.length)];return out}
-function publicPlayer(p){return{id:p.id,name:p.name,character:p.character,connected:p.connected}};
-function publicGamePlayer(p){return{id:p.id,name:p.name,character:p.character,handCount:p.hand.length,points:p.points,shield:p.shield,extraPlay:p.extraPlay}};
-class RoomServer{
- constructor({rng=Math.random}={}){this.rng=rng;this.rooms=new Map();this.nextId=1}
- createRoom(hostName='Host'){
-  let code=makeCode(this.rng);while(this.rooms.has(code))code=makeCode(this.rng);
-  const hostId=`h_${this.nextId++}`,hostToken=makeToken(this.rng);
-  const room={code,hostId,hostName:String(hostName||'Host').trim()||'Host',hostToken,players:new Map(),sockets:new Map(),game:null,started:false,lastRoundWinnerId:null};
-  this.rooms.set(code,room);return{code,hostId,hostToken,host:true,name:room.hostName};
- }
- getRoom(code){const room=this.rooms.get(String(code||'').trim().toUpperCase());assert(room,'Room not found');return room}
- joinRoom(code,name,character='Bug'){
-  const room=this.getRoom(code);assert(!room.started,'Game already started');assert(room.players.size<engine.MAX_PLAYERS,`Room is full (${engine.MAX_PLAYERS} players maximum)`);assert(typeof name==='string'&&name.trim(),'Player name is required');assert(engine.CHARACTERS.includes(character),'Invalid character');
-  const id=`p_${this.nextId++}`,token=makeToken(this.rng),player={id,name:name.trim(),character,token,host:false,connected:false};room.players.set(id,player);
-  return{code:room.code,playerId:id,reconnectToken:token,host:false,name:player.name,character:player.character};
- }
- reconnect(code,id,token){
-  const room=this.getRoom(code);if(id===room.hostId){assert(token===room.hostToken,'Invalid reconnect credentials');return{code:room.code,playerId:room.hostId,host:true,hostId:room.hostId,name:room.hostName,hostToken:room.hostToken}};
-  const p=room.players.get(id);assert(p&&p.token===token,'Invalid reconnect credentials');return{code:room.code,playerId:p.id,reconnectToken:p.token,host:false,name:p.name,character:p.character};
- }
- attachSocket(code,id,socket){
-  const room=this.getRoom(code),isHost=id===room.hostId,p=room.players.get(id);assert(isHost||p,'Player not found');
-  const old=room.sockets.get(id);if(old&&old!==socket&&typeof old.close==='function'){try{old.close()}catch(_){} }
-  room.sockets.set(id,socket);if(p)p.connected=true;
- }
- detachSocket(code,id,socket){const room=this.getRoom(code);if(room.sockets.get(id)===socket){room.sockets.delete(id);const p=room.players.get(id);if(p)p.connected=false}}
- startGame(code){
-  const room=this.getRoom(code);assert(!room.started,'Game already started');assert(room.players.size>=engine.MIN_PLAYERS,`Need at least ${engine.MIN_PLAYERS} players to start`);
-  room.game=engine.createGame({rng:this.rng,playerIds:[...room.players.keys()]});for(const p of room.game.players){const info=room.players.get(p.id);p.name=info.name;p.character=info.character}room.started=true;return this.snapshot(code);
- }
- snapshot(code,viewerId=null){
-  const room=this.getRoom(code),g=room.game;
-  return{type:'STATE',roomCode:room.code,started:room.started,hostId:room.hostId,players:[...room.players.values()].map(publicPlayer),game:g?{
-   phase:g.phase,round:g.round,turnPlayerId:g.phase==='finished'?null:engine.currentPlayer(g).id,direction:g.direction,currentColor:engine.currentColor(g),topCard:engine.topCard(g),
-   players:g.players.map(publicGamePlayer),viewerHand:viewerId?(g.players.find(p=>p.id===viewerId)?.hand||[]):undefined,
-   pendingAction:g.pendingAction,wheelResult:g.wheelResult,winnerId:g.winner?.id||null,roundWinnerId:room.lastRoundWinnerId
-  }:null};
- }
- sendState(code){const room=this.getRoom(code);for(const[id,socket]of room.sockets.entries())if(socket?.readyState===1||typeof socket?.send==='function'){const viewerId=id===room.hostId?null:id;try{socket.send(JSON.stringify(this.snapshot(code,viewerId)))}catch(_){} }}
- resetRoom(code){const room=this.getRoom(code);for(const socket of room.sockets.values())try{socket.send(JSON.stringify({type:'RESET_ROOM'}))}catch(_){};for(const socket of room.sockets.values())try{socket.close()}catch(_){};this.rooms.delete(room.code);return true}
-}
-module.exports={RoomServer,ROOM_CODE_LENGTH,RECONNECT_TOKEN_LENGTH};
+const crypto=require('crypto'); const engine=require('../game/engine');
+const ALPHABET='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function code(){let s='';for(let i=0;i<4;i++)s+=ALPHABET[crypto.randomInt(ALPHABET.length)];return s}
+function token(){return crypto.randomBytes(24).toString('hex')}
+class RoomServer{constructor(){this.rooms=new Map();this.next=1}createRoom(name='Host'){let c;do{c=code()}while(this.rooms.has(c));const r={code:c,hostId:`h${this.next++}`,hostName:String(name||'Host').trim()||'Host',hostToken:token(),players:new Map(),sockets:new Map(),game:null};this.rooms.set(c,r);return{code:c,hostId:r.hostId,hostToken:r.hostToken,host:true,name:r.hostName}}joinRoom(c,name,character){const r=this.getRoom(c);if(r.game)throw Error('Game already started');if(r.players.size>=6)throw Error('Room full');if(!String(name||'').trim())throw Error('Player name required');if(!engine.CHARACTERS.includes(character))throw Error('Invalid character');const id=`p${this.next++}`,p={id,name:String(name).trim(),character,token:token(),connected:false};r.players.set(id,p);return{code:r.code,playerId:id,reconnectToken:p.token,host:false,name:p.name,character:p.character}}getRoom(c){const r=this.rooms.get(String(c||'').toUpperCase());if(!r)throw Error('Room not found');return r}reconnect(c,id,t){const r=this.getRoom(c);if(id===r.hostId){if(t!==r.hostToken)throw Error('Invalid reconnect');return{code:r.code,playerId:id,host:true,name:r.hostName,hostToken:t}}const p=r.players.get(id);if(!p||p.token!==t)throw Error('Invalid reconnect');return{code:r.code,playerId:id,reconnectToken:t,host:false,name:p.name,character:p.character}}startGame(c){const r=this.getRoom(c);if(r.players.size<2)throw Error('Need at least 2 players');r.game=engine.createGame({playerIds:[...r.players.keys()]});for(const p of r.game.players){const info=r.players.get(p.id);p.name=info.name;p.character=info.character}return this.snapshot(c)}snapshot(c,viewerId){const r=this.getRoom(c),g=r.game;return{type:'STATE',roomCode:r.code,started:!!g,hostName:r.hostName,players:[...r.players.values()].map(p=>({id:p.id,name:p.name,character:p.character,connected:p.connected})),game:g?{phase:g.phase,round:g.round,turnPlayerId:g.phase==='finished'?null:engine.currentPlayer(g).id,direction:g.direction,currentColor:engine.currentColor(g),topCard:engine.topCard(g),players:g.players.map(p=>({id:p.id,name:p.name,character:p.character,handCount:p.hand.length,points:p.points,shield:p.shield,extraPlay:p.extraPlay,colorChoice:p.colorChoice,turnSwitch:p.turnSwitch})),viewerHand:viewerId&&viewerId!==r.hostId?(g.players.find(p=>p.id===viewerId)||{}).hand:undefined,pending:g.pending,wheelResult:g.wheelResult,winner:g.winner||null}:null}}sendState(c){const r=this.getRoom(c);for(const [id,s]of r.sockets)try{s.send(JSON.stringify(this.snapshot(c,id)))}catch{}}attach(c,id,s){const r=this.getRoom(c);r.sockets.set(id,s);if(r.players.has(id))r.players.get(id).connected=true}detach(c,id,s){const r=this.getRoom(c);if(r.sockets.get(id)===s)r.sockets.delete(id);if(r.players.has(id))r.players.get(id).connected=false}}
+module.exports={RoomServer};

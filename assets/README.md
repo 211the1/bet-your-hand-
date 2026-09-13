@@ -1,0 +1,1 @@
+Production assets are intentionally preserved from the existing repository. Character files remain at repository root to avoid altering or re-encoding the supplied JPGs. Required mapping: Bug.jpg, Face.jpg, Ling_Ling.jpg, Beanz.jpg, The_One.jpg, Boone.jpg, Chicken_Joe.jpg, Juby.jpg, Meemaw.jpg. New audio/art should be added under assets/ without changing game rules.
