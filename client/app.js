@@ -1,125 +1,15 @@
 (() => {
   'use strict';
-
-  const codeInput = document.getElementById('code');
-  const nameInput = document.getElementById('name');
-  const characterSelect = document.getElementById('char');
-  const joinButton = document.getElementById('join');
-  const statusEl = document.getElementById('status');
-  const gameEl = document.getElementById('game');
-
-  const characters = ['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];
-  characterSelect.replaceChildren(new Option('SELECT CHARACTER', ''));
-  characters.forEach(character => characterSelect.add(new Option(character, character)));
-
-  let ws = null;
-  let me = null;
-  let joined = false;
-
-  function setStatus(message, isError = false) {
-    statusEl.textContent = message || '';
-    statusEl.style.color = isError ? '#ff6b6b' : '#21f17d';
-  }
-
-  function send(message) {
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-      setStatus('Connecting…', true);
-      return false;
-    }
-    ws.send(JSON.stringify(message));
-    return true;
-  }
-
-  function render(message) {
-    if (message.type === 'ERROR') {
-      setStatus(message.error || 'Something went wrong.', true);
-      joinButton.disabled = false;
-      return;
-    }
-
-    if (message.type === 'JOINED') {
-      me = message.playerId;
-      joined = true;
-      joinButton.disabled = true;
-      setStatus(`JOINED ROOM ${message.code}`);
-      return;
-    }
-
-    if (message.type !== 'STATE') return;
-
-    const game = message.game;
-    if (!game) {
-      gameEl.innerHTML = '<h2>WAITING FOR HOST…</h2>' +
-        message.players.map(player => `<div>${escapeHtml(player.name)} — ${escapeHtml(player.character)} ${player.connected ? '🟢' : '⚪'}</div>`).join('');
-      return;
-    }
-
-    const hand = Array.isArray(game.viewerHand) ? game.viewerHand : [];
-    const isMyTurn = game.turnPlayerId === me;
-    const cards = hand.map(card =>
-      `<button class="card" data-card-id="${escapeHtml(card.id)}">${escapeHtml(card.character || card.type)}<br>${escapeHtml(card.color || '')}</button>`
-    ).join('');
-
-    gameEl.innerHTML =
-      `<h2>ROUND ${game.round}</h2>` +
-      `<div>Current color: ${escapeHtml(game.currentColor || '—')}</div>` +
-      `<div>Top: ${escapeHtml(game.topCard.character || game.topCard.type)}</div>` +
-      `<div>${game.players.map(player => `<b>${escapeHtml(player.name)}</b> ${player.handCount} cards · ${player.points} pts`).join('<br>')}</div>` +
-      (isMyTurn ? `<h2 class="turn">YOUR TURN</h2>${cards}` : '<h2>WAITING</h2>') +
-      (game.pending?.playerId === me && game.pending.type === 'SPIN_WHEEL' ? '<button id="spin">SPIN POWER WHEEL</button>' : '');
-
-    gameEl.querySelectorAll('[data-card-id]').forEach(button => {
-      button.addEventListener('click', () => send({ type: 'PLAY_CARD', cardId: button.dataset.cardId }));
-    });
-
-    const spinButton = document.getElementById('spin');
-    if (spinButton) spinButton.addEventListener('click', () => send({ type: 'SPIN_WHEEL' }));
-  }
-
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>'"]/g, character => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-    }[character]));
-  }
-
-  joinButton.addEventListener('click', () => {
-    const code = codeInput.value.trim().toUpperCase();
-    const playerName = nameInput.value.trim();
-    const character = characterSelect.value;
-
-    if (code.length !== 4) return setStatus('Enter the 4-character room code.', true);
-    if (!playerName) return setStatus('Enter your name.', true);
-    if (!character) return setStatus('Choose a character.', true);
-
-    joinButton.disabled = true;
-    setStatus('Connecting…');
-    gameEl.replaceChildren();
-
-    if (ws) {
-      try { ws.close(); } catch {}
-    }
-
-    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    ws = new WebSocket(`${protocol}//${location.host}`);
-
-    ws.addEventListener('open', () => {
-      setStatus('Joining room…');
-      send({ type: 'JOIN_ROOM', code, name: playerName, character });
-    });
-
-    ws.addEventListener('message', event => {
-      try { render(JSON.parse(event.data)); }
-      catch { setStatus('Received an invalid game message.', true); }
-    });
-
-    ws.addEventListener('error', () => {
-      setStatus('Connection error. Please try JOIN GAME again.', true);
-      joinButton.disabled = false;
-    });
-
-    ws.addEventListener('close', () => {
-      if (!joined) joinButton.disabled = false;
-      setStatus(joined ? 'Disconnected from game.' : 'Could not connect to the game.', true);
-    });
-  });
+  const codeInput=document.getElementById('code'),nameInput=document.getElementById('name'),characterSelect=document.getElementById('char'),joinButton=document.getElementById('join'),statusEl=document.getElementById('status'),gameEl=document.getElementById('game');
+  const characters=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];characterSelect.replaceChildren(new Option('SELECT CHARACTER',''));characters.forEach(c=>characterSelect.add(new Option(c,c)));
+  let ws=null,me=null,joined=false,connecting=false,retryTimer=null,pingTimer=null,session=null;try{session=JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{}
+  if(session){codeInput.value=session.code||'';nameInput.value=session.name||'';characterSelect.value=session.character||'';joined=true}
+  const setStatus=(m,bad=false)=>{statusEl.textContent=m||'';statusEl.style.color=bad?'#ff6b6b':'#21f17d'};
+  const send=m=>{if(!ws||ws.readyState!==WebSocket.OPEN)return false;ws.send(JSON.stringify(m));return true};
+  const save=s=>localStorage.setItem('byhPlayerSession',JSON.stringify(s));
+  function scheduleReconnect(){if(retryTimer||!session)return;retryTimer=setTimeout(()=>{retryTimer=null;connect()},1000)}
+  function connect(){if(connecting||ws?.readyState===WebSocket.OPEN||!session)return;connecting=true;setStatus('RECONNECTING TO GAME SERVER…');const protocol=location.protocol==='https:'?'wss:':'ws:';ws=new WebSocket(`${protocol}//${location.host}`);ws.addEventListener('open',()=>{connecting=false;setStatus('CONNECTED');if(session)send({type:'RECONNECT',code:session.code,playerId:session.playerId,reconnectToken:session.reconnectToken});clearInterval(pingTimer);pingTimer=setInterval(()=>send({type:'PING'}),10000)});ws.addEventListener('message',event=>{let m;try{m=JSON.parse(event.data)}catch{return};if(m.type==='ERROR'){setStatus(m.error||'Something went wrong.',true);if(!joined)joinButton.disabled=false;return}if(m.type==='JOINED'||m.type==='RECONNECTED'){me=m.playerId;joined=true;session={code:m.code,playerId:m.playerId,reconnectToken:m.reconnectToken,name:m.name,character:m.character};save(session);joinButton.disabled=true;setStatus(`JOINED ROOM ${m.code}`);return}if(m.type==='CALL_PLAYER'){setStatus('HOST IS CALLING YOU');return}if(m.type!=='STATE')return;const game=m.game;if(!game){gameEl.innerHTML='<h2>WAITING FOR HOST…</h2>'+m.players.map(p=>`<div>${escapeHtml(p.name)} — ${escapeHtml(p.character)} ${p.connected?'🟢':'⚪'}</div>`).join('');return}const hand=Array.isArray(game.viewerHand)?game.viewerHand:[];const isMyTurn=game.turnPlayerId===me;const cards=hand.map(card=>`<button class="card" data-card-id="${escapeHtml(card.id)}">${escapeHtml(card.character||card.type)}<br>${escapeHtml(card.color||'')}</button>`).join('');gameEl.innerHTML=`<h2>ROUND ${game.round}</h2><div>Current color: ${escapeHtml(game.currentColor||'—')}</div><div>Top: ${escapeHtml(game.topCard.character||game.topCard.type)}</div><div>${game.players.map(p=>`<b>${escapeHtml(p.name)}</b> ${p.handCount} cards · ${p.points} pts`).join('<br>')}</div>`+(isMyTurn?`<h2 class="turn">YOUR TURN</h2>${cards}`:'<h2>WAITING</h2>')+(game.pending?.playerId===me&&game.pending.type==='SPIN_WHEEL'?'<button id="spin">SPIN POWER WHEEL</button>':'');gameEl.querySelectorAll('[data-card-id]').forEach(b=>b.addEventListener('click',()=>send({type:'PLAY_CARD',cardId:b.dataset.cardId})));const spin=document.getElementById('spin');if(spin)spin.addEventListener('click',()=>send({type:'SPIN_WHEEL'}));});ws.addEventListener('error',()=>setStatus('CONNECTION LOST — RETRYING…',true));ws.addEventListener('close',()=>{connecting=false;clearInterval(pingTimer);ws=null;setStatus('CONNECTION LOST — RETRYING…',true);scheduleReconnect()})}
+  function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+  joinButton.addEventListener('click',()=>{const code=codeInput.value.trim().toUpperCase(),name=nameInput.value.trim(),character=characterSelect.value;if(code.length!==4)return setStatus('Enter the 4-character room code.',true);if(!name)return setStatus('Enter your name.',true);if(!character)return setStatus('Choose a character.',true);session={code,name,character};joined=false;joinButton.disabled=true;setStatus('CONNECTING…');if(ws){try{ws.close()}catch{}}connect()});
+  if(session)connect();else joinButton.disabled=false;
 })();
