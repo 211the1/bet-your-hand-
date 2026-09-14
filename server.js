@@ -16,7 +16,7 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
   if(t==='START_GAME'){if(!host)throw Error('Host only');await rooms.startGame(r.code);return rooms.sendState(r.code)}
   if(t==='RESTART_GAME'){if(!host)throw Error('Host only');await rooms.restartGame(r.code);return rooms.sendState(r.code)}
   if(t==='CALL_PLAYER'){if(!host)throw Error('Host only');const q=r.sockets.get(m.playerId);if(q)send(q,{type:'CALL_PLAYER',playerId:m.playerId});return}
-  if(['PLAY_CARD','SPIN_WHEEL','USE_POWER'].includes(t)){const g=r.game;if(!g)throw Error('Game has not started');if(t==='PLAY_CARD')e.playCard(g,s.playerId,m.cardId,{color:m.color});if(t==='SPIN_WHEEL')e.spinWheel(g,s.playerId);if(t==='USE_POWER')e.usePower(g,s.playerId,m.power,{color:m.color});await rooms.saveRoom(r.code);return rooms.sendState(r.code)}
+  if(['PLAY_CARD','SPIN_WHEEL','USE_POWER','DRAW_CARD'].includes(t)){const g=r.game;if(!g)throw Error('Game has not started');if(t==='PLAY_CARD')e.playCard(g,s.playerId,m.cardId,{color:m.color});if(t==='SPIN_WHEEL')e.spinWheel(g,s.playerId);if(t==='USE_POWER')e.usePower(g,s.playerId,m.power,{color:m.color});if(t==='DRAW_CARD')e.drawCard(g,s.playerId);await rooms.saveRoom(r.code);return rooms.sendState(r.code)}
   if(t==='ROUND_NEXT'){if(!host)throw Error('Host only');if(!r.game)throw Error('Game has not started');e.completeRound(r.game);await rooms.saveRoom(r.code);return rooms.sendState(r.code)}
   throw Error('Unknown action');
  }catch(err){send(ws,{type:'ERROR',error:err.message||'Server error'})}});
