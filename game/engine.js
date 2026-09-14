@@ -9,7 +9,7 @@ function currentColor(g){return g.currentColor||topCard(g)?.color||null}
 function currentPlayer(g){return g.players[g.turnIndex]}
 function isPlayable(card,g){if(card.type==='PLAY_YOUR_HAND'||card.type==='WILD')return true;const top=topCard(g),color=currentColor(g);return card.color===color||(card.type==='CHARACTER'&&top?.character===card.character)}
 function refill(g){if(g.deck.length)return;if(g.discard.length<=1)throw new Error('No cards available to draw');const top=g.discard.pop();g.deck=shuffle(g.discard);g.discard=[top]}
-function drawCard(g,playerId){const p=currentPlayer(g);if(p.id!==playerId)throw new Error('Not your turn');if(g.pending)throw new Error('Finish the current action first');refill(g);const card=g.deck.shift();if(!card)throw new Error('No cards available to draw');p.hand.push(card);return card}
+function drawCard(g,playerId){const p=currentPlayer(g);if(p.id!==playerId)throw new Error('Not your turn');if(g.pending)throw new Error('Finish the current action first');return drawUntilPlayable(g,p)}
 function drawUntilPlayable(g,p){let drawn=0;while(true){refill(g);const c=g.deck.shift();p.hand.push(c);drawn++;if(isPlayable(c,g))return{drawn,card:c}}}
 function advance(g,steps=1){g.turnIndex=(g.turnIndex+g.direction*steps+g.players.length*100)%g.players.length}
 function startTurn(g){const p=currentPlayer(g);const playable=p.hand.some(c=>isPlayable(c,g));if(playable)p.points+=150;else drawUntilPlayable(g,p);return{player:p,playable}}
