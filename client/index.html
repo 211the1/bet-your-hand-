@@ -1,13 +1,10 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><link rel="stylesheet" href="/client/style.css?v=4"></head><body class="player-page"><main><h1>PLAY YOUR HAND</h1><p>GAME NIGHT</p><input id="code" maxlength="4" placeholder="ROOM CODE"><input id="name" placeholder="YOUR NAME"><select id="char"></select><button id="join">JOIN GAME</button><div id="status"></div><section id="game"></section></main><script src="/client/app.js?v=4"></script><script>
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><link rel="stylesheet" href="/client/style.css?v=5"></head><body class="player-page"><main><h1>PLAY YOUR HAND</h1><p>GAME NIGHT</p><input id="code" maxlength="4" placeholder="ROOM CODE"><input id="name" placeholder="YOUR NAME"><select id="char"></select><button id="join">JOIN GAME</button><div id="status"></div><section id="game"></section></main><script src="/client/app.js?v=5"></script><script>
 (()=>{
-  const status=document.getElementById('status');
-  const resetExpired=()=>{
-    if((status.textContent||'').toLowerCase().includes('invalid reconnect')){
-      localStorage.removeItem('byhPlayerSession');
-      location.reload();
-    }
-  };
-  new MutationObserver(resetExpired).observe(status,{childList:true,characterData:true,subtree:true});
-  resetExpired();
+ const code=document.getElementById('code'),sel=document.getElementById('char'),status=document.getElementById('status');
+ let preview=null,timer=null;
+ function apply(players){const taken=new Set((players||[]).map(p=>p.character));Array.from(sel.options).forEach(o=>{if(!o.value)return;o.disabled=taken.has(o.value);if(o.disabled)o.textContent=o.value+' — TAKEN';else o.textContent=o.value});if(sel.value&&taken.has(sel.value))sel.value='';}
+ function previewRoom(){const c=code.value.trim().toUpperCase();if(c.length!==4)return;if(preview){try{preview.close()}catch{}preview=null}const proto=location.protocol==='https:'?'wss:':'ws:';preview=new WebSocket(proto+'//'+location.host);preview.onopen=()=>preview.send(JSON.stringify({type:'PREVIEW_ROOM',code:c}));preview.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='ROOM_PREVIEW'&&m.code===c)apply(m.players)}catch{}};preview.onerror=()=>{};preview.onclose=()=>{preview=null}}
+ code.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(previewRoom,250)});code.addEventListener('change',previewRoom);code.addEventListener('blur',previewRoom);
+ new MutationObserver(()=>{if((status.textContent||'').toLowerCase().includes('invalid reconnect')){localStorage.removeItem('byhPlayerSession');location.reload()}}).observe(status,{childList:true,characterData:true,subtree:true});
 })();
 </script></body></html>
