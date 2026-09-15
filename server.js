@@ -22,6 +22,6 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
   if(t==='ROUND_NEXT'){if(!host)throw Error('Host only');if(!r.game)throw Error('Game has not started');if(r.game.lastCardEvent)throw Error('LAST CARD animation is playing');e.completeRound(r.game);await rooms.saveRoom(r.code);return rooms.sendState(r.code)}
   throw Error('Unknown action');
  }catch(err){send(ws,{type:'ERROR',error:err.message||'Server error'})}});
- ws.on('close',()=>{const s=sessions.get(ws);if(s)rooms.detach(s.code,s.playerId,ws).then(()=>rooms.sendState(s.code)).catch(()=>{});sessions.delete(ws)})});
+ ws.on('close',()=>{const s=sessions.get(ws);if(s)rooms.detach(s.code,s.playerId,ws).then(changed=>{if(changed)return rooms.sendState(s.code)}).catch(()=>{});sessions.delete(ws)})});
  const heartbeat=setInterval(()=>{wss.clients.forEach(ws=>{if(ws.isAlive===false)return ws.terminate();ws.isAlive=false;try{ws.ping()}catch{}})},20000);wss.on('close',()=>{clearInterval(heartbeat);rooms.store.close().catch(()=>{})});return{httpServer,wss}}
 if(require.main===module)createServer().httpServer.listen(process.env.PORT||10000,'0.0.0.0',()=>console.log('PLAY YOUR HAND server ready'));module.exports={createServer};
