@@ -9,7 +9,7 @@ function serve(req,res){let u;try{u=decodeURIComponent(new URL(req.url,'http://x
 function send(ws,m){if(ws.readyState===1)ws.send(JSON.stringify(m))}
 function createServer(){const httpServer=http.createServer(serve);const wss=new WebSocketServer({server:httpServer});const sessions=new Map();
  wss.on('connection',ws=>{ws.isAlive=true;ws.on('pong',()=>{ws.isAlive=true});ws.on('message',async raw=>{try{await rooms.ready;const m=JSON.parse(raw),t=String(m.type||'').toUpperCase();if(t==='PING')return send(ws,{type:'PONG'});let s=sessions.get(ws),r;
-  if(t==='CREATE_ROOM'){s=await rooms.createRoom(m.name);sessions.set(ws,s);await rooms.attach(s.code,s.hostId,ws);send(ws,{type:'ROOM_CREATED',...s});return rooms.sendState(s.code)}
+  if(t==='CREATE_ROOM'){s=await rooms.createRoom(m.name);sessions.set(ws,s);await rooms.attach(s.code,s.hostId,ws);send(ws,{type:'ROOM_CREATED',...s});return}
   if(t==='JOIN_ROOM'){s=await rooms.joinRoom(m.code,m.name,m.character);sessions.set(ws,s);await rooms.attach(s.code,s.playerId,ws);send(ws,{type:'JOINED',...s});return rooms.sendState(s.code)}
   if(t==='RECONNECT'){s=await rooms.reconnect(m.code,m.playerId||m.hostId,m.reconnectToken||m.hostToken);sessions.set(ws,s);await rooms.attach(s.code,s.playerId,ws);return rooms.sendState(s.code)}
   if(!s)throw Error('Not connected');r=await rooms.getRoom(s.code);const host=s.playerId===r.hostId;
