@@ -1,1 +1,15 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><link rel="stylesheet" href="/client/style.css?v=3"></head><body class="player-page"><main><h1>PLAY YOUR HAND</h1><p>GAME NIGHT</p><input id="code" maxlength="4" placeholder="ROOM CODE"><input id="name" placeholder="YOUR NAME"><select id="char"></select><button id="join">JOIN GAME</button><div id="status"></div><section id="game"></section></main><script src="/client/app.js?v=3"></script></body></html>
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><link rel="stylesheet" href="/client/style.css?v=4"></head><body class="player-page"><main><h1>PLAY YOUR HAND</h1><p>GAME NIGHT</p><input id="code" maxlength="4" placeholder="ROOM CODE"><input id="name" placeholder="YOUR NAME"><select id="char"></select><button id="join">JOIN GAME</button><div id="status"></div><section id="game"></section></main><script src="/client/app.js?v=4"></script><script>
+(()=>{
+  const status=document.getElementById('status'),join=document.getElementById('join');
+  const resetExpired=()=>{
+    if((status.textContent||'').toLowerCase().includes('invalid reconnect')){
+      localStorage.removeItem('byhPlayerSession');
+      join.disabled=false;
+      status.textContent='OLD SESSION CLEARED — ENTER THE NEW ROOM CODE';
+      status.style.color='#21f17d';
+    }
+  };
+  new MutationObserver(resetExpired).observe(status,{childList:true,characterData:true,subtree:true});
+  resetExpired();
+})();
+</script></body></html>
