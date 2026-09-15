@@ -10,7 +10,7 @@ function send(ws,m){if(ws.readyState===1)ws.send(JSON.stringify(m))}
 function createServer(){const httpServer=http.createServer(serve);const wss=new WebSocketServer({server:httpServer});const sessions=new Map();
  wss.on('connection',ws=>{ws.isAlive=true;ws.on('pong',()=>{ws.isAlive=true});ws.on('message',async raw=>{try{await rooms.ready;const m=JSON.parse(raw),t=String(m.type||'').toUpperCase();if(t==='PING')return send(ws,{type:'PONG'});let s=sessions.get(ws),r;
   if(t==='CREATE_ROOM'){s=await rooms.createRoom(m.name);sessions.set(ws,s);await rooms.attach(s.code,s.hostId,ws);send(ws,{type:'ROOM_CREATED',...s});return}
-  if(t==='JOIN_ROOM'){s=await rooms.joinRoom(m.code,m.name,m.character);sessions.set(ws,s);await rooms.attach(s.code,s.playerId,ws);send(ws,{type:'JOINED',...s});return rooms.sendState(s.code)}
+  if(t==='JOIN_ROOM'){const room=await rooms.getRoom(m.code);if(room.game)throw Error('Game already started');if([...room.players.values()].some(p=>p.character===m.character))throw Error('Character already taken — choose another');s=await rooms.joinRoom(m.code,m.name,m.character);sessions.set(ws,s);await rooms.attach(s.code,s.playerId,ws);send(ws,{type:'JOINED',...s});return rooms.sendState(s.code)}
   if(t==='RECONNECT'){s=await rooms.reconnect(m.code,m.playerId||m.hostId,m.reconnectToken||m.hostToken);sessions.set(ws,s);await rooms.attach(s.code,s.playerId,ws);return rooms.sendState(s.code)}
   if(!s)throw Error('Not connected');r=await rooms.getRoom(s.code);const host=s.host===true&&s.hostToken===r.hostToken;
   if(t==='START_GAME'){if(!host)throw Error('Host only');await rooms.startGame(r.code);return rooms.sendState(r.code)}
