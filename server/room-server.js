@@ -3,7 +3,7 @@ const crypto=require('crypto');
 const engine=require('../game/engine');
 const {createStore}=require('./persistence');
 const ALPHABET='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-function code(){let s='';for(let i=0;i<4;i++)s+=ALPHABET[crypto.randomInt(ALPHABET.length)] ;return s}
+function code(){let s='';for(let i=0;i<4;i++)s+=ALPHABET[crypto.randomInt(ALPHABET.length)];return s}
 function token(){return crypto.randomBytes(24).toString('hex')}
 function toJSON(r){return{code:r.code,hostId:r.hostId,hostName:r.hostName,hostToken:r.hostToken,players:[...r.players.values()],game:r.game}}
 function fromJSON(x){return{...x,players:new Map((x.players||[]).map(p=>[p.id,p])),sockets:new Map()}}
@@ -24,6 +24,6 @@ class RoomServer{
  async snapshot(c,viewerId){const r=await this.getRoom(c),g=r.game;return{type:'STATE',roomCode:r.code,started:!!g,hostName:r.hostName,players:[...r.players.values()].map(p=>({id:p.id,name:p.name,character:p.character,connected:p.connected})),game:g?{phase:g.phase,round:g.round,viewerId:viewerId||null,isYourTurn:Boolean(viewerId&&g.phase!=='finished'&&engine.currentPlayer(g)?.id===viewerId),turnPlayerId:g.phase==='finished'?null:engine.currentPlayer(g).id,turnPlayerName:g.phase==='finished'?null:engine.currentPlayer(g).name,direction:g.direction,currentColor:engine.currentColor(g),topCard:engine.topCard(g),discardCount:g.discard.length,players:g.players.map(p=>({id:p.id,name:p.name,character:p.character,handCount:p.hand.length,points:p.points,shield:p.shield,extraPlay:p.extraPlay,colorChoice:p.colorChoice,turnSwitch:p.turnSwitch})),viewerHand:viewerId&&viewerId!==r.hostId?(g.players.find(p=>p.id===viewerId)||{}).hand:undefined,pending:g.pending,wheelResult:g.wheelResult,lastCardEvent:g.lastCardEvent||null,winner:g.winner||null}:null}}
  async sendState(c){const r=await this.getRoom(c);for(const [id,s]of r.sockets)try{if(s.readyState===1)s.send(JSON.stringify(await this.snapshot(c,id)))}catch{}}
  async attach(c,id,s){const r=await this.getRoom(c);r.sockets.set(id,s);if(r.players.has(id))r.players.get(id).connected=true}
- async detach(c,id,s){const r=await this.getRoom(c);if(r.sockets.get(id)===s)r.sockets.delete(id);if(r.players.has(id))r.players.get(id).connected=false}
+ async detach(c,id,s){const r=await this.getRoom(c);const wasPlayer=r.players.has(id);if(r.sockets.get(id)===s)r.sockets.delete(id);if(wasPlayer)r.players.get(id).connected=false;return wasPlayer}
 }
 module.exports={RoomServer};
