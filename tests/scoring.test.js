@@ -41,7 +41,7 @@ test('a Wild used as the last card gets both its special value and the 500 point
   g.discard=[{id:'top',type:'CHARACTER',color:'Blue',character:'Bug'}];
   g.currentColor='Blue';
   engine.playCard(g,'p1','wild-last');
-  assert.equal(p.points,700);
+  assert.equal(p.points,1200);
   engine.chooseWildColor(g,'p1','Red');
   assert.equal(p.points,1200);
   assert.equal(g.phase,'round_complete');
