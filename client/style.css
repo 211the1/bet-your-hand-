@@ -466,3 +466,21 @@ body.player-page .join-panel.prejoin .join-box{
 @keyframes easterEggRainbow{0%{color:#ff2bd6;transform:scale(1) rotate(-2deg)}20%{color:#00eaff}40%{color:#7dff00}60%{color:#ffe600}80%{color:#ff7a00}100%{color:#8c4dff;transform:scale(1.08) rotate(2deg)}}
 @keyframes easterEggBounce{from{filter:drop-shadow(0 0 8px #fff)}to{filter:drop-shadow(0 0 34px #00eaff)}}
 @keyframes rimFirePulse{from{opacity:.62;transform:scale(.995)}to{opacity:1;transform:scale(1.012)}}
+/* Mobile special-card text fit: keep REVERSE fully inside the 88px hand card. */
+@media(max-width:520px){
+  body.player-page .arcade-card .modern-special-name{
+    width:100%!important;
+    box-sizing:border-box!important;
+    padding:0 2px!important;
+    font-size:14px!important;
+    letter-spacing:0!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    transform:scaleX(.84)!important;
+    transform-origin:center!important;
+  }
+  body.player-page .arcade-card .modern-special{
+    overflow:hidden!important;
+  }
+}
