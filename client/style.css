@@ -527,3 +527,25 @@ body.player-page .join-panel.prejoin .join-box{
 .deck-view-count{font:900 18px system-ui,sans-serif;color:#ffd21c;text-shadow:0 0 8px #ffd21c;margin:8px 0}
 .deck-view-note{font:700 12px/1.4 system-ui,sans-serif;color:#fff;opacity:.9}
 @media(max-width:520px){.deck-view-box{width:min(88vw,330px);padding:24px 16px 18px}.deck-view-title{font-size:24px}.deck-stack{transform:scale(.88);margin:-2px auto 4px}.deck-view-count{font-size:15px}.deck-view-note{font-size:11px}}
+
+
+/* Mobile side-button text containment: never let labels hang outside their boxes. */
+@media(max-width:520px){
+  body.player-page .arcade-side-btn,
+  body.player-page .arcade-emoji{
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    white-space:normal!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+    text-align:center!important;
+    line-height:1.05!important;
+    letter-spacing:0!important;
+    padding:3px 1px!important;
+    font-size:7px!important;
+  }
+  body.player-page .arcade-emoji{font-size:7px!important;}
+}
