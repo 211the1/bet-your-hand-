@@ -301,3 +301,24 @@ body.player-page .arcade-header{grid-template-columns:90px minmax(0,1fr) 72px!im
  body.player-page .arcade-tools button{width:50px!important;height:42px!important;font-size:12px!important;border-radius:10px!important}
  body.player-page .arcade-tools small{font-size:6px!important}
 }
+
+/* Picture-based character picker */
+body.player-page .character-select-hidden{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+body.player-page .character-picker-title{font-size:15px;font-weight:1000;letter-spacing:.5px;margin:8px 0 6px;color:#fff;text-shadow:0 0 8px #1687ff}
+body.player-page .character-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:5px 0 10px}
+body.player-page .character-choice{position:relative!important;width:100%!important;height:112px!important;margin:0!important;padding:3px!important;border:3px solid #1687ff!important;border-radius:13px!important;background:#07112b!important;overflow:hidden!important;box-shadow:0 0 10px #1687ff55!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-end!important}
+body.player-page .character-choice img{width:100%!important;height:78px!important;object-fit:cover!important;object-position:center!important;border-radius:8px 8px 4px 4px!important;border:1px solid #fff!important}
+body.player-page .character-choice span{font-family:system-ui,sans-serif!important;font-size:11px!important;font-weight:900!important;line-height:16px!important;color:#fff!important;white-space:nowrap!important}
+body.player-page .character-choice i{position:absolute;right:4px;top:4px;min-width:17px;height:17px;border-radius:50%;background:#1687ff;color:#fff;font:900 11px/17px system-ui,sans-serif;font-style:normal}
+body.player-page .character-choice.selected{border-color:#21f17d!important;box-shadow:0 0 18px #21f17d99!important;transform:translateY(-1px)}
+body.player-page .character-choice.selected i{background:#21f17d;color:#06110a}
+body.player-page .character-choice.taken{opacity:.35!important;filter:grayscale(1)!important}
+body.player-page .character-choice.taken i{width:auto;border-radius:5px;padding:0 4px;background:#ff4b4b;font-size:8px}
+@media(max-width:520px){
+ body.player-page .character-grid{gap:6px;margin:4px 0 8px}
+ body.player-page .character-choice{height:94px!important;border-width:2px!important;border-radius:10px!important}
+ body.player-page .character-choice img{height:62px!important}
+ body.player-page .character-choice span{font-size:9px!important;line-height:15px!important}
+ body.player-page .character-choice i{right:3px;top:3px;width:16px;height:16px;line-height:16px;font-size:10px}
+ body.player-page .character-picker-title{font-size:13px;margin:5px 0}
+}
