@@ -152,7 +152,7 @@ gameEl.innerHTML=`
       <div class="arcade-actions">${drawButton}${playButton}<button id="sort-cards" class="arcade-sort" type="button">SORT</button></div>
     </section>
     <aside class="arcade-side right-side">${info}<button class="arcade-emoji" type="button">EMOJI<br>SMILE</button></aside></div>
-</div>;
+</div>`;
 gameEl.dataset.handLength=hand.length;
 const menu=gameEl.querySelector('#menu-toggle');if(menu){menu.addEventListener('click',()=>{const panel=document.getElementById('join-panel');if(panel){panel.classList.add('show');panel.setAttribute('aria-hidden','false')}})}
 
