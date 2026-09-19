@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><link rel="stylesheet" href="/client/style.css?v=17"></head><body class="player-page"><main>
   <div class="player-brand"><h1>PLAY YOUR HAND</h1><p>GAME NIGHT</p></div>
-  <button id="open-join" class="open-join">MENU</button>
+  <button id="open-join" class="open-join" hidden>MENU</button>
   <div id="join-panel" class="join-panel" aria-hidden="true">
     <div class="join-box">
       <button id="close-join" class="close-join" type="button" aria-label="Close">X</button>
@@ -15,7 +15,7 @@
     </div>
   </div>
   <section id="game"></section>
-</main><script src="/client/app.js?v=26"></script><script>
+</main><script src="/client/app.js?v=27"></script><script>
 (()=>{
  const code=document.getElementById('code'),sel=document.getElementById('char'),status=document.getElementById('status'),game=document.getElementById('game');
  let preview=null,timer=null,gameOverShown=false;
@@ -61,5 +61,5 @@ function hide(){panel.classList.remove('show');panel.setAttribute('aria-hidden',
 open.addEventListener('click',show);close.addEventListener('click',hide);
 panel.addEventListener('click',e=>{if(e.target===panel)hide()});
 new MutationObserver(()=>{if((status.textContent||'').toLowerCase().includes('joined room'))hide()}).observe(status,{childList:true,characterData:true,subtree:true});
-try{if(JSON.parse(localStorage.getItem('byhPlayerSession')||'null')?.playerId)hide()}catch{}
+try{const saved=JSON.parse(localStorage.getItem('byhPlayerSession')||'null');if(saved?.playerId)hide();else show()}catch{show()}
 })();</script></body></html>
