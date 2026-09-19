@@ -40,6 +40,15 @@ class RoomServer{
  async snapshot(c,viewerId){const r=await this.getRoom(c),g=r.game;const displayCard=card=>{if(!card)return card;const color=engine.cardColor(card);return {...card,color}};return{type:'STATE',roomCode:r.code,started:!!g,hostName:r.hostName,players:[...r.players.values()].map(p=>({id:p.id,name:p.name,character:p.character,connected:p.connected})),game:g?{phase:g.phase,round:g.round,viewerId:viewerId||null,isYourTurn:Boolean(viewerId&&g.phase!=='finished'&&engine.currentPlayer(g)?.id===viewerId),turnPlayerId:g.phase==='finished'?null:engine.currentPlayer(g).id,turnPlayerName:g.phase==='finished'?null:engine.currentPlayer(g).name,direction:g.direction,currentColor:engine.currentColor(g),topCard:displayCard(engine.topCard(g)),discardCount:g.discard.length,players:g.players.map(p=>({id:p.id,name:p.name,character:p.character,handCount:p.hand.length,points:p.points,shield:p.shield,extraPlay:p.extraPlay,colorChoice:p.colorChoice,turnSwitch:p.turnSwitch})),viewerHand:viewerId&&viewerId!==r.hostId?(g.players.find(p=>p.id===viewerId)||{}).hand?.map(displayCard):undefined,pending:g.pending,wheelResult:g.wheelResult,lastCardEvent:g.lastCardEvent||null,winner:g.winner||null}:null}}
  async sendState(c){const key=String(c).toUpperCase();const previous=this.stateQueues.get(key)||Promise.resolve();const next=previous.catch(()=>{}).then(async()=>{const r=await this.getRoom(key);for(const [id,s]of r.sockets)try{if(s.readyState===1)s.send(JSON.stringify(await this.snapshot(key,id)))}catch{}});this.stateQueues.set(key,next);try{await next}finally{if(this.stateQueues.get(key)===next)this.stateQueues.delete(key)}}
  async attach(c,id,s){const r=await this.getRoom(c);r.sockets.set(id,s);if(r.players.has(id))r.players.get(id).connected=true}
+ async leavePlayer(c,id,s){
+  const r=await this.getRoom(c);
+  if(r.sockets.get(id)===s)r.sockets.delete(id);
+  if(!r.players.has(id))return false;
+  r.players.delete(id);
+  if(r.game){engine.removePlayer(r.game,id);if(r.game.players.length<2)r.game=null}
+  await this.saveRoom(r.code);
+  return true;
+ }
  async detach(c,id,s){const r=await this.getRoom(c);const wasPlayer=r.players.has(id);if(r.sockets.get(id)===s)r.sockets.delete(id);if(wasPlayer)r.players.get(id).connected=false;return wasPlayer}
 }
 module.exports={RoomServer};
