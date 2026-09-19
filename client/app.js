@@ -133,6 +133,7 @@ gameEl.innerHTML=`
     <div class="arcade-tools"><button id="menu-toggle" type="button">MENU<small>MENU</small></button></div>
   </header>
   <section class="arcade-players">${playerTiles}</section>
+  <div class="turn-banner ${isMyTurn?'my-turn':'waiting-turn'}">${isMyTurn?'🔥 YOUR TURN — PLAY OR DRAW':'⏳ WAITING FOR '+escapeHtml(current?.name||'THE OTHER PLAYER')}</div>
   <div class="arcade-main">
     <aside class="arcade-side left-side">${callButton}${nextPlayer}<button class="arcade-side-btn" type="button">VIEW DECK</button></aside>
     <section class="arcade-center">
