@@ -44,8 +44,9 @@ const send=m=>{if(!ws||ws.readyState!==WebSocket.OPEN)return false;ws.send(JSON.
 const save=s=>localStorage.setItem('byhPlayerSession',JSON.stringify(s));
 function scheduleReconnect(){if(retryTimer||!session?.playerId)return;retryTimer=setTimeout(()=>{retryTimer=null;connect()},1000)}
 function characterImage(name){return name?({'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'}[name]||''):''}
+function cardColor(card){if(!card)return '';if(colors.includes(card.color))return card.color;if(card.type==='CHARACTER'){const c=String(card.id||'').split('-')[0];return colors.includes(c)?c:''}if(card.type==='SKIP'||card.type==='REVERSE'){const n=Number(String(card.id||'').split('-')[1]);return Number.isFinite(n)?colors[n%4]:(card.color||'')}return card.color||''}
 function specialImage(card){if(!card)return '';const base='https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3';if(card.type==='WILD')return base+'/WILD.png';if(card.type==='PLAY_YOUR_HAND')return base+'/PLAY_YOUR_HAND.png';if(card.type==='SKIP'||card.type==='REVERSE'){const names={Red:'DEEP_PURPLE',Blue:'ROYAL_BLUE',Green:'EMERALD',Yellow:'GOLD'};const suffix=names[card.color]||'ROYAL_BLUE';return base+`/${card.type}_${suffix}.png`}return ''}
-function cardHtml(card){const c=card||{},name=c.character||({SKIP:'SKIP',REVERSE:'REVERSE',WILD:'WILD',PLAY_YOUR_HAND:'PLAY YOUR HAND'}[c.type]||'CARD'),img=characterImage(c.character),color=(c.color||'').toLowerCase();return `<div class="card table-card player-current color-${escapeHtml(color)}">${img?`<img class="card-face" src="${img}" alt="${escapeHtml(name)}">`:''}<div class="card-name">${escapeHtml(name)}</div>${c.color?`<div class="card-color">${escapeHtml(c.color)}</div>`:`<div class="card-type">${escapeHtml((c.type||'CARD').replaceAll('_',' '))}</div>`}</div>`}
+function cardHtml(card){const c=card||{},name=c.character||({SKIP:'SKIP',REVERSE:'REVERSE',WILD:'WILD',PLAY_YOUR_HAND:'PLAY YOUR HAND'}[c.type]||'CARD'),img=characterImage(c.character),color=cardColor(c).toLowerCase();return `<div class="card table-card player-current color-${escapeHtml(color)}">${img?`<img class="card-face" src="${img}" alt="${escapeHtml(name)}">`:''}<div class="card-name">${escapeHtml(name)}</div>${c.color?`<div class="card-color">${escapeHtml(c.color)}</div>`:`<div class="card-type">${escapeHtml((c.type||'CARD').replaceAll('_',' '))}</div>`}</div>`}
 function wheelHtml(result,spinning){return `<div class="wheel-box"><div class="wheel ${spinning?'wheel-spin':''}"><div class="wheel-center">POWER</div></div><div class="wheel-pointer">▼</div>${result?`<div class="wheel-result">POWER: ${escapeHtml(result.power.replaceAll('_',' '))}</div>`:''}</div>`}
 function colorButtons(id){return `<div class="color-buttons">${colors.map(c=>`<button type="button" class="color-choice color-choice-${c.toLowerCase()}" data-color="${c}" data-color-group="${id}">${c}</button>`).join('')}</div>`}
 function powerControls(game){const p=game.pending?.power;if(!p)return '';if(p==='COLOR_CHOICE')return `<div class="power-panel"><b>CHOOSE A COLOR</b>${colorButtons('power-color')}</div>`;return `<div class="power-panel"><b>YOU WON: ${escapeHtml(p.replaceAll('_',' '))}</b><button id="use-power" type="button">USE POWER</button></div>`}
@@ -92,13 +93,13 @@ const cards=orderedHand.map(card=>{
   const nm=card.character||({'SKIP':'SKIP','REVERSE':'REVERSE','WILD':'WILD','PLAY_YOUR_HAND':'PLAY YOUR HAND'}[card.type]||'CARD');
   const img=characterImage(card.character);
   const specialImg=specialImage(card);
-  const col=(card.color||'').toLowerCase();
+  const col=cardColor(card).toLowerCase();
   const specialClass=special?` special-${String(card.type).toLowerCase()}`:'';
   return `<button type="button" class="arcade-card color-${escapeHtml(col)}${specialClass} ${selected?'selected':''}" data-card-id="${escapeHtml(card.id)}">
     ${specialImg?`<img class="special-art" src="${specialImg}" alt="${escapeHtml(nm)}">`:img?`<img src="${img}" alt="${escapeHtml(nm)}">`:''}
-    ${specialImg?'':`<strong>${escapeHtml(nm)}</strong><small>${card.color?escapeHtml(card.color):escapeHtml((card.type||'CARD').replaceAll('_',' '))}</small>`}
+    ${specialImg?'':`<strong>${escapeHtml(nm)}</strong><small>${cardColor(card)?escapeHtml(cardColor(card)):escapeHtml((card.type||'CARD').replaceAll('_',' '))}</small>`}
   </button>`}).join('');
-const playableHint=top.character?`MATCH ${escapeHtml(top.color||game.currentColor||'')} OR ${escapeHtml(top.character.toUpperCase())}`:`MATCH ${escapeHtml(game.currentColor||'')} • WILD / PLAY YOUR HAND ALWAYS PLAY`;
+const playableHint=top.character?`MATCH ${escapeHtml(cardColor(top)||game.currentColor||'')} OR ${escapeHtml(top.character.toUpperCase())}`:`MATCH ${escapeHtml(game.currentColor||'')} • WILD / PLAY YOUR HAND ALWAYS PLAY`;
 let special='';
 if(game.pending?.type==='SPIN_WHEEL'&&game.pending.playerId===game.viewerId){
   special=wheelHtml(null,true)+'<div class="wheel-message">POWER WHEEL SPINNING…</div>';
@@ -147,7 +148,7 @@ gameEl.innerHTML=`
         <div class="tv-screen">
           <div class="tv-watermark">PLAY YOUR HAND</div>
           <div class="tv-card ${top.type==='WILD'?'wild':''} ${top.type==='PLAY_YOUR_HAND'?'play-special':''}">
-            ${topSpecialImage?topCardVisual:(topImage?`<span class="tv-number">${escapeHtml(top.character||top.type||'')}</span><img src="${topImage}" alt=""><strong>${escapeHtml(top.character||'CARD')}</strong><small>${escapeHtml(top.color||'')}</small>`:`<div class="special-card-symbol">${escapeHtml((top.type||'CARD').replaceAll('_',' '))}</div>`)}
+            ${topSpecialImage?topCardVisual:(topImage?`<span class="tv-number">${escapeHtml(top.character||top.type||'')}</span><img src="${topImage}" alt=""><strong>${escapeHtml(top.character||'CARD')}</strong><small>${escapeHtml(cardColor(top)||'')}</small>`:`<div class="special-card-symbol">${escapeHtml((top.type||'CARD').replaceAll('_',' '))}</div>`)}
           </div>
         </div>
       </div>
