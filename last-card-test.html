@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PLAY YOUR HAND — LAST CARD TEST</title>
+<style>
+html,body{margin:0;min-height:100%;background:#000;color:#fff;font-family:Arial,sans-serif}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;box-sizing:border-box}
+h1{margin:0;text-align:center;font-size:26px}
+p{margin:0;text-align:center}
+video{width:min(100%,900px);max-height:70vh;background:#000;border:2px solid #1687ff;border-radius:10px}
+button{font-size:18px;font-weight:800;padding:12px 18px;border:0;border-radius:10px}
+</style>
+</head>
+<body>
+<h1>PLAY YOUR HAND — LAST CARD TEST</h1>
+<p>If the video is here, the game has the LAST CARD video file.</p>
+<video id="v" src="/last-card.mp4" autoplay muted playsinline controls preload="auto"></video>
+<button id="replay">PLAY AGAIN</button>
+<script>
+const v=document.getElementById('v');
+document.getElementById('replay').onclick=()=>{v.currentTime=0;v.play()};
+v.play().catch(()=>{});
+</script>
+</body>
+</html>
