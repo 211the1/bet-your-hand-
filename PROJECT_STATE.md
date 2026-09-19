@@ -78,3 +78,12 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - Server STATE snapshots now normalize transmitted top cards and player hands to the authoritative cardColor(), preventing persisted stale color fields from disagreeing with the card ID.
 - Exported cardColor() from game/engine.js for the server snapshot normalization.
 - Commits: 6879a641a32023b37470b6b7af3addc8a11e318d, 7f9fdc843ab1068256febfb0bf5a28d28ce2982f, 9f074dce6013572458a848369e6182cf8a804dc4, plus engine export fix 725ee642c5d04db82b44e6e1e91957d00318e17e.
+
+## Latest Power Wheel update (2026-09-19)
+- PLAY YOUR HAND now uses a nine-section Power Wheel matching the game's four actual card colors: Red, Blue, Green, Yellow.
+- Each wheel section is an individual labeled wedge with a character and a Power Play result.
+- When PLAY YOUR HAND is played, the wheel result now sets the next game color immediately to the color of the section where the wheel lands.
+- COLOR_CHOICE remains a Power Play that can override the wheel-selected color after the result.
+- The wheel result shows POWER PLAY, selected COLOR, and the landed character.
+- The wheel is rendered in the existing player game screen; no separate image upload is required.
+- Engine wheel sections are defined in game/engine.js as WHEEL_SECTIONS.
