@@ -133,3 +133,10 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - Laptop controls, wheel behavior, card rules, and card visuals were not changed.
 - Player cache bumped to app.js?v=62.
 - Commits: 23c2b265099b7aa2d8b64248f75713a2b03aaca7, 22c5acdbb501e8df5729de41c79278ba504a8ba9, ddf614d144d5d99d582f36cf69192e71a621057c.
+
+## TV character card lettering restored (2026-09-19)
+- The TV top-card renderer was changed to a shared special-card visual, but that also removed the character name/color labels beneath normal character cards.
+- Restored the character name and authoritative color text directly beneath the character image on the TV card.
+- No controls, scoring, wheel, card rules, or special-card artwork were changed.
+- Player cache bumped to app.js?v=63.
+- Commits: 9af3b6fdc45d95ddfdcdfca06a6a9edf88ee5982, 0733d345197dab670f41998cfef7871dfc1881f3.
