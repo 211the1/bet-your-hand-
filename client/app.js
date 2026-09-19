@@ -6,7 +6,7 @@ compact.textContent+='.call-flash{position:fixed;inset:0;z-index:99990;pointer-e
 const codeInput=document.getElementById('code'),nameInput=document.getElementById('name'),characterSelect=document.getElementById('char'),joinButton=document.getElementById('join'),statusEl=document.getElementById('status'),gameEl=document.getElementById('game');
 const characters=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];const colors=['Red','Blue','Green','Yellow'];
 characterSelect.replaceChildren(new Option('SELECT CHARACTER',''));characters.forEach(c=>characterSelect.add(new Option(c,c)));
-let ws=null,me=null,joined=false,connecting=false,retryTimer=null,pingTimer=null,session=null,autoSpinSent=false,lastSeenEvent=null;
+let ws=null,me=null,joined=false,connecting=false,retryTimer=null,pingTimer=null,session=null,autoSpinSent=false,lastSeenEvent=null,selectedCardId=null,sortMode=false;
 try{session=JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{}
 if(session){codeInput.value=session.code||'';nameInput.value=session.name||'';characterSelect.value=session.character||'';joined=Boolean(session.playerId)}
 const setStatus=(m,bad=false)=>{statusEl.textContent=m||'';statusEl.style.color=bad?'#ff6b6b':'#21f17d'};const send=m=>{if(!ws||ws.readyState!==WebSocket.OPEN)return false;ws.send(JSON.stringify(m));return true};const save=s=>localStorage.setItem('byhPlayerSession',JSON.stringify(s));
@@ -24,14 +24,92 @@ if(game.phase==='finished'){
  const scores=[...game.players].sort((a,b)=>Number(b.points)-Number(a.points));
  gameEl.innerHTML=`<div style="text-align:center;padding:24px 10px"><h2 style="font-size:42px;color:#21f17d;text-shadow:0 0 18px #21f17d;margin:8px 0">GAME NIGHT COMPLETE</h2><h3 style="font-size:28px;margin:10px 0">WINNER</h3><div style="font-size:34px;font-weight:1000;color:#fff;margin:10px 0">${escapeHtml(winner?.name||'—')}</div><div style="font-size:18px;margin:4px 0">${escapeHtml(winner?.character||'')}</div><div style="margin:18px auto;max-width:420px">${scores.map((p,i)=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 10px;border-bottom:1px solid #1687ff"><span>${i+1}. <b>${escapeHtml(p.name)}</b></span><span><b>${Number(p.points)}</b> points</span></div>`).join('')}</div><p style="font-size:14px">Round 2 is finished.</p></div>`;
  return;
-}const hand=Array.isArray(game.viewerHand)?game.viewerHand:[],isMyTurn=Boolean(game.isYourTurn),current=game.players.find(p=>p.id===game.turnPlayerId),top=game.topCard||{},viewer=game.players.find(p=>String(p.id)===String(game.viewerId));const previousHandLength=Number(gameEl.dataset.handLength||0);const cards=hand.map(card=>`<button type="button" class="card hand-card" data-card-id="${escapeHtml(card.id)}">${escapeHtml(card.character||card.type)}<br>${escapeHtml(card.color||'')}</button>`).join('');const playableHint=top.character?`MATCH ${escapeHtml(top.color||game.currentColor||'')} OR ${escapeHtml(top.character.toUpperCase())}`:`MATCH ${escapeHtml(game.currentColor||'')} • WILD / PLAY YOUR HAND ALWAYS PLAY`;
-let special='';if(game.pending?.type==='SPIN_WHEEL'&&game.pending.playerId===game.viewerId){special=wheelHtml(null,true)+'<div class="wheel-message">POWER WHEEL SPINNING…</div>';if(!autoSpinSent){autoSpinSent=true;setTimeout(()=>send({type:'SPIN_WHEEL'}),2200)}}else if(game.pending?.type==='WILD_COLOR_CHOICE'&&game.pending.playerId===game.viewerId){autoSpinSent=false;special=wildColorControls()+'<div class="wheel-message">WILD CARD — CHOOSE THE NEW COLOR</div>'}else if(game.pending?.type==='POWER_USED'&&game.pending.playerId===game.viewerId){autoSpinSent=false;special=wheelHtml(game.wheelResult,false)+powerControls(game)}else autoSpinSent=false;
-const callButton='<button id="call-players" type="button" style="width:100%;margin:6px auto;padding:11px;font-size:16px;font-weight:900;border-radius:12px">📞 CALL PLAYERS</button>';const drawButton=isMyTurn&&!game.pending&&!game.lastCardEvent?'<button id="draw-card" class="draw-button" type="button">DRAW CARD</button>':'';const lastCardButton='';
-gameEl.innerHTML=`${callButton}<div class="game-top"><h2>ROUND ${game.round}</h2><div>COLOR: <b>${escapeHtml(game.currentColor||'—')}</b> · DISCARD: ${Number(game.discardCount||0)}</div></div><h3>CARD IN PLAY</h3>${cardHtml(top)}<div class="play-hint">PLAY: ${playableHint}</div><div class="score-line">${game.players.map(p=>`<b>${escapeHtml(p.name)}</b> ${p.handCount} · ${p.points}`).join(' &nbsp;|&nbsp; ')}</div>`+(isMyTurn?`<h2 class="turn">YOUR TURN</h2>`:`<h2 class="waiting">WAITING · ${escapeHtml(current?.name||'—')}</h2>`)+special+`<h3 class="hand-title">YOUR HAND <span>${hand.length}</span></h3><div class="hand-grid">${cards}</div>${lastCardButton}${drawButton}`;
-const oldShield=gameEl.querySelector('.shield-status');if(oldShield)oldShield.remove();if(viewer?.shield){const box=document.createElement('div');box.className='shield-status';box.textContent='🛡️ SHIELD ACTIVE — SKIP PROTECTED';const title=gameEl.querySelector('.hand-title');if(title)gameEl.insertBefore(box,title)}
+}const hand=Array.isArray(game.viewerHand)?game.viewerHand:[],isMyTurn=Boolean(game.isYourTurn),current=game.players.find(p=>p.id===game.turnPlayerId),top=game.topCard||{},viewer=game.players.find(p=>String(p.id)===String(game.viewerId));
+const previousHandLength=Number(gameEl.dataset.handLength||0);
+if(!hand.some(c=>String(c.id)===String(selectedCardId)))selectedCardId=null;
+const orderedHand=[...hand].sort((a,b)=>{
+  if(!sortMode)return 0;
+  return String(a.character||a.type).localeCompare(String(b.character||b.type))||String(a.color||'').localeCompare(String(b.color||''));
+});
+const cards=orderedHand.map(card=>{
+  const selected=String(card.id)===String(selectedCardId);
+  const nm=card.character||({'SKIP':'SKIP','REVERSE':'REVERSE','WILD':'WILD','PLAY_YOUR_HAND':'PLAY YOUR HAND'}[card.type]||'CARD');
+  const img=characterImage(card.character);
+  const col=(card.color||'').toLowerCase();
+  return `<button type="button" class="arcade-card color-${escapeHtml(col)} ${selected?'selected':''}" data-card-id="${escapeHtml(card.id)}">
+    ${img?`<img src="${img}" alt="${escapeHtml(nm)}">`:''}
+    <span class="arcade-card-number">${escapeHtml(card.character?card.character.slice(0,1):'')}</span>
+    <strong>${escapeHtml(nm)}</strong>
+    ${card.color?`<small>${escapeHtml(card.color)}</small>`:`<small>${escapeHtml((card.type||'CARD').replaceAll('_',' '))}</small>`}
+  </button>`
+}).join('');
+const playableHint=top.character?`MATCH ${escapeHtml(top.color||game.currentColor||'')} OR ${escapeHtml(top.character.toUpperCase())}`:`MATCH ${escapeHtml(game.currentColor||'')} • WILD / PLAY YOUR HAND ALWAYS PLAY`;
+let special='';
+if(game.pending?.type==='SPIN_WHEEL'&&game.pending.playerId===game.viewerId){
+  special=wheelHtml(null,true)+'<div class="wheel-message">POWER WHEEL SPINNING…</div>';
+  if(!autoSpinSent){autoSpinSent=true;setTimeout(()=>send({type:'SPIN_WHEEL'}),2200)}
+}else if(game.pending?.type==='WILD_COLOR_CHOICE'&&game.pending.playerId===game.viewerId){
+  autoSpinSent=false;special=wildColorControls()+'<div class="wheel-message">WILD CARD — CHOOSE THE NEW COLOR</div>';
+}else if(game.pending?.type==='POWER_USED'&&game.pending.playerId===game.viewerId){
+  autoSpinSent=false;special=wheelHtml(game.wheelResult,false)+powerControls(game)
+}else autoSpinSent=false;
+
+const playerTiles=(game.players||[]).map(p=>{
+  const mine=String(p.id)===String(game.viewerId);
+  const active=String(p.id)===String(game.turnPlayerId);
+  const img=characterImage(p.character);
+  return `<div class="arcade-player ${active?'active':''} ${mine?'mine':''}">
+    <div class="arcade-avatar">${img?`<img src="${img}" alt="${escapeHtml(p.character)}">`:''}</div>
+    <b>${escapeHtml(p.character||'PLAYER')}</b>
+    <span>${escapeHtml(p.name||'')}</span>
+    <em>${Number(p.handCount||0)}</em>
+    ${active?'<label>YOUR TURN</label>':''}
+  </div>`
+}).join('');
+
+const nextPlayer=current?'<div class="side-player"><b>NEXT PLAYER</b><div>'+escapeHtml(current.name||'—')+'</div></div>':'';
+const info=`<div class="game-info"><b>GAME INFO</b><div>Direction <strong>${game.direction===-1?'←':'→'}</strong></div><div>Color: <strong>${escapeHtml(game.currentColor||'—')}</strong></div><div>Cards Left: <strong>${Number(game.deckCount||game.cardsLeft||0)}</strong></div></div>`;
+const callButton='<button id="call-players" class="arcade-call" type="button">☎<strong>CALL</strong><span>WAKE PLAYER</span></button>';
+const drawButton=isMyTurn&&!game.pending&&!game.lastCardEvent?'<button id="draw-card" class="arcade-draw" type="button">DRAW</button>':'<button class="arcade-draw disabled" type="button" disabled>DRAW</button>';
+const playButton=isMyTurn&&!game.pending&&!game.lastCardEvent&&selectedCardId?'<button id="play-selected" class="arcade-play" type="button">PLAY YOUR HAND</button>':'<button class="arcade-play disabled" type="button" disabled>PLAY YOUR HAND</button>';
+const topImage=characterImage(top.character);
+const topCardVisual=topImage?`<img src="${topImage}" alt="${escapeHtml(top.character||'Card')}">`:'<div class="special-card-symbol">'+escapeHtml((top.type||'CARD').replaceAll('_',' '))+'</div>';
+
+gameEl.innerHTML=`
+<div class="arcade-shell">
+  <header class="arcade-header">
+    <div class="arcade-room">ROOM ${escapeHtml(game.code||session?.code||'—')}<small>ROUND ${Number(game.round||1)}</small></div>
+    <div class="arcade-logo">PLAY YOUR HAND</div>
+    <div class="arcade-tools"><button type="button">🔊<small>SOUND</small></button><button type="button">☰<small>MENU</small></button></div>
+  </header>
+  <section class="arcade-players">${playerTiles}</section>
+  <div class="arcade-main">
+    <aside class="arcade-side left-side">${callButton}${nextPlayer}<button class="arcade-side-btn" type="button">▤ VIEW DECK</button></aside>
+    <section class="arcade-center">
+      <div class="arcade-tv">
+        <div class="tv-screen">
+          <div class="tv-watermark">PLAY YOUR HAND</div>
+          <div class="tv-card ${top.type==='WILD'?'wild':''} ${top.type==='PLAY_YOUR_HAND'?'play-special':''}">
+            <span class="tv-number">${escapeHtml(top.character||top.type||'')}</span>
+            ${topImage?`<img src="${topImage}" alt="">`:''}
+            <strong>${escapeHtml(top.character||({'SKIP':'SKIP','REVERSE':'REVERSE','WILD':'WILD','PLAY_YOUR_HAND':'PLAY YOUR HAND'}[top.type]||'CARD'))}</strong>
+            <small>${escapeHtml(top.color||top.type||'')}</small>
+          </div>
+        </div>
+      </div>
+      <div class="arcade-hint">${playableHint}</div>
+      ${special}
+    </section>
+    <aside class="arcade-side right-side">${info}<button class="arcade-emoji" type="button">EMOJI 🙂</button><div class="arcade-special-label">PLAY<br>YOUR<br>HAND</div></aside>
+  </div>
+  <div class="arcade-hand-title">YOUR HAND <span>${hand.length} CARDS</span></div>
+  <div class="arcade-hand-wrap"><button class="hand-arrow" id="hand-left">‹</button><div class="hand-grid arcade-hand">${cards}</div><button class="hand-arrow" id="hand-right">›</button></div>
+  <div class="arcade-slide-label">‹ &nbsp; SLIDE CARDS LEFT OR RIGHT &nbsp; ›</div>
+  <div class="arcade-actions">${drawButton}${playButton}<button id="sort-cards" class="arcade-sort" type="button">↕ SORT</button></div>
+</div>`;
 gameEl.dataset.handLength=hand.length;
 const handGrid=gameEl.querySelector('.hand-grid');if(handGrid){if(hand.length>previousHandLength)setTimeout(()=>handGrid.scrollTo({left:handGrid.scrollWidth,behavior:'smooth'}),40)}
-gameEl.querySelectorAll('[data-card-id]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();if(!isMyTurn||game.pending||game.lastCardEvent){setStatus(isMyTurn?'FINISH THE CURRENT ACTION FIRST':`WAITING FOR ${current?.name||'THE OTHER PLAYER'}`,true);return}send({type:'PLAY_CARD',cardId:b.dataset.cardId})}));const call=gameEl.querySelector('#call-players');if(call)call.addEventListener('click',()=>send({type:'CALL_PLAYER',playerId:'all'}));const draw=gameEl.querySelector('#draw-card');if(draw)draw.addEventListener('click',()=>send({type:'DRAW_CARD'}));const use=gameEl.querySelector('#use-power');if(use)use.addEventListener('click',()=>{const color=gameEl.querySelector('#power-color')?.value;send({type:'USE_POWER',power:game.pending.power,color})});const wild=gameEl.querySelector('#choose-wild-color');if(wild)wild.addEventListener('click',()=>{const color=gameEl.querySelector('#wild-color')?.value;send({type:'CHOOSE_COLOR',color})})});ws.addEventListener('error',()=>setStatus('CONNECTION LOST — RETRYING…',true));ws.addEventListener('close',()=>{connecting=false;clearInterval(pingTimer);ws=null;setStatus('CONNECTION LOST — RETRYING…',true);scheduleReconnect()})}
+gameEl.querySelectorAll('[data-card-id]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();if(!isMyTurn||game.pending||game.lastCardEvent){setStatus(isMyTurn?'FINISH THE CURRENT ACTION FIRST':`WAITING FOR ${current?.name||'THE OTHER PLAYER'}`,true);return}selectedCardId=b.dataset.cardId;document.querySelectorAll('.arcade-card').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');setStatus('CARD SELECTED — TAP PLAY YOUR HAND')}));const call=gameEl.querySelector('#call-players');if(call)call.addEventListener('click',()=>send({type:'CALL_PLAYER',playerId:'all'}));const draw=gameEl.querySelector('#draw-card');if(draw)draw.addEventListener('click',()=>send({type:'DRAW_CARD'}));const play=gameEl.querySelector('#play-selected');if(play)play.addEventListener('click',()=>{if(selectedCardId){send({type:'PLAY_CARD',cardId:selectedCardId});selectedCardId=null}});const sort=gameEl.querySelector('#sort-cards');if(sort)sort.addEventListener('click',()=>{sortMode=!sortMode;setStatus(sortMode?'HAND SORTED':'HAND ORDER RESTORED')});const left=gameEl.querySelector('#hand-left'),right=gameEl.querySelector('#hand-right'),grid=gameEl.querySelector('.arcade-hand');if(left&&grid)left.addEventListener('click',()=>grid.scrollBy({left:-240,behavior:'smooth'}));if(right&&grid)right.addEventListener('click',()=>grid.scrollBy({left:240,behavior:'smooth'}));const use=gameEl.querySelector('#use-power');if(use)use.addEventListener('click',()=>{const color=gameEl.querySelector('#power-color')?.value;send({type:'USE_POWER',power:game.pending.power,color})});const wild=gameEl.querySelector('#choose-wild-color');if(wild)wild.addEventListener('click',()=>{const color=gameEl.querySelector('#wild-color')?.value;send({type:'CHOOSE_COLOR',color})})});ws.addEventListener('error',()=>setStatus('CONNECTION LOST — RETRYING…',true));ws.addEventListener('close',()=>{connecting=false;clearInterval(pingTimer);ws=null;setStatus('CONNECTION LOST — RETRYING…',true);scheduleReconnect()})}
 function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
 joinButton.addEventListener('click',()=>{const code=codeInput.value.trim().toUpperCase(),name=nameInput.value.trim(),character=characterSelect.value;if(!code||!name||!character){setStatus('ENTER CODE, NAME, AND CHARACTER',true);return}session={code,name,character};save(session);connect()});
 if(session?.playerId)connect();
