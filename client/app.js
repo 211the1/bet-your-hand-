@@ -45,7 +45,8 @@ const save=s=>localStorage.setItem('byhPlayerSession',JSON.stringify(s));
 function scheduleReconnect(){if(retryTimer||!session?.playerId)return;retryTimer=setTimeout(()=>{retryTimer=null;connect()},1000)}
 function characterImage(name){return name?({'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'}[name]||''):''}
 function cardColor(card){if(!card)return '';if(card.type==='CHARACTER'){const c=String(card.id||'').split('-')[0];return colors.includes(c)?c:(colors.includes(card.color)?card.color:'')}if(card.type==='SKIP'||card.type==='REVERSE'){const n=Number(String(card.id||'').split('-')[1]);return Number.isFinite(n)?colors[n%4]:(colors.includes(card.color)?card.color:'')}return colors.includes(card.color)?card.color:''}
-function specialImage(card){if(!card)return '';const base='https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3';if(card.type==='WILD')return base+'/WILD.png';if(card.type==='PLAY_YOUR_HAND')return base+'/PLAY_YOUR_HAND.png';if(card.type==='SKIP'||card.type==='REVERSE'){const names={Red:'DEEP_PURPLE',Blue:'ROYAL_BLUE',Green:'EMERALD',Yellow:'GOLD'};const suffix=names[card.color]||'ROYAL_BLUE';return base+`/${card.type}_${suffix}.png`}return ''}
+function specialImage(card){if(!card)return '';const base='https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3';if(card.type==='WILD')return base+'/WILD.png';if(card.type==='PLAY_YOUR_HAND')return base+'/PLAY_YOUR_HAND.png';if(card.type==='SKIP'||card.type==='REVERSE')return '';return ''}
+function specialModern(card,where='hand'){const c=card||{},type=c.type;if(type!=='SKIP'&&type!=='REVERSE')return '';const col=cardColor(c);const icon=type==='SKIP'?'»':'↻';return `<div class="modern-special ${type.toLowerCase()} modern-${String(col).toLowerCase()} ${where}"><div class="modern-special-icon">${icon}</div><div class="modern-special-name">${type}</div><div class="modern-special-color">${escapeHtml(col)}</div></div>`}
 function cardHtml(card){const c=card||{},name=c.character||({SKIP:'SKIP',REVERSE:'REVERSE',WILD:'WILD',PLAY_YOUR_HAND:'PLAY YOUR HAND'}[c.type]||'CARD'),img=characterImage(c.character),color=cardColor(c).toLowerCase();return `<div class="card table-card player-current color-${escapeHtml(color)}">${img?`<img class="card-face" src="${img}" alt="${escapeHtml(name)}">`:''}<div class="card-name">${escapeHtml(name)}</div>${c.color?`<div class="card-color">${escapeHtml(c.color)}</div>`:`<div class="card-type">${escapeHtml((c.type||'CARD').replaceAll('_',' '))}</div>`}</div>`}
 function wheelHtml(result,spinning){return `<div class="wheel-box"><div class="wheel ${spinning?'wheel-spin':''}"><div class="wheel-center">POWER</div></div><div class="wheel-pointer">▼</div>${result?`<div class="wheel-result">POWER: ${escapeHtml(result.power.replaceAll('_',' '))}</div>`:''}</div>`}
 function colorButtons(id){return `<div class="color-buttons">${colors.map(c=>`<button type="button" class="color-choice color-choice-${c.toLowerCase()}" data-color="${c}" data-color-group="${id}">${c}</button>`).join('')}</div>`}
@@ -96,8 +97,8 @@ const cards=orderedHand.map(card=>{
   const col=cardColor(card).toLowerCase();
   const specialClass=special?` special-${String(card.type).toLowerCase()}`:'';
   return `<button type="button" class="arcade-card color-${escapeHtml(col)}${specialClass} ${selected?'selected':''}" data-card-id="${escapeHtml(card.id)}">
-    ${specialImg?`<img class="special-art" src="${specialImg}" alt="${escapeHtml(nm)}">`:img?`<img src="${img}" alt="${escapeHtml(nm)}">`:''}
-    ${specialImg?'':`<strong>${escapeHtml(nm)}</strong><small>${cardColor(card)?escapeHtml(cardColor(card)):escapeHtml((card.type||'CARD').replaceAll('_',' '))}</small>`}
+    ${specialImg?`<img class="special-art" src="${specialImg}" alt="${escapeHtml(nm)}">`:special?specialModern(card,'hand'):img?`<img src="${img}" alt="${escapeHtml(nm)}">`:''}
+    ${specialImg||special?'':`<strong>${escapeHtml(nm)}</strong><small>${cardColor(card)?escapeHtml(cardColor(card)):escapeHtml((card.type||'CARD').replaceAll('_',' '))}</small>`}
   </button>`}).join('');
 const playableHint=top.character?`MATCH ${escapeHtml(cardColor(top)||game.currentColor||'')} OR ${escapeHtml(top.character.toUpperCase())}`:`MATCH ${escapeHtml(game.currentColor||'')} • WILD / PLAY YOUR HAND ALWAYS PLAY`;
 let special='';
@@ -130,7 +131,7 @@ const drawButton=isMyTurn&&!game.pending&&!game.lastCardEvent?'<button id="draw-
 
 const topImage=characterImage(top.character);
 const topSpecialImage=specialImage(top);
-const topCardVisual=topSpecialImage?`<img class="tv-special-art" src="${topSpecialImage}" alt="${escapeHtml(top.character||top.type||'Card')}">`:topImage?`<img src="${topImage}" alt="${escapeHtml(top.character||'Card')}">`:'<div class="special-card-symbol">'+escapeHtml((top.type||'CARD').replaceAll('_',' '))+'</div>';
+const topCardVisual=topSpecialImage?`<img class="tv-special-art" src="${topSpecialImage}" alt="${escapeHtml(top.character||top.type||'Card')}">`:(top.type==='SKIP'||top.type==='REVERSE')?specialModern(top,'tv'):topImage?`<img src="${topImage}" alt="${escapeHtml(top.character||'Card')}">`:'<div class="special-card-symbol">'+escapeHtml((top.type||'CARD').replaceAll('_',' '))+'</div>';
 
 gameEl.innerHTML=`
 <div class="arcade-shell">
