@@ -3,6 +3,17 @@ const COLORS = Object.freeze(['Red','Blue','Green','Yellow']);
 const CHARACTERS = Object.freeze(['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw']);
 const MIN_PLAYERS=2, MAX_PLAYERS=6, STARTING_HAND=8, STARTING_POINTS=500;
 const SPECIAL_POINTS=Object.freeze({SKIP:100,REVERSE:100,WILD:200,PLAY_YOUR_HAND:300});
+const WHEEL_SECTIONS=Object.freeze([
+  {section:1,character:'Bug',color:'Blue',power:'EXTRA_PLAY'},
+  {section:2,character:'Face',color:'Red',power:'SHIELD'},
+  {section:3,character:'Ling Ling',color:'Green',power:'COLOR_CHOICE'},
+  {section:4,character:'Beanz',color:'Yellow',power:'EXTRA_PLAY'},
+  {section:5,character:'The One',color:'Blue',power:'TURN_SWITCH'},
+  {section:6,character:'Boone',color:'Green',power:'SHIELD'},
+  {section:7,character:'Chicken Joe',color:'Red',power:'COLOR_CHOICE'},
+  {section:8,character:'Juby',color:'Yellow',power:'EXTRA_PLAY'},
+  {section:9,character:'Meemaw',color:'Blue',power:'TURN_SWITCH'}
+]);
 function buildDeck(){const deck=[];for(const character of CHARACTERS) for(const color of COLORS) for(let copy=0;copy<2;copy++) deck.push({id:`${color}-${character}-${copy}`,type:'CHARACTER',color,character});for(let i=0;i<8;i++) deck.push({id:`SKIP-${i}`,type:'SKIP',color:COLORS[i%4]});for(let i=0;i<8;i++) deck.push({id:`REVERSE-${i}`,type:'REVERSE',color:COLORS[i%4]});for(let i=0;i<8;i++) deck.push({id:`WILD-${i}`,type:'WILD',color:null});for(let i=0;i<12;i++) deck.push({id:`PLAY-${i}`,type:'PLAY_YOUR_HAND',color:null});if(deck.length!==108)throw new Error('Deck must contain exactly 108 cards');return deck}
 function shuffle(a,rng=Math.random){const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x}
 function topCard(g){return g.discard[g.discard.length-1]}
@@ -21,7 +32,7 @@ function playCard(g,playerId,cardId,extra={}){const p=currentPlayer(g);if(p.id!=
 if(SPECIAL_POINTS[card.type])p.points+=SPECIAL_POINTS[card.type];
 if(p.hand.length===0){p.points+=500;g.finalCardBonusAwarded=playerId}let turnAlreadyAdvanced=false;if(card.type==='SKIP'){advance(g);const target=currentPlayer(g);if(target.shield){target.shield=false;advance(g)}else advance(g);turnAlreadyAdvanced=true}else if(card.type==='REVERSE'){g.direction*=-1;if(g.players.length===2){advance(g,2);turnAlreadyAdvanced=true}}else if(card.type==='WILD'){g.pending={type:'WILD_COLOR_CHOICE',playerId}}else if(card.type==='PLAY_YOUR_HAND'){g.pending={type:'SPIN_WHEEL',playerId}}if(p.hand.length===0&&card.type!=='WILD'){finishRoundOrGame(g,playerId);return card}if(g.pending?.type!=='SPIN_WHEEL'&&g.pending?.type!=='WILD_COLOR_CHOICE'){if(p.extraPlay)p.extraPlay=false;else if(!turnAlreadyAdvanced)advance(g);if(g.phase==='playing')startTurn(g)}return card}
 function chooseWildColor(g,playerId,color){if(g.pending?.type!=='WILD_COLOR_CHOICE'||g.pending.playerId!==playerId)throw new Error('Wild color choice is not pending');if(!COLORS.includes(color))throw new Error('Color required');g.currentColor=color;const p=g.players.find(x=>x.id===playerId);if(p?.hand.length===0){finishRoundOrGame(g,playerId);return color}g.pending=null;advance(g);if(g.phase==='playing')startTurn(g);return color}
-function spinWheel(g,playerId,rng=Math.random){if(g.pending?.type!=='SPIN_WHEEL'||g.pending.playerId!==playerId)throw new Error('Wheel is not pending');const index=Math.floor(rng()*9),powers=['EXTRA_PLAY','SHIELD','COLOR_CHOICE','EXTRA_PLAY','TURN_SWITCH','SHIELD','COLOR_CHOICE','EXTRA_PLAY','TURN_SWITCH'],power=powers[index],p=currentPlayer(g);p[camel(power)]=true;g.wheelResult={section:index+1,power};g.pending={type:'POWER_USED',power,playerId};return g.wheelResult}
+function spinWheel(g,playerId,rng=Math.random){if(g.pending?.type!=='SPIN_WHEEL'||g.pending.playerId!==playerId)throw new Error('Wheel is not pending');const index=Math.floor(rng()*WHEEL_SECTIONS.length),section=WHEEL_SECTIONS[index],power=section.power,p=currentPlayer(g);p[camel(power)]=true;g.currentColor=section.color;g.wheelResult={section:section.section,character:section.character,color:section.color,power};g.pending={type:'POWER_USED',power,playerId};return g.wheelResult}
 function usePower(g,playerId,power,data={}){const p=g.players.find(x=>x.id===playerId);if(!p||currentPlayer(g).id!==playerId)throw new Error('Not your turn');if(!['EXTRA_PLAY','SHIELD','COLOR_CHOICE','TURN_SWITCH'].includes(power))throw new Error('Unknown power');const key=camel(power);if(!p[key])throw new Error('Power not available');p[key]=false;if(power==='COLOR_CHOICE'){if(!COLORS.includes(data.color))throw new Error('Color required');g.currentColor=data.color}if(power==='TURN_SWITCH')g.direction*=-1;if(power==='EXTRA_PLAY')p.extraPlay=true;if(power==='SHIELD')p.shield=true;g.pending=null;if(power==='EXTRA_PLAY')startTurn(g);else{advance(g);if(g.phase==='playing')startTurn(g)}return power}
 function camel(x){return x.toLowerCase().replace(/_([a-z])/g,(_,c)=>c.toUpperCase())}
 function removePlayer(g,playerId){
@@ -44,4 +55,4 @@ function removePlayer(g,playerId){
  return true;
 }
 function completeRound(g){if(g.phase!=='round_complete')throw new Error('Round is not complete');if(g.round===2){g.phase='finished';g.winner=[...g.players].sort((a,b)=>b.points-a.points)[0].id;return}g.round=2;g.phase='playing';g.deck=shuffle(buildDeck());g.discard=[];g.currentColor=null;g.pending=null;g.wheelResult=null;g.turnIndex=0;g.direction=1;for(const p of g.players){p.hand=[];p.shield=false;p.extraPlay=false;p.colorChoice=false;p.turnSwitch=false}for(const p of g.players)p.hand=g.deck.splice(0,STARTING_HAND);let first;do{first=g.deck.shift();g.deck.push(first)}while(first.type==='PLAY_YOUR_HAND');g.discard=[first];g.currentColor=cardColor(first)||null;startTurn(g)}
-module.exports={COLORS,CHARACTERS,MIN_PLAYERS,MAX_PLAYERS,STARTING_HAND,STARTING_POINTS,SPECIAL_POINTS,buildDeck,shuffle,createGame,isPlayable,startTurn,playCard,chooseWildColor,spinWheel,usePower,removePlayer,completeRound,currentPlayer,currentColor,topCard,cardColor,drawUntilPlayable,drawCard};
+module.exports={COLORS,CHARACTERS,WHEEL_SECTIONS,MIN_PLAYERS,MAX_PLAYERS,STARTING_HAND,STARTING_POINTS,SPECIAL_POINTS,buildDeck,shuffle,createGame,isPlayable,startTurn,playCard,chooseWildColor,spinWheel,usePower,removePlayer,completeRound,currentPlayer,currentColor,topCard,cardColor,drawUntilPlayable,drawCard};
