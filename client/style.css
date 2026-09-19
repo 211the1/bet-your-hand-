@@ -241,3 +241,25 @@ body.player-page #game{width:100%;margin:0;padding:0}
   .arcade-card.special-wild .special-art,
   .arcade-card.special-play_your_hand .special-art{border-radius:8px!important}
 }
+
+/* Compact sign-in popup — keeps the game screen clear */
+body.player-page .player-brand{margin:8px auto 4px}
+body.player-page .player-brand h1{margin:0!important}
+body.player-page .player-brand p{margin:0 0 4px!important}
+body.player-page .open-join{width:min(260px,90%);margin:4px auto 8px;padding:10px 16px;border:3px solid #1687ff;border-radius:14px;background:#082c8c;color:#fff;font-weight:1000;font-size:18px;box-shadow:0 0 18px #1687ff99}
+body.player-page .join-panel{position:fixed;inset:0;z-index:99990;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72);backdrop-filter:blur(5px)}
+body.player-page .join-panel.show{display:flex}
+body.player-page .join-box{position:relative;width:min(360px,92vw);padding:24px 18px 20px;border:3px solid #1687ff;border-radius:24px;background:radial-gradient(circle at 50% 20%,#172c67,#070b20 72%);box-shadow:0 0 35px #1687ff99;color:#fff}
+body.player-page .join-box h2{font-size:30px;margin:2px 0 4px;color:#fff;text-shadow:0 0 12px #1687ff}
+body.player-page .join-box p{font-family:system-ui;font-size:13px;margin:0 0 12px;opacity:.85}
+body.player-page .join-box input,body.player-page .join-box select{margin:9px 0;padding:12px;border:2px solid #713cff;border-radius:12px;background:#0d1028;color:#fff}
+body.player-page .join-box #join{margin:10px 0 2px;padding:13px;border:3px solid #1687ff;border-radius:13px;background:#1687ff;color:#fff;font-size:17px}
+body.player-page .join-box #status{min-height:20px;margin-top:7px;font-family:system-ui;font-weight:800;font-size:13px}
+body.player-page .close-join{position:absolute!important;top:9px;right:9px;width:38px!important;height:38px!important;margin:0!important;padding:0!important;border:2px solid #ff4b4b!important;border-radius:50%!important;background:#3a0b12!important;color:#fff!important;font-size:16px!important}
+@media(max-width:520px){
+ body.player-page .player-brand{margin:3px auto 2px}
+ body.player-page .player-brand h1{font-size:25px!important}
+ body.player-page .player-brand p{font-size:10px!important}
+ body.player-page .open-join{width:180px;padding:7px 10px;font-size:14px;margin:2px auto 4px}
+ body.player-page .join-box{padding:20px 15px 16px}
+}
