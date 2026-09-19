@@ -94,3 +94,10 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - Added a clearer desktop horizontal scrollbar for the hand.
 - Player cache bumped to app.js?v=54.
 - Commits: 10abfceee8b841e11f209719f770bcd2ac4dd19b, cb2e582c7a04611db95a420acad0730a9d6b78e6, 2296551e056f86efb15f5348d52e2c974b86edcc.
+
+## Card play scan/fix (2026-09-19)
+- Full scan found the server/engine PLAY_YOUR_HAND wheel path is intact: PLAY_YOUR_HAND sets pending=SPIN_WHEEL, and SPIN_WHEEL assigns the nine-section wheel result and color.
+- The actual player-card failure was in the client gesture handler: it was rejecting ordinary taps and only sending PLAY_CARD after an upward 70px swipe. That contradicted the locked direct/tap card-play behavior.
+- Fixed card input so a normal tap plays the card, while an upward swipe still plays it and horizontal dragging remains available for scrolling.
+- Cache bumped to app.js?v=55.
+- Commit: 568a48e35151a6b52ab321c47765a9de68c816c8.
