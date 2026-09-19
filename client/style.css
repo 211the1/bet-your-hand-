@@ -69,3 +69,40 @@ body.player-page #game{width:100%;margin:0;padding:0}
 @media(max-width:900px){
  .special-symbol{font-size:34px}.special-reverse .special-symbol{font-size:43px}.special-wild .special-symbol{font-size:20px}.special-play_your_hand .special-symbol{font-size:18px}.arcade-card.special-skip strong,.arcade-card.special-reverse strong,.arcade-card.special-wild strong,.arcade-card.special-play_your_hand strong{font-size:13px}
 }
+
+/* Exact card-face correction from the phone reference */
+.arcade-card{background:#151d45!important;border:3px solid #1687ff!important;box-shadow:0 0 10px #1687ff55!important;overflow:hidden!important}
+.arcade-card:before{display:none!important}
+.arcade-card img{width:82px;height:82px;object-fit:cover;border-radius:10px;border:3px solid rgba(255,255,255,.9);margin:0 auto 8px;flex:none}
+.arcade-card strong{font-family:system-ui,sans-serif;font-size:17px;font-weight:900;color:#fff;text-shadow:1px 2px 2px #000;text-align:center}
+.arcade-card small{font-family:system-ui,sans-serif;font-size:11px;font-weight:800;color:#fff;text-align:center}
+.arcade-card-number{display:none!important}
+.arcade-card.color-red{background:#a9151d!important;border-color:#ff4b55!important}
+.arcade-card.color-blue{background:#172c92!important;border-color:#1687ff!important}
+.arcade-card.color-green{background:#07883f!important;border-color:#20e36d!important}
+.arcade-card.color-yellow{background:#d89c00!important;border-color:#ffd83d!important}
+
+/* Custom special faces — no Uno styling */
+.arcade-card.special-skip{background:#d91620!important;border-color:#ff6268!important}
+.arcade-card.special-reverse{background:#08a447!important;border-color:#39f27c!important}
+.arcade-card.special-wild{background:#11151d!important;border-color:#f3f3f3!important}
+.arcade-card.special-play_your_hand{background:#e4a900!important;border-color:#ffd83d!important}
+.arcade-card.special-skip .special-symbol,.arcade-card.special-reverse .special-symbol,.arcade-card.special-wild .special-symbol,.arcade-card.special-play_your_hand .special-symbol{display:block;color:#fff;text-shadow:2px 2px 2px #000;text-align:center;margin:auto 0 8px}
+.arcade-card.special-skip .special-symbol{font-size:52px}
+.arcade-card.special-reverse .special-symbol{font-size:58px}
+.arcade-card.special-wild .special-symbol{font-size:29px;font-style:italic}
+.arcade-card.special-play_your_hand .special-symbol{font-size:23px;line-height:1.02}
+.arcade-card.special-skip strong,.arcade-card.special-reverse strong,.arcade-card.special-wild strong,.arcade-card.special-play_your_hand strong{font-size:16px}
+@media(max-width:900px){
+ .arcade-card{flex-basis:108px!important;width:108px!important;height:154px!important;padding:7px!important}
+ .arcade-card img{width:70px;height:70px;margin-bottom:7px}
+ .arcade-card strong{font-size:12px}.arcade-card small{font-size:8px}
+}
+@media(max-width:520px){
+ .arcade-hand-wrap{grid-template-columns:30px 1fr 30px}
+ .arcade-hand{gap:5px!important;padding:10px 8px 18px!important}
+ .arcade-card{flex-basis:104px!important;width:104px!important;height:150px!important;border-width:3px!important}
+ .arcade-card img{width:68px;height:68px}
+ .arcade-card strong{font-size:12px}.arcade-card small{font-size:8px}
+ .arcade-card.special-skip .special-symbol{font-size:43px}.arcade-card.special-reverse .special-symbol{font-size:48px}.arcade-card.special-wild .special-symbol{font-size:23px}.arcade-card.special-play_your_hand .special-symbol{font-size:19px}
+}
