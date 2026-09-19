@@ -64,3 +64,9 @@ ffcb8335d87abce4e75146f04a9a1f1dd70d2f74 — Refresh player app
 
 ## Continuity
 Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check this file before making changes in a new chat.
+
+## Latest restart fix (2026-09-19)
+- Host RESTART GAME is visible again after a host reconnect.
+- Restart now sends connected players a restart signal, closes their old room connection, clears their saved room session, and returns them to JOIN GAME so they can enter the new room code.
+- Host remains in control and receives the newly created room after restart.
+- Commits: c21921b5c451da641b2cc8300863c20dcbeb06b3, aa6c4602f470e9e8d5140f76eea0a12fc94d473e, fabe3bfc743e2cb934d03a0345d9c8bb0e6d8f24.
