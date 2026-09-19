@@ -1,65 +1,45 @@
-/* Clean active-player flame — flames outside the card, never a box over the artwork */
+/* Active-player flame rim: organic flame asset, transparent center, no box/grid. */
 .arcade-player.active{
   position:relative!important;
   overflow:visible!important;
   isolation:isolate!important;
+  border-color:#ffd21a!important;
+  box-shadow:0 0 18px #ff6a00,0 0 36px #ff240066!important;
+  transform:translateY(-3px)!important;
 }
 .arcade-player.active:before{
   content:""!important;
   position:absolute!important;
-  inset:-25px!important;
-  z-index:0!important;
+  inset:-22px!important;
+  z-index:4!important;
   pointer-events:none!important;
   border:0!important;
-  border-radius:20px!important;
-  background:
-    radial-gradient(ellipse at 8% 10%,#fff06a 0 4%,#ff7a00 5% 9%,transparent 12%),
-    radial-gradient(ellipse at 20% 3%,#ffd21a 0 5%,#ff3b00 6% 10%,transparent 13%),
-    radial-gradient(ellipse at 34% 8%,#fff06a 0 4%,#ff6a00 5% 9%,transparent 12%),
-    radial-gradient(ellipse at 49% 2%,#ffd21a 0 5%,#ff3b00 6% 10%,transparent 13%),
-    radial-gradient(ellipse at 64% 7%,#fff06a 0 4%,#ff6a00 5% 9%,transparent 12%),
-    radial-gradient(ellipse at 79% 3%,#ffd21a 0 5%,#ff3b00 6% 10%,transparent 13%),
-    radial-gradient(ellipse at 93% 10%,#fff06a 0 4%,#ff6a00 5% 9%,transparent 12%),
-    radial-gradient(ellipse at 4% 27%,#ffd21a 0 5%,#ff3b00 6% 10%,transparent 13%),
-    radial-gradient(ellipse at 2% 48%,#fff06a 0 4%,#ff6a00 5% 9%,transparent 12%),
-    radial-gradient(ellipse at 5% 70%,#ffd21a 0 5%,#ff3b00 6% 10%,transparent 13%),
-    radial-gradient(ellipse at 4% 91%,#fff06a 0 4%,#ff6a00 5% 9%,transparent 12%),
-    radial-gradient(ellipse at 20% 98%,#ffd21a 0 5%,#ff3b00 6% 10%,transparent 13%),
-    radial-gradient(ellipse at 38% 96%,#fff06a 0 4%,#ff6a00 5% 9%,transparent 12%),
-    radial-gradient(ellipse at 57% 99%,#ffd21a 0 5%,#ff3b00 6% 10%,transparent 13%),
-    radial-gradient(ellipse at 76% 96%,#fff06a 0 4%,#ff6a00 5% 9%,transparent 12%),
-    radial-gradient(ellipse at 94% 91%,#ffd21a 0 5%,#ff3b00 6% 10%,transparent 13%),
-    radial-gradient(ellipse at 98% 70%,#fff06a 0 4%,#ff6a00 5% 9%,transparent 12%),
-    radial-gradient(ellipse at 96% 48%,#ffd21a 0 5%,#ff3b00 6% 10%,transparent 13%),
-    radial-gradient(ellipse at 98% 27%,#fff06a 0 4%,#ff6a00 5% 9%,transparent 12%);
-  filter:blur(1px) drop-shadow(0 0 5px #ff2400) drop-shadow(0 0 14px #ff7a00);
-  animation:realFlameGlow .42s ease-in-out infinite alternate!important;
+  border-radius:0!important;
+  background:url("/client/flame-rim.svg?v=2") center/100% 100% no-repeat!important;
+  filter:drop-shadow(0 0 4px #ff2400) drop-shadow(0 0 10px #ff7a00)!important;
+  animation:realFlameRim .55s ease-in-out infinite alternate!important;
 }
 .arcade-player.active:after{
   content:""!important;
   position:absolute!important;
-  inset:-9px!important;
-  z-index:1!important;
+  inset:-5px!important;
+  z-index:3!important;
   pointer-events:none!important;
-  border:3px solid #ff9d00!important;
-  border-radius:22px!important;
+  border:2px solid rgba(255,210,26,.7)!important;
+  border-radius:16px!important;
   background:transparent!important;
-  box-shadow:
-    0 0 5px #fff06a,
-    0 0 12px #ff6a00,
-    0 0 24px #ff2400,
-    inset 0 0 8px #ff6a00!important;
-  animation:realFlameEdge .35s ease-in-out infinite alternate!important;
+  box-shadow:0 0 7px #ff6a00,0 0 16px #ff2400!important;
+  animation:realFlameCore .42s ease-in-out infinite alternate!important;
 }
 .arcade-player.active>*{
   position:relative!important;
-  z-index:2!important;
+  z-index:5!important;
 }
-@keyframes realFlameGlow{
-  from{transform:scale(.985);filter:blur(1px) drop-shadow(0 0 4px #ff2400) drop-shadow(0 0 10px #ff6a00)}
-  to{transform:scale(1.025);filter:blur(1.5px) drop-shadow(0 0 8px #ff2400) drop-shadow(0 0 20px #ffb000)}
+@keyframes realFlameRim{
+  from{transform:scale(.99);filter:drop-shadow(0 0 3px #ff2400) drop-shadow(0 0 8px #ff6a00)}
+  to{transform:scale(1.025);filter:drop-shadow(0 0 7px #ff2400) drop-shadow(0 0 15px #ffb000)}
 }
-@keyframes realFlameEdge{
-  from{opacity:.58;box-shadow:0 0 4px #fff06a,0 0 10px #ff6a00,0 0 20px #ff2400,inset 0 0 6px #ff6a00}
-  to{opacity:.95;box-shadow:0 0 8px #fff06a,0 0 16px #ff6a00,0 0 30px #ff2400,inset 0 0 10px #ff6a00}
+@keyframes realFlameCore{
+  from{opacity:.45}
+  to{opacity:.9}
 }
