@@ -17,6 +17,15 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
   if(t==='RECONNECT'){s=await rooms.reconnect(m.code,m.playerId||m.hostId,m.reconnectToken||m.hostToken);sessions.set(ws,s);await rooms.attach(s.code,s.playerId,ws);send(ws,{type:'RECONNECTED',...s});return send(ws,await rooms.snapshot(s.code,s.playerId))}
   if(!s)throw Error('Not connected');r=await rooms.getRoom(s.code);const host=s.host===true&&s.hostToken===r.hostToken;
   if(t==='START_GAME'){if(!host)throw Error('Host only');await rooms.startGame(r.code);return rooms.sendState(r.code)}
+  if(t==='LEAVE_ROOM'){
+    if(s.host===true)throw Error('Host cannot leave from the player screen');
+    const code=s.code;
+    await rooms.leavePlayer(code,s.playerId,ws);
+    sessions.delete(ws);
+    send(ws,{type:'LEFT_ROOM'});
+    try{ws.close(1000,'Player left room')}catch{}
+    return;
+  }
   if(t==='RESTART_GAME'){if(!host)throw Error('Host only');const fresh=await rooms.restartGame(r.code);s={...fresh};sessions.set(ws,s);await rooms.attach(fresh.code,fresh.hostId,ws);send(ws,{type:'ROOM_CREATED',...fresh});return rooms.sendState(fresh.code)}
   if(t==='TEST_LAST_CARD'){if(!host)throw Error('Host only');if(!r.game)throw Error('Game has not started');makeTestLastCard(r.game,String(m.playerId),String(m.cardType||'').toUpperCase());await rooms.saveRoom(r.code);return rooms.sendState(r.code)}
   if(t==='TEST_REFILL'){if(!host)throw Error('Host only');if(!r.game)throw Error('Game has not started');makeTestRefill(r.game);await rooms.saveRoom(r.code);return rooms.sendState(r.code)}
