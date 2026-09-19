@@ -134,7 +134,7 @@ const cards=orderedHand.map(card=>{
     ${specialImg?`<img class="special-art" src="${specialImg}" alt="${escapeHtml(nm)}">`:special?specialModern(card,'hand'):img?`<img src="${img}" alt="${escapeHtml(nm)}">`:''}
     ${specialImg||special?'':`<strong>${escapeHtml(nm)}</strong><small>${cardColor(card)?escapeHtml(cardColor(card)):escapeHtml((card.type||'CARD').replaceAll('_',' '))}</small>`}
   </button>`}).join('');
-const playableHint=top.character?`MATCH ${escapeHtml(cardColor(top)||game.currentColor||'')} OR ${escapeHtml(top.character.toUpperCase())}`:`MATCH ${escapeHtml(game.currentColor||'')} • WILD / PLAY YOUR HAND ALWAYS PLAY`;
+const playableColor=game.currentColor||cardColor(top)||'';const playableHint=top.character?`MATCH ${escapeHtml(playableColor)} OR ${escapeHtml(top.character.toUpperCase())}`:`MATCH ${escapeHtml(playableColor)} • WILD / PLAY YOUR HAND ALWAYS PLAY`;
 let special='';
 if(game.pending?.type==='SPIN_WHEEL'&&game.pending.playerId===game.viewerId){
   special=wheelHtml(null,false);
@@ -159,7 +159,7 @@ const playerTiles=(game.players||[]).map(p=>{
 }).join('');
 
 const nextPlayer=current?'<div class="side-player"><b>NEXT PLAYER</b><div>'+escapeHtml(current.name||'—')+'</div></div>':'';
-const shownColor=game.wheelResult?.color||game.currentColor||'—';const info=`<div class="game-info"><b>GAME INFO</b><div>Direction <strong>${game.direction===-1?'LEFT':'RIGHT'}</strong></div><div>Color: <strong class="info-color">${escapeHtml(shownColor)}</strong></div><div>Cards Left: <strong>${Number(game.deckCount||game.cardsLeft||0)}</strong></div></div>`;
+const shownColor=game.currentColor||'—';const info=`<div class="game-info"><b>GAME INFO</b><div>Direction <strong>${game.direction===-1?'LEFT':'RIGHT'}</strong></div><div>Color: <strong class="info-color">${escapeHtml(shownColor)}</strong></div><div>Cards Left: <strong>${Number(game.deckCount||game.cardsLeft||0)}</strong></div></div>`;
 const callButton='<button id="call-players" class="arcade-call" type="button">CALL<span>WAKE PLAYER</span></button>';
 const drawButton=isMyTurn&&!game.pending&&!game.lastCardEvent?'<button id="draw-card" class="arcade-draw" type="button">DRAW</button>':'<button class="arcade-draw disabled" type="button" disabled>DRAW</button>';
 
