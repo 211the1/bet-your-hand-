@@ -15,7 +15,7 @@
     </div>
   </div>
   <section id="game"></section>
-</main><script src="/client/app.js?v=23"></script><script>
+</main><script src="/client/app.js?v=24"></script><script>
 (()=>{
  const code=document.getElementById('code'),sel=document.getElementById('char'),status=document.getElementById('status'),game=document.getElementById('game');
  let preview=null,timer=null,gameOverShown=false;
@@ -30,6 +30,7 @@
    sel.add(o);
  });
  if(current && !taken.includes(current)) sel.value=current;
+ if(window.refreshCharacterChoices) window.refreshCharacterChoices(taken);
 }
  function previewRoom(){const c=code.value.trim().toUpperCase();if(c.length!==4)return;if(preview){try{preview.close()}catch{}preview=null}const proto=location.protocol==='https:'?'wss:':'ws:';preview=new WebSocket(proto+'//'+location.host);preview.onopen=()=>preview.send(JSON.stringify({type:'PREVIEW_ROOM',code:c}));preview.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='ROOM_PREVIEW'&&m.code===c)apply(m.players)}catch{}};preview.onerror=()=>{};preview.onclose=()=>{preview=null}}
  function enableHandScroll(){const hand=game.querySelector('.hand-grid');if(!hand||hand.dataset.scrollReady)return;hand.dataset.scrollReady='1';hand.addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&hand.scrollWidth>hand.clientWidth){hand.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});let dragging=false,startX=0,startScroll=0,moved=false;hand.addEventListener('mousedown',e=>{if(e.button!==0)return;dragging=true;moved=false;startX=e.clientX;startScroll=hand.scrollLeft;hand.style.cursor='grabbing'});window.addEventListener('mousemove',e=>{if(!dragging)return;const dx=e.clientX-startX;if(Math.abs(dx)>5)moved=true;hand.scrollLeft=startScroll-dx;if(moved)e.preventDefault()});window.addEventListener('mouseup',()=>{if(!dragging)return;dragging=false;hand.style.cursor='grab';setTimeout(()=>{moved=false},0)});hand.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation()}},true)}
