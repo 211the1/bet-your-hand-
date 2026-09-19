@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 500" preserveAspectRatio="none">
+<defs>
+ <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+  <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+ </filter>
+ <linearGradient id="fire" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#fff36a"/><stop offset=".35" stop-color="#ffd21a"/><stop offset=".72" stop-color="#ff6a00"/><stop offset="1" stop-color="#ff2400"/>
+ </linearGradient>
+ <linearGradient id="inner" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#fffbd0"/><stop offset=".4" stop-color="#fff06a"/><stop offset="1" stop-color="#ff8a00"/>
+ </linearGradient>
+</defs>
+<g filter="url(#glow)" fill="url(#fire)" stroke="#ff3b00" stroke-width="2" stroke-linejoin="round">
+ <!-- top flames -->
+ <path d="M18 48 C8 35 24 30 21 8 C38 25 31 37 42 48 Z"/>
+ <path d="M48 48 C36 31 55 27 52 4 C72 24 62 37 75 48 Z"/>
+ <path d="M82 48 C69 30 89 24 88 0 C108 23 98 37 110 48 Z"/>
+ <path d="M118 48 C104 29 126 25 124 3 C145 23 135 38 147 48 Z"/>
+ <path d="M155 48 C142 29 163 22 162 1 C183 23 173 37 185 48 Z"/>
+ <path d="M193 48 C180 30 202 24 200 2 C221 23 210 37 223 48 Z"/>
+ <path d="M230 48 C217 31 238 26 238 4 C258 25 248 38 260 48 Z"/>
+ <path d="M268 48 C255 30 277 25 276 1 C297 24 286 38 299 48 Z"/>
+ <path d="M305 48 C293 32 313 28 311 6 C330 24 321 38 334 48 Z"/>
+</g>
+<g filter="url(#glow)" fill="url(#inner)">
+ <!-- inner top flames -->
+ <path d="M27 48 C21 38 31 31 29 20 C39 31 36 40 44 48 Z"/>
+ <path d="M95 48 C88 38 98 31 97 18 C108 31 103 40 112 48 Z"/>
+ <path d="M169 48 C162 38 173 31 171 17 C182 31 178 40 187 48 Z"/>
+ <path d="M243 48 C236 38 247 31 245 18 C256 31 252 40 261 48 Z"/>
+ <path d="M316 48 C309 38 320 32 318 20 C329 31 325 40 334 48 Z"/>
+</g>
+<g filter="url(#glow)" fill="url(#fire)" stroke="#ff3b00" stroke-width="2" stroke-linejoin="round">
+ <!-- bottom flames -->
+ <path d="M18 452 C8 465 24 470 21 492 C38 475 31 463 42 452 Z"/>
+ <path d="M55 452 C42 468 61 474 58 496 C78 476 68 463 80 452 Z"/>
+ <path d="M94 452 C81 470 101 476 100 500 C120 477 110 463 122 452 Z"/>
+ <path d="M132 452 C118 471 140 475 138 497 C159 477 149 462 161 452 Z"/>
+ <path d="M170 452 C157 471 178 478 177 499 C198 477 188 462 200 452 Z"/>
+ <path d="M209 452 C196 470 218 476 216 498 C237 477 227 463 240 452 Z"/>
+ <path d="M247 452 C234 469 255 474 255 496 C275 475 265 463 277 452 Z"/>
+ <path d="M285 452 C272 469 294 474 293 496 C314 476 304 463 317 452 Z"/>
+ <path d="M322 452 C310 468 330 473 329 492 C348 474 340 463 351 452 Z"/>
+</g>
+<g filter="url(#glow)" fill="url(#fire)" stroke="#ff3b00" stroke-width="2" stroke-linejoin="round">
+ <!-- left flames -->
+ <path d="M48 18 C35 8 30 24 8 21 C25 38 37 31 48 42 Z"/>
+ <path d="M48 63 C30 50 25 70 3 68 C25 88 38 77 48 90 Z"/>
+ <path d="M48 105 C31 92 25 113 2 111 C23 132 38 121 48 133 Z"/>
+ <path d="M48 148 C30 135 24 156 1 154 C23 175 37 164 48 177 Z"/>
+ <path d="M48 191 C30 178 24 199 1 197 C23 218 38 207 48 220 Z"/>
+ <path d="M48 234 C30 221 24 242 1 240 C23 261 38 250 48 263 Z"/>
+ <path d="M48 277 C30 264 24 285 1 283 C23 304 38 293 48 306 Z"/>
+ <path d="M48 320 C30 307 24 328 2 326 C23 347 38 336 48 349 Z"/>
+ <path d="M48 363 C31 350 25 371 3 369 C25 389 38 378 48 392 Z"/>
+ <path d="M48 406 C35 395 30 411 8 409 C25 426 37 420 48 431 Z"/>
+</g>
+<g filter="url(#glow)" fill="url(#fire)" stroke="#ff3b00" stroke-width="2" stroke-linejoin="round">
+ <!-- right flames -->
+ <path d="M312 18 C325 8 330 24 352 21 C335 38 323 31 312 42 Z"/>
+ <path d="M312 63 C330 50 335 70 357 68 C335 88 322 77 312 90 Z"/>
+ <path d="M312 105 C329 92 335 113 358 111 C337 132 322 121 312 133 Z"/>
+ <path d="M312 148 C330 135 336 156 359 154 C337 175 323 164 312 177 Z"/>
+ <path d="M312 191 C330 178 336 199 359 197 C337 218 322 207 312 220 Z"/>
+ <path d="M312 234 C330 221 336 242 359 240 C337 261 322 250 312 263 Z"/>
+ <path d="M312 277 C330 264 336 285 359 283 C337 304 322 293 312 306 Z"/>
+ <path d="M312 320 C330 307 336 328 358 326 C337 347 322 336 312 349 Z"/>
+ <path d="M312 363 C329 350 335 371 357 369 C335 389 322 378 312 392 Z"/>
+ <path d="M312 406 C325 395 330 411 352 409 C335 426 323 420 312 431 Z"/>
+</g>
+<!-- small inner flame highlights -->
+<g fill="url(#inner)" filter="url(#glow)" opacity=".95">
+ <path d="M35 62 C27 54 35 47 34 38 C44 49 41 56 48 62 Z"/>
+ <path d="M35 190 C27 182 35 175 34 166 C44 177 41 184 48 190 Z"/>
+ <path d="M325 62 C333 54 325 47 326 38 C316 49 319 56 312 62 Z"/>
+ <path d="M325 190 C333 182 325 175 326 166 C316 177 319 184 312 190 Z"/>
+</g>
+</svg>
