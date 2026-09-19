@@ -124,3 +124,12 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - No game rules, laptop controls, or card engine behavior changed.
 - Player cache bumped to app.js?v=61.
 - Commits: 1e0c48df78511ead89dee188b2042b8c6e25a483, 0e83c33684b6331750b131815e047d4792050a16.
+
+## Player score display restored (2026-09-19)
+- Restored the current SCORE on every player tile in the arcade player screen.
+- Score comes directly from the existing server snapshot `p.points`; scoring rules/engine were not changed.
+- Player tiles now show character, player name, SCORE, and hand-card count.
+- Added a visible gold score treatment with a star marker.
+- Laptop controls, wheel behavior, card rules, and card visuals were not changed.
+- Player cache bumped to app.js?v=62.
+- Commits: 23c2b265099b7aa2d8b64248f75713a2b03aaca7, 22c5acdbb501e8df5729de41c79278ba504a8ba9, ddf614d144d5d99d582f36cf69192e71a621057c.
