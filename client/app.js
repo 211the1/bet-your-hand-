@@ -33,14 +33,16 @@ const orderedHand=[...hand].sort((a,b)=>{
 });
 const cards=orderedHand.map(card=>{
   const selected=String(card.id)===String(selectedCardId);
+  const special=['SKIP','REVERSE','WILD','PLAY_YOUR_HAND'].includes(card.type);
   const nm=card.character||({'SKIP':'SKIP','REVERSE':'REVERSE','WILD':'WILD','PLAY_YOUR_HAND':'PLAY YOUR HAND'}[card.type]||'CARD');
   const img=characterImage(card.character);
   const col=(card.color||'').toLowerCase();
-  return `<button type="button" class="arcade-card color-${escapeHtml(col)} ${selected?'selected':''}" data-card-id="${escapeHtml(card.id)}">
-    ${img?`<img src="${img}" alt="${escapeHtml(nm)}">`:''}
-    <span class="arcade-card-number">${escapeHtml(card.character?card.character.slice(0,1):'')}</span>
+  const specialClass=special?` special-${String(card.type).toLowerCase()}`:'';
+  const symbol=card.type==='SKIP'?'↪':card.type==='REVERSE'?'⟳':card.type==='WILD'?'WILD':card.type==='PLAY_YOUR_HAND'?'PLAY YOUR HAND':'';
+  return `<button type="button" class="arcade-card color-${escapeHtml(col)}${specialClass} ${selected?'selected':''}" data-card-id="${escapeHtml(card.id)}">
+    ${img?`<img src="${img}" alt="${escapeHtml(nm)}">`:special?`<span class="special-symbol">${symbol}</span>`:''}
     <strong>${escapeHtml(nm)}</strong>
-    ${card.color?`<small>${escapeHtml(card.color)}</small>`:`<small>${escapeHtml((card.type||'CARD').replaceAll('_',' '))}</small>`}
+    ${special?'<small>PLAY YOUR HAND</small>':(card.color?`<small>${escapeHtml(card.color)}</small>`:`<small>${escapeHtml((card.type||'CARD').replaceAll('_',' '))}</small>`)}
   </button>`
 }).join('');
 const playableHint=top.character?`MATCH ${escapeHtml(top.color||game.currentColor||'')} OR ${escapeHtml(top.character.toUpperCase())}`:`MATCH ${escapeHtml(game.currentColor||'')} • WILD / PLAY YOUR HAND ALWAYS PLAY`;
