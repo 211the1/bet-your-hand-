@@ -1,6 +1,6 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><link rel="stylesheet" href="/client/style.css?v=15"></head><body class="player-page"><main>
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><link rel="stylesheet" href="/client/style.css?v=16"></head><body class="player-page"><main>
   <div class="player-brand"><h1>PLAY YOUR HAND</h1><p>GAME NIGHT</p></div>
-  <button id="open-join" class="open-join">JOIN GAME</button>
+  <button id="open-join" class="open-join">MENU</button>
   <div id="join-panel" class="join-panel" aria-hidden="true">
     <div class="join-box">
       <button id="close-join" class="close-join" type="button" aria-label="Close">X</button>
@@ -10,11 +10,12 @@
       <input id="name" placeholder="YOUR NAME">
       <select id="char"></select>
       <button id="join" type="button">JOIN GAME</button>
+      <button id="menu-sound" class="menu-sound-control" type="button">SOUND: ON</button>
       <div id="status"></div>
     </div>
   </div>
   <section id="game"></section>
-</main><script src="/client/app.js?v=19"></script><script>
+</main><script src="/client/app.js?v=20"></script><script>
 (()=>{
  const code=document.getElementById('code'),sel=document.getElementById('char'),status=document.getElementById('status'),game=document.getElementById('game');
  let preview=null,timer=null,gameOverShown=false;
