@@ -166,7 +166,7 @@ const drawButton=isMyTurn&&!game.pending&&!game.lastCardEvent?'<button id="draw-
 
 const topImage=characterImage(top.character);
 const topSpecialImage=specialImage(top);
-const topCardVisual=topSpecialImage?`<img class="tv-special-art" src="${topSpecialImage}" alt="${escapeHtml(top.character||top.type||'Card')}">`:(top.type==='SKIP'||top.type==='REVERSE')?specialModern(top,'tv'):topImage?`<img src="${topImage}" alt="${escapeHtml(top.character||'Card')}">`:'<div class="special-card-symbol">'+escapeHtml((top.type||'CARD').replaceAll('_',' '))+'</div>';
+const topCardVisual=topSpecialImage?`<img class="tv-special-art" src="${topSpecialImage}" alt="${escapeHtml(top.character||top.type||'Card')}">`:(top.type==='SKIP'||top.type==='REVERSE')?specialModern(top,'tv'):topImage?`<img src="${topImage}" alt="${escapeHtml(top.character||'Card')}"><strong>${escapeHtml(top.character||'CARD')}</strong><small>${escapeHtml(cardColor(top)||'')}</small>`:'<div class="special-card-symbol">'+escapeHtml((top.type||'CARD').replaceAll('_',' '))+'</div>';
 
 gameEl.innerHTML=`
 <div class="arcade-shell">
