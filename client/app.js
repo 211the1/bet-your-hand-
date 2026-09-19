@@ -5,7 +5,17 @@ compact.textContent='@media(max-width:600px){body.player-page main{max-width:430
 compact.textContent+='.call-flash{position:fixed;inset:0;z-index:99990;pointer-events:none;background:rgba(255,255,255,.82);animation:callFlash .45s steps(2,end) 6}@keyframes callFlash{0%,100%{opacity:0}50%{opacity:1}}';document.head.appendChild(compact);
 const codeInput=document.getElementById('code'),nameInput=document.getElementById('name'),characterSelect=document.getElementById('char'),joinButton=document.getElementById('join'),statusEl=document.getElementById('status'),gameEl=document.getElementById('game');
 const characters=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];const colors=['Red','Blue','Green','Yellow'];
-characterSelect.replaceChildren(new Option('SELECT CHARACTER',''));characters.forEach(c=>characterSelect.add(new Option(c,c)));
+function buildCharacterChoices(taken=[]){
+  const current=characterSelect.value;
+  characterSelect.replaceChildren(new Option('TAP TO CHOOSE CHARACTER',''));
+  characters.forEach(c=>{
+    const o=new Option(taken.includes(c)?c+' — TAKEN':c,c);
+    o.disabled=taken.includes(c);
+    characterSelect.add(o);
+  });
+  if(current && !taken.includes(current)) characterSelect.value=current;
+}
+buildCharacterChoices([]);
 let ws=null,me=null,joined=false,connecting=false,retryTimer=null,pingTimer=null,session=null,autoSpinSent=false,lastSeenEvent=null,selectedCardId=null,sortMode=false,soundEnabled=true;
 const topMenuSound=document.getElementById('menu-sound');if(topMenuSound)topMenuSound.addEventListener('click',()=>{soundEnabled=!soundEnabled;topMenuSound.textContent=soundEnabled?'SOUND: ON':'SOUND: OFF';if(soundEnabled)playUiTone(880,.16)});
 try{session=JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{}
