@@ -437,7 +437,7 @@ body.player-page .join-panel.prejoin .join-box{
 .modern-special-icon{position:relative;font-size:52px;line-height:.9;text-shadow:2px 2px 0 #000,0 0 10px #fff}
 .modern-special-name{position:relative;font-size:25px;letter-spacing:1px;text-shadow:3px 3px 0 #000}
 .modern-special-color{position:relative;margin-top:8px;padding:5px 22px;border-radius:8px;background:#111;color:#fff;border:2px solid #fff;font-size:14px;text-transform:uppercase;letter-spacing:1px}
-.modern-red{background:linear-gradient(145deg,#ff2525,#7c0710);color:#ff3c45;border-color:#ff3c45}
+.modern-red{background:linear-gradient(145deg,#ff2525,#7c0710);color:#ff3c45;border-color:#ff3c45}.modern-green{background:linear-gradient(145deg,#12d65d,#035b2c);color:#20e36d;border-color:#20e36d}.modern-blue{background:linear-gradient(145deg,#1f55e8,#071b68);color:#1687ff;border-color:#1687ff}.modern-yellow{background:linear-gradient(145deg,#f0c928,#7a5600);color:#fff1a8;border-color:#ffd43b}.modern-special-name{font-family:Impact,"Arial Black",system-ui,sans-serif;font-weight:1000;letter-spacing:1px;text-transform:uppercase;text-shadow:3px 3px 0 #000,-1px -1px 0 #fff;font-style:normal}.modern-special-icon{font-family:Impact,"Arial Black",system-ui,sans-serif;text-shadow:3px 3px 0 #000,-1px -1px 0 #fff}
 .modern-blue{background:linear-gradient(145deg,#1268ff,#07185f);color:#1687ff;border-color:#1687ff}
 .modern-green{background:linear-gradient(145deg,#12d65d,#035b2c);color:#20e36d;border-color:#20e36d}
 .modern-yellow{background:linear-gradient(145deg,#ffd51a,#9b6500);color:#ffd83d;border-color:#ffd83d}
