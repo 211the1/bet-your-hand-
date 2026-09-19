@@ -15,11 +15,20 @@
     </div>
   </div>
   <section id="game"></section>
-</main><script src="/client/app.js?v=24"></script><script>
+</main><script src="/client/app.js?v=25"></script><script>
 (()=>{
  const code=document.getElementById('code'),sel=document.getElementById('char'),status=document.getElementById('status'),game=document.getElementById('game');
  let preview=null,timer=null,gameOverShown=false;
  const gameOverKey=()=>{const c=code.value.trim().toUpperCase();return c?`byhGameOver:${c}`:'byhGameOver:unknown'};
+ window.refreshCharacterChoices=function(taken=[]){
+ const grid=document.getElementById('character-grid'); if(!grid)return;
+ const chars=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];
+ const imgs={'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'};
+ const current=sel.value;
+ grid.innerHTML=chars.map(c=>'<button type="button" class="character-choice'+(current===c?' selected':'')+(taken.includes(c)?' taken':'')+'" data-character="'+c+'"'+(taken.includes(c)?' disabled':'')+'><img src="'+imgs[c]+'" alt="'+c+'"><span>'+c+'</span><i>'+(taken.includes(c)?'TAKEN':(current===c?'✓':''))+'</i></button>').join('');
+ grid.querySelectorAll('.character-choice:not([disabled])').forEach(btn=>btn.onclick=()=>{sel.value=btn.dataset.character;grid.querySelectorAll('.character-choice').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');});
+ };
+ window.refreshCharacterChoices([]);
  function apply(players){
  const taken=(players||[]).map(p=>p.character).filter(Boolean);
  const current=sel.value;
