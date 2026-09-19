@@ -117,3 +117,10 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - Power-panel buttons remain explicitly clickable.
 - Player cache bumped to app.js?v=57.
 - Commit: bc5126580b36b453226099d131c95111ca5d9333; cache commit: 8eeb69c36c67c9d12f2f61596eb3ab086e9a0e72.
+
+## Top display card consistency fix (2026-09-19)
+- The laptop TV display was still rendering SKIP/REVERSE through a fallback branch, which replaced the shared special-card visual with a plain text label such as REVERSE.
+- Fixed the TV markup to always use the same `topCardVisual` renderer used for special cards, so SKIP and REVERSE use the approved shared card design on the TV display, matching the hand/card-pile appearance.
+- No game rules, laptop controls, or card engine behavior changed.
+- Player cache bumped to app.js?v=61.
+- Commits: 1e0c48df78511ead89dee188b2042b8c6e25a483, 0e83c33684b6331750b131815e047d4792050a16.
