@@ -116,3 +116,42 @@ body.player-page #game{width:100%;margin:0;padding:0}
 @media(max-width:520px){
  .arcade-card:not(.special-skip):not(.special-reverse):not(.special-wild):not(.special-play_your_hand) img{height:80px}
 }
+
+/* Special cards — match the approved card artwork */
+.arcade-card.special-skip,
+.arcade-card.special-reverse,
+.arcade-card.special-wild,
+.arcade-card.special-play_your_hand{
+  position:relative; overflow:hidden!important; justify-content:center!important;
+  border-radius:14px!important; padding:7px!important;
+}
+.arcade-card.special-skip{background:radial-gradient(circle at 50% 58%,#160406 0 18%,transparent 19%),radial-gradient(circle at 18% 30%,#000 0 3px,transparent 4px),radial-gradient(circle at 82% 35%,#000 0 4px,transparent 5px),linear-gradient(145deg,#ff202b,#b80012)!important;border-color:#ff6970!important}
+.arcade-card.special-skip:after{content:'♛';position:absolute;top:7px;left:50%;transform:translateX(-50%);font-size:34px;color:#ffd21c;text-shadow:0 2px 3px #000}
+.arcade-card.special-skip .special-symbol{font-size:40px!important;font-style:italic!important;font-weight:1000!important;transform:skew(-7deg);margin:18px 0 4px!important}
+.arcade-card.special-skip strong{font-size:11px!important;margin-top:0}
+.arcade-card.special-skip small{font-size:8px!important}
+
+.arcade-card.special-reverse{background:radial-gradient(circle at 50% 50%,#001f0c 0 23%,transparent 24%),linear-gradient(145deg,#16e867,#00943e)!important;border-color:#54ff91!important}
+.arcade-card.special-reverse:before{content:'↻';display:block;position:absolute;inset:14px 5px 25px;font-family:Arial,sans-serif;font-size:92px;font-weight:900;color:#21f36d;text-shadow:0 2px 3px #003c18,0 0 6px #fff3;text-align:center}
+.arcade-card.special-reverse:after{content:'♛';position:absolute;top:7px;left:50%;transform:translateX(-50%);font-size:34px;color:#ffd21c;text-shadow:0 2px 3px #000}
+.arcade-card.special-reverse .special-symbol{font-size:28px!important;font-style:italic!important;transform:skew(-8deg);margin:auto 0 14px!important;z-index:2}
+.arcade-card.special-reverse strong{font-size:11px!important;z-index:2}.arcade-card.special-reverse small{font-size:8px!important;z-index:2}
+
+.arcade-card.special-wild{background:#08090d!important;border-color:#f5f5f5!important}
+.arcade-card.special-wild:before{content:'';position:absolute;inset:17px 6px 25px;border-radius:50%;background:conic-gradient(#ff2d2d,#ffd21c,#20df69,#18a9ff,#9c3cff,#ff2d2d);box-shadow:0 0 8px #fff6}
+.arcade-card.special-wild:after{content:'♛';position:absolute;top:7px;left:50%;transform:translateX(-50%);font-size:34px;color:#ffd21c;text-shadow:0 2px 3px #000;z-index:2}
+.arcade-card.special-wild .special-symbol{font-size:25px!important;font-style:italic!important;z-index:3;margin:auto 0 14px!important}
+.arcade-card.special-wild strong{font-size:11px!important;z-index:3}.arcade-card.special-wild small{font-size:8px!important;z-index:3}
+
+.arcade-card.special-play_your_hand{background:linear-gradient(145deg,#ffd52c,#d99500)!important;border-color:#ffe978!important;box-shadow:0 0 18px #ffd21c99!important}
+.arcade-card.special-play_your_hand:after{content:'♛';position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:38px;color:#ffd21c;text-shadow:0 2px 3px #000}
+.arcade-card.special-play_your_hand .special-symbol{font-size:21px!important;line-height:1.03!important;color:#fff!important;text-shadow:2px 2px 2px #5d3900!important;margin:40px 0 8px!important;z-index:2}
+.arcade-card.special-play_your_hand strong{display:none}.arcade-card.special-play_your_hand small{font-size:8px!important;color:#fff!important;text-shadow:1px 1px 2px #5d3900!important;z-index:2}
+
+@media(max-width:520px){
+ .arcade-card.special-skip .special-symbol{font-size:34px!important}
+ .arcade-card.special-reverse:before{font-size:72px}
+ .arcade-card.special-reverse .special-symbol{font-size:23px!important}
+ .arcade-card.special-wild .special-symbol{font-size:21px!important}
+ .arcade-card.special-play_your_hand .special-symbol{font-size:18px!important}
+}
