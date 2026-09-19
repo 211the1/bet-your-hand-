@@ -549,3 +549,30 @@ body.player-page .join-panel.prejoin .join-box{
   }
   body.player-page .arcade-emoji{font-size:7px!important;}
 }
+
+/* Power Wheel v2 — nine distinct game-color sections with readable power labels */
+.wheel{background:conic-gradient(from -20deg,var(--wheel-sectors));position:relative;border:5px solid #111!important;box-shadow:0 0 0 3px #ffd43b,0 0 26px #1687ff88!important}
+.wheel:before{content:'';position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(from -20deg,rgba(4,6,14,.98) 0deg 1.8deg,transparent 1.8deg 40deg);pointer-events:none;z-index:1}
+.wheel:after{content:'';position:absolute;inset:12%;border:3px solid rgba(255,255,255,.45);border-radius:50%;box-shadow:inset 0 0 18px #0008;pointer-events:none;z-index:1}
+.wheel-labels{position:absolute;inset:0;z-index:2}
+.wheel-label{position:absolute;left:50%;top:50%;width:72px;height:58px;margin-left:-36px;margin-top:-29px;transform:rotate(calc(var(--i)*40deg + 20deg)) translateY(-68px);transform-origin:36px 68px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-shadow:1px 2px 2px #000;font-family:system-ui,sans-serif;line-height:1}
+.wheel-label b{font-size:11px;border:1px solid #fff;border-radius:50%;width:19px;height:19px;display:grid;place-items:center;background:#07102b}
+.wheel-label strong{font-size:9px;margin-top:2px;white-space:nowrap}
+.wheel-label small{font-size:6px;font-weight:900;margin-top:2px;white-space:nowrap}
+.wheel-center{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:74px;height:74px;border-radius:50%;background:radial-gradient(circle,#242a36,#080a10);border:3px solid #ffd43b;box-shadow:0 0 16px #ffd43b99;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ffd43b;font-family:system-ui,sans-serif}
+.wheel-center b{font-size:10px;line-height:1}
+.wheel-center small{font-size:6px;color:#fff;margin-top:3px}
+.wheel-result{display:flex;flex-direction:column;gap:2px;font-size:13px;line-height:1.05;margin-top:4px;color:#ffd43b;text-shadow:0 0 8px #ffd43b}
+.wheel-result span{font-family:system-ui,sans-serif;font-size:11px;color:#fff}
+.power-note{display:block;font-family:system-ui,sans-serif;font-size:10px;opacity:.85;margin:2px auto 4px}
+@media(max-width:600px){
+ body.player-page .wheel-box{width:210px!important}
+ body.player-page .wheel{width:198px!important;height:198px!important}
+ body.player-page .wheel-label{width:58px;height:50px;margin-left:-29px;margin-top:-25px;transform:rotate(calc(var(--i)*40deg + 20deg)) translateY(-82px);transform-origin:29px 82px}
+ body.player-page .wheel-label b{font-size:9px;width:16px;height:16px}
+ body.player-page .wheel-label strong{font-size:7px}
+ body.player-page .wheel-label small{font-size:5px}
+ body.player-page .wheel-center{width:68px;height:68px}
+ body.player-page .wheel-center b{font-size:9px}
+ body.player-page .wheel-center small{font-size:5px}
+}
