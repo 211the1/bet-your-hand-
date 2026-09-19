@@ -14,6 +14,22 @@ function buildCharacterChoices(taken=[]){
     characterSelect.add(o);
   });
   if(current && !taken.includes(current)) characterSelect.value=current;
+  const grid=document.getElementById('character-grid');
+  if(grid){
+    grid.innerHTML=characters.map(c=>{
+      const takenNow=taken.includes(c);
+      const selected=characterSelect.value===c;
+      const img=characterImage(c);
+      return '<button type="button" class="character-choice'+(selected?' selected':'')+(takenNow?' taken':'')+'" data-character="'+escapeHtml(c)+'"'+(takenNow?' disabled':'')+'>'+
+        '<img src="'+img+'" alt="'+escapeHtml(c)+'"><span>'+escapeHtml(c)+'</span><i>'+ (takenNow?'TAKEN':(selected?'✓':'')) +'</i></button>';
+    }).join('');
+    grid.querySelectorAll('.character-choice:not([disabled])').forEach(btn=>btn.addEventListener('click',()=>{
+      characterSelect.value=btn.dataset.character;
+      grid.querySelectorAll('.character-choice').forEach(x=>x.classList.remove('selected'));
+      btn.classList.add('selected');
+      setStatus('CHARACTER: '+btn.dataset.character);
+    }));
+  }
 }
 buildCharacterChoices([]);
 let ws=null,me=null,joined=false,connecting=false,retryTimer=null,pingTimer=null,session=null,autoSpinSent=false,lastSeenEvent=null,selectedCardId=null,sortMode=false,soundEnabled=true;
