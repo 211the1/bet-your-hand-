@@ -61,7 +61,7 @@ function connect(){if(connecting||ws?.readyState===WebSocket.OPEN||!session)retu
   setStatus(msg,true);
   // A missing/invalid reconnect session means the old room is gone or the host restarted it.
   // Clear the stale player session so refresh cannot trap the phone in the old lobby.
-  const staleSessionError=/room not found|invalid reconnect/i.test(msg);
+  const staleSessionError=/room not found|invalid reconnect|room restarted by host/i.test(msg);
   if(staleSessionError){
     localStorage.removeItem('byhPlayerSession');
     session=null;me=null;joined=false;
