@@ -100,14 +100,13 @@ gameEl.innerHTML=`
       </div>
       <div class="arcade-hint">${playableHint}</div>
       ${special}
+      <div class="arcade-hand-title">YOUR HAND <span>${hand.length} CARDS</span></div>
+      <div class="arcade-hand-wrap"><button class="hand-arrow" id="hand-left"><</button><div class="hand-grid arcade-hand">${cards}</div><button class="hand-arrow" id="hand-right">></button></div>
+      <div class="arcade-slide-label">SLIDE CARDS LEFT OR RIGHT</div>
+      <div class="arcade-actions">${drawButton}${playButton}<button id="sort-cards" class="arcade-sort" type="button">SORT</button></div>
     </section>
     <aside class="arcade-side right-side">${info}<button class="arcade-emoji" type="button">EMOJI<br>SMILE</button></aside></div>
-  </div>
-  <div class="arcade-hand-title">YOUR HAND <span>${hand.length} CARDS</span></div>
-  <div class="arcade-hand-wrap"><button class="hand-arrow" id="hand-left"><</button><div class="hand-grid arcade-hand">${cards}</div><button class="hand-arrow" id="hand-right">></button></div>
-  <div class="arcade-slide-label">SLIDE CARDS LEFT OR RIGHT</div>
-  <div class="arcade-actions">${drawButton}${playButton}<button id="sort-cards" class="arcade-sort" type="button">SORT</button></div>
-</div>`;
+</div>;
 gameEl.dataset.handLength=hand.length;
 const menu=gameEl.querySelector('#menu-toggle');if(menu){menu.addEventListener('click',()=>{const panel=document.getElementById('join-panel');if(panel){panel.classList.add('show');panel.setAttribute('aria-hidden','false')}})}
 
