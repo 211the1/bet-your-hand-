@@ -70,3 +70,11 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - Restart now sends connected players a restart signal, closes their old room connection, clears their saved room session, and returns them to JOIN GAME so they can enter the new room code.
 - Host remains in control and receives the newly created room after restart.
 - Commits: c21921b5c451da641b2cc8300863c20dcbeb06b3, aa6c4602f470e9e8d5140f76eea0a12fc94d473e, fabe3bfc743e2cb934d03a0345d9c8bb0e6d8f24.
+
+## Latest card-color consistency fix (2026-09-19)
+- Scanned the authoritative deck/cardColor logic after a screenshot showed a green character card labeled Yellow.
+- The engine's cardColor() remains authoritative from card IDs.
+- Player and host card labels now display cardColor(), not the potentially stale card.color field.
+- Server STATE snapshots now normalize transmitted top cards and player hands to the authoritative cardColor(), preventing persisted stale color fields from disagreeing with the card ID.
+- Exported cardColor() from game/engine.js for the server snapshot normalization.
+- Commits: 6879a641a32023b37470b6b7af3addc8a11e318d, 7f9fdc843ab1068256febfb0bf5a28d28ce2982f, 9f074dce6013572458a848369e6182cf8a804dc4, plus engine export fix 725ee642c5d04db82b44e6e1e91957d00318e17e.
