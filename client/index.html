@@ -45,7 +45,7 @@
  function checkGameOver(){const round2=Array.from(game.querySelectorAll('.game-top h2')).some(x=>x.textContent.trim()==='ROUND 2');const waiting=game.querySelector('.waiting');const waitingForNoPlayer=waiting&&waiting.textContent.trim()==='WAITING · —';if(round2&&waitingForNoPlayer){showGameOver()}else if(!round2||!waitingForNoPlayer){gameOverShown=false;localStorage.removeItem(gameOverKey())}}
  function restoreGameOver(){if(localStorage.getItem(gameOverKey())==='1')showGameOver();}
  code.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(previewRoom,250)});code.addEventListener('change',previewRoom);code.addEventListener('blur',previewRoom);
- new MutationObserver(()=>{if((status.textContent||'').toLowerCase().includes('invalid reconnect')){localStorage.removeItem('byhPlayerSession');location.reload()}}).observe(status,{childList:true,characterData:true,subtree:true});
+ // app.js now handles stale reconnects directly; do not reload the page on an error.
  new MutationObserver(()=>{enableHandScroll();checkGameOver()}).observe(game,{childList:true,subtree:true});
  window.addEventListener('pageshow',restoreGameOver);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')restoreGameOver()});
