@@ -38,7 +38,7 @@ const cards=orderedHand.map(card=>{
   const img=characterImage(card.character);
   const col=(card.color||'').toLowerCase();
   const specialClass=special?` special-${String(card.type).toLowerCase()}`:'';
-  const symbol=card.type==='SKIP'?'↪':card.type==='REVERSE'?'⟳':card.type==='WILD'?'WILD':card.type==='PLAY_YOUR_HAND'?'PLAY YOUR HAND':'';
+  const symbol=card.type==='SKIP'?'SKIP':card.type==='REVERSE'?'REVERSE':card.type==='WILD'?'WILD':card.type==='PLAY_YOUR_HAND'?'PLAY YOUR HAND':'';
   return `<button type="button" class="arcade-card color-${escapeHtml(col)}${specialClass} ${selected?'selected':''}" data-card-id="${escapeHtml(card.id)}">
     ${img?`<img src="${img}" alt="${escapeHtml(nm)}">`:special?`<span class="special-symbol">${symbol}</span>`:''}
     <strong>${escapeHtml(nm)}</strong>
