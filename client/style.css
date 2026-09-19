@@ -183,3 +183,61 @@ body.player-page #game{width:100%;margin:0;padding:0}
  .arcade-card.special-wild .special-symbol:before{font-size:22px}
  .arcade-card.special-play_your_hand .special-symbol:before{font-size:18px}
 }
+
+/* Use the uploaded finished special-card artwork */
+.arcade-card.special-skip,
+.arcade-card.special-reverse,
+.arcade-card.special-wild,
+.arcade-card.special-play_your_hand{
+  padding:0!important;
+  overflow:hidden!important;
+  border-width:3px!important;
+  background:#111!important;
+}
+.arcade-card.special-skip .special-art,
+.arcade-card.special-reverse .special-art,
+.arcade-card.special-wild .special-art,
+.arcade-card.special-play_your_hand .special-art{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:cover!important;
+  border:0!important;
+  border-radius:11px!important;
+  margin:0!important;
+}
+.arcade-card.special-skip strong,
+.arcade-card.special-skip small,
+.arcade-card.special-reverse strong,
+.arcade-card.special-reverse small,
+.arcade-card.special-wild strong,
+.arcade-card.special-wild small,
+.arcade-card.special-play_your_hand strong,
+.arcade-card.special-play_your_hand small,
+.arcade-card.special-skip .special-symbol,
+.arcade-card.special-reverse .special-symbol,
+.arcade-card.special-wild .special-symbol,
+.arcade-card.special-play_your_hand .special-symbol{display:none!important}
+.tv-special-art{
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  border:0!important;
+  border-radius:10px!important;
+  display:block!important;
+}
+.tv-card:has(.tv-special-art){
+  padding:0!important;
+  overflow:hidden!important;
+}
+@media(max-width:900px){
+  .arcade-card.special-skip .special-art,
+  .arcade-card.special-reverse .special-art,
+  .arcade-card.special-wild .special-art,
+  .arcade-card.special-play_your_hand .special-art{border-radius:8px!important}
+}
