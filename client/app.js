@@ -69,8 +69,8 @@ const playerTiles=(game.players||[]).map(p=>{
 }).join('');
 
 const nextPlayer=current?'<div class="side-player"><b>NEXT PLAYER</b><div>'+escapeHtml(current.name||'—')+'</div></div>':'';
-const info=`<div class="game-info"><b>GAME INFO</b><div>Direction <strong>${game.direction===-1?'←':'→'}</strong></div><div>Color: <strong>${escapeHtml(game.currentColor||'—')}</strong></div><div>Cards Left: <strong>${Number(game.deckCount||game.cardsLeft||0)}</strong></div></div>`;
-const callButton='<button id="call-players" class="arcade-call" type="button">CALL<strong>CALL</strong><span>WAKE PLAYER</span></button>';
+const info=`<div class="game-info"><b>GAME INFO</b><div>Direction <strong>${game.direction===-1?'LEFT':'RIGHT'}</strong></div><div>Color: <strong>${escapeHtml(game.currentColor||'—')}</strong></div><div>Cards Left: <strong>${Number(game.deckCount||game.cardsLeft||0)}</strong></div></div>`;
+const callButton='<button id="call-players" class="arcade-call" type="button">CALL<span>WAKE PLAYER</span></button>';
 const drawButton=isMyTurn&&!game.pending&&!game.lastCardEvent?'<button id="draw-card" class="arcade-draw" type="button">DRAW</button>':'<button class="arcade-draw disabled" type="button" disabled>DRAW</button>';
 const playButton=isMyTurn&&!game.pending&&!game.lastCardEvent&&selectedCardId?'<button id="play-selected" class="arcade-play" type="button">PLAY YOUR HAND</button>':'<button class="arcade-play disabled" type="button" disabled>PLAY YOUR HAND</button>';
 const topImage=characterImage(top.character);
@@ -82,11 +82,11 @@ gameEl.innerHTML=`
   <header class="arcade-header">
     <div class="arcade-room">ROOM ${escapeHtml(game.code||session?.code||'—')}<small>ROUND ${Number(game.round||1)}</small></div>
     <div class="arcade-logo">PLAY YOUR HAND</div>
-    <div class="arcade-tools"><button type="button">🔊<small>SOUND</small></button><button type="button">MENU<small>MENU</small></button></div>
+    <div class="arcade-tools"><button type="button">SOUND<small>SOUND</small></button><button type="button">MENU<small>MENU</small></button></div>
   </header>
   <section class="arcade-players">${playerTiles}</section>
   <div class="arcade-main">
-    <aside class="arcade-side left-side">${callButton}${nextPlayer}<button class="arcade-side-btn" type="button">▤ VIEW DECK</button></aside>
+    <aside class="arcade-side left-side">${callButton}${nextPlayer}<button class="arcade-side-btn" type="button">VIEW DECK</button></aside>
     <section class="arcade-center">
       <div class="arcade-tv">
         <div class="tv-screen">
@@ -99,12 +99,12 @@ gameEl.innerHTML=`
       <div class="arcade-hint">${playableHint}</div>
       ${special}
     </section>
-    <aside class="arcade-side right-side">${info}<button class="arcade-emoji" type="button">EMOJI SMILE</button><div class="arcade-special-label">PLAY<br>YOUR<br>HAND</div></aside>
+    <aside class="arcade-side right-side">${info}<button class="arcade-emoji" type="button">EMOJI<br>SMILE</button></aside>
   </div>
   <div class="arcade-hand-title">YOUR HAND <span>${hand.length} CARDS</span></div>
   <div class="arcade-hand-wrap"><button class="hand-arrow" id="hand-left"><</button><div class="hand-grid arcade-hand">${cards}</div><button class="hand-arrow" id="hand-right">></button></div>
-  <div class="arcade-slide-label">‹ &nbsp; SLIDE CARDS LEFT OR RIGHT &nbsp; ›</div>
-  <div class="arcade-actions">${drawButton}${playButton}<button id="sort-cards" class="arcade-sort" type="button">SORT SORT</button></div>
+  <div class="arcade-slide-label">SLIDE CARDS LEFT OR RIGHT</div>
+  <div class="arcade-actions">${drawButton}${playButton}<button id="sort-cards" class="arcade-sort" type="button">SORT</button></div>
 </div>`;
 gameEl.dataset.handLength=hand.length;
 const handGrid=gameEl.querySelector('.hand-grid');if(handGrid){if(hand.length>previousHandLength)setTimeout(()=>handGrid.scrollTo({left:handGrid.scrollWidth,behavior:'smooth'}),40)}
