@@ -272,3 +272,10 @@ body.player-page .close-join{position:absolute!important;top:9px;right:9px;width
 .menu-close{position:absolute!important;right:9px;top:9px;width:36px!important;height:36px!important;margin:0!important;padding:0!important;border:2px solid #ff4b4b!important;border-radius:50%!important;background:#3a0b12!important;color:#fff!important}
 .menu-help-text{margin:10px 5px 2px;padding:12px;border:2px solid #713cff;border-radius:12px;background:#080d22;font-family:system-ui;font-size:12px;line-height:1.35}
 .menu-help-text p{margin:7px 0}
+
+/* True full-screen menu overlay */
+.game-menu-panel.show{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100vw!important;height:100vh!important;margin:0!important;padding:18px!important;background:rgba(0,0,0,.78)!important;backdrop-filter:blur(6px)!important}
+.game-menu-box{position:relative!important;width:min(340px,88vw)!important;margin:0!important;padding:28px 20px 22px!important;border:3px solid #1687ff!important;border-radius:24px!important;background:radial-gradient(circle at 50% 15%,#182f6d,#070b20 72%)!important;box-shadow:0 0 35px #1687ff99!important;text-align:center!important}
+.game-menu-box h2{margin:0 0 16px!important;font-size:28px!important}
+.game-menu-box .menu-message{margin:10px 0!important;padding:8px 4px!important;font-family:system-ui,sans-serif!important;font-size:13px!important;line-height:1.35!important;color:#fff!important}
+.game-menu-box .menu-close{position:absolute!important;right:9px!important;top:9px!important;width:36px!important;height:36px!important;margin:0!important;padding:0!important}
