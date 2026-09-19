@@ -139,6 +139,16 @@ const menu=gameEl.querySelector('#menu-toggle');if(menu){menu.addEventListener('
 const handGrid=gameEl.querySelector('.hand-grid');if(handGrid){if(hand.length>previousHandLength)setTimeout(()=>handGrid.scrollTo({left:handGrid.scrollWidth,behavior:'smooth'}),40)}
 gameEl.querySelectorAll('[data-card-id]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();if(!isMyTurn||game.pending||game.lastCardEvent){setStatus(isMyTurn?'FINISH THE CURRENT ACTION FIRST':`WAITING FOR ${current?.name||'THE OTHER PLAYER'}`,true);return}selectedCardId=b.dataset.cardId;document.querySelectorAll('.arcade-card').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');setStatus('CARD SELECTED — TAP PLAY YOUR HAND')}));const call=gameEl.querySelector('#call-players');if(call)call.addEventListener('click',()=>send({type:'CALL_PLAYER',playerId:'all'}));const sound=gameEl.querySelector('#sound-toggle');if(sound)sound.addEventListener('click',()=>{soundEnabled=!soundEnabled;sound.innerHTML=soundEnabled?'SOUND<small>SOUND</small>':'OFF<small>SOUND</small>';if(soundEnabled)playUiTone(880,.16);setStatus(soundEnabled?'SOUND ON':'SOUND OFF')});const draw=gameEl.querySelector('#draw-card');if(draw)draw.addEventListener('click',()=>send({type:'DRAW_CARD'}));const play=gameEl.querySelector('#play-selected');if(play)play.addEventListener('click',()=>{if(selectedCardId){send({type:'PLAY_CARD',cardId:selectedCardId});selectedCardId=null}});const sort=gameEl.querySelector('#sort-cards');if(sort)sort.addEventListener('click',()=>{sortMode=!sortMode;setStatus(sortMode?'HAND SORTED':'HAND ORDER RESTORED')});const left=gameEl.querySelector('#hand-left'),right=gameEl.querySelector('#hand-right'),grid=gameEl.querySelector('.arcade-hand');if(left&&grid)left.addEventListener('click',()=>grid.scrollBy({left:-240,behavior:'smooth'}));if(right&&grid)right.addEventListener('click',()=>grid.scrollBy({left:240,behavior:'smooth'}));const use=gameEl.querySelector('#use-power');if(use)use.addEventListener('click',()=>{const color=gameEl.querySelector('#power-color')?.value;send({type:'USE_POWER',power:game.pending.power,color})});const wild=gameEl.querySelector('#choose-wild-color');if(wild)wild.addEventListener('click',()=>{const color=gameEl.querySelector('#wild-color')?.value;send({type:'CHOOSE_COLOR',color})})});ws.addEventListener('error',()=>setStatus('CONNECTION LOST — RETRYING…',true));ws.addEventListener('close',()=>{connecting=false;clearInterval(pingTimer);ws=null;setStatus('CONNECTION LOST — RETRYING…',true);scheduleReconnect()})}
 function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-joinButton.addEventListener('click',()=>{const code=codeInput.value.trim().toUpperCase(),name=nameInput.value.trim(),character=characterSelect.value;if(!code||!name||!character){setStatus('ENTER CODE, NAME, AND CHARACTER',true);return}session={code,name,character};save(session);connect()});
+joinButton.addEventListener('click',()=>{
+ const code=codeInput.value.trim().toUpperCase(),name=nameInput.value.trim(),character=characterSelect.value;
+ if(!code||!name||!character){setStatus('ENTER CODE, NAME, AND CHARACTER',true);return}
+ session={code,name,character};save(session);
+ setStatus('JOINING ROOM…');
+ if(ws?.readyState===WebSocket.OPEN){
+   send({type:'JOIN_ROOM',code,name,character});
+ }else{
+   connect();
+ }
+});
 if(session?.playerId)connect();
 })();
