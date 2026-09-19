@@ -26,3 +26,31 @@ body.player-page #game{width:100%;margin:0;padding:0}
 }
 @media(max-width:520px){.arcade-header{grid-template-columns:72px 1fr 72px}.arcade-room{font-size:9px}.arcade-logo{font-size:18px}.arcade-tools button{width:34px;height:42px;font-size:14px}.arcade-players{grid-template-columns:repeat(5,1fr)}.arcade-player:nth-child(n+6){display:none}.arcade-main{grid-template-columns:54px 1fr 54px}.arcade-call{height:88px;font-size:22px}.arcade-call strong{font-size:16px}.arcade-call span{font-size:6px}.tv-screen{min-height:155px}.tv-card{width:70px;min-height:100px}.tv-card img{width:48px;height:48px}.arcade-special-label{font-size:9px}.game-info{line-height:1.15}.arcade-hand-title{font-size:16px}.arcade-card{flex-basis:76px!important;width:76px!important;height:105px!important}.arcade-card img{width:45px;height:45px}.arcade-card strong{font-size:9px}.arcade-actions button{height:48px;font-size:14px}
 }
+
+/* Card-only refinement — match the locked #2 reference */
+.arcade-hand-wrap{max-width:1280px}
+.arcade-hand{padding:14px 12px 22px!important;gap:4px!important;scroll-padding-left:12px}
+.arcade-card{flex:0 0 118px!important;width:118px!important;height:158px!important;border-width:3px!important;border-radius:14px!important;padding:7px!important;justify-content:flex-end;overflow:visible}
+.arcade-card img{width:76px;height:76px;border-radius:10px;border-width:2px;margin-bottom:auto}
+.arcade-card strong{font-size:15px}
+.arcade-card small{font-size:10px}
+.arcade-card-number{font-size:17px}
+.arcade-card:nth-child(4n+1){transform:rotate(-2.5deg)}
+.arcade-card:nth-child(4n+2){transform:rotate(-1deg)}
+.arcade-card:nth-child(4n+3){transform:rotate(1deg)}
+.arcade-card:nth-child(4n){transform:rotate(2.5deg)}
+.arcade-card:hover,.arcade-card:focus-visible{transform:translateY(-8px) scale(1.03)!important;z-index:4}
+.arcade-card.selected{transform:translateY(-14px) scale(1.06)!important;z-index:5}
+@media(max-width:900px){
+  .arcade-hand{gap:3px!important;padding:10px 8px 18px!important}
+  .arcade-card{flex-basis:92px!important;width:92px!important;height:128px!important;border-width:2px!important;border-radius:11px!important}
+  .arcade-card img{width:58px;height:58px;border-radius:8px}
+  .arcade-card strong{font-size:10px}
+  .arcade-card small{font-size:7px}
+  .arcade-card-number{font-size:12px}
+}
+@media(max-width:520px){
+  .arcade-hand{gap:2px!important;padding:9px 7px 16px!important}
+  .arcade-card{flex-basis:88px!important;width:88px!important;height:124px!important}
+  .arcade-card img{width:55px;height:55px}
+}
