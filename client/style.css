@@ -279,3 +279,11 @@ body.player-page .close-join{position:absolute!important;top:9px;right:9px;width
 .game-menu-box h2{margin:0 0 16px!important;font-size:28px!important}
 .game-menu-box .menu-message{margin:10px 0!important;padding:8px 4px!important;font-family:system-ui,sans-serif!important;font-size:13px!important;line-height:1.35!important;color:#fff!important}
 .game-menu-box .menu-close{position:absolute!important;right:9px!important;top:9px!important;width:36px!important;height:36px!important;margin:0!important;padding:0!important}
+
+/* One compact top menu: join + sound */
+body.player-page .open-join{font-size:16px!important}
+body.player-page .menu-sound-control{background:#07132e!important;border:2px solid #1687ff!important;color:#fff!important;box-shadow:0 0 14px #1687ff66!important}
+body.player-page .arcade-header{grid-template-columns:230px 1fr!important}
+body.player-page .arcade-tools{display:none!important}
+@media(max-width:900px){body.player-page .arcade-header{grid-template-columns:100px 1fr!important}}
+@media(max-width:520px){body.player-page .arcade-header{grid-template-columns:72px 1fr!important}}
