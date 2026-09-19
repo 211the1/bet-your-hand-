@@ -1,0 +1,38 @@
+/* Active-player flame rim correction — keep the card fully visible */
+.arcade-player.active{
+  position:relative!important;
+  overflow:visible!important;
+  isolation:isolate!important;
+}
+.arcade-player.active:before{
+  content:""!important;
+  position:absolute!important;
+  inset:-18px!important;
+  z-index:0!important;
+  pointer-events:none!important;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400' preserveAspectRatio='none'%3E%3Cpath fill-rule='evenodd' fill='%23ff2b00' d='M25 18 C18 4 34 8 38 24 C42 5 56 1 55 23 C62 7 76 8 70 30 C82 9 98 13 89 36 C104 17 118 23 104 43 L286 43 C272 25 286 12 294 29 C292 8 306 5 299 36 C300 19 314 18 305 47 L305 353 C319 330 331 339 316 360 C333 348 339 362 315 374 C300 390 291 379 286 358 L104 358 C118 378 104 390 89 365 C98 388 82 392 70 370 C76 392 62 393 55 377 C56 399 42 395 38 376 C34 392 18 396 25 382 C8 376 12 362 30 358 L30 47 C12 43 8 29 25 35 C8 22 12 8 25 18 Z M45 52 L255 52 L255 348 L45 348 Z'/%3E%3Cpath fill-rule='evenodd' fill='%23ffb000' d='M34 30 C32 17 45 15 47 33 C51 19 62 18 61 37 C68 21 78 24 73 43 L278 43 C272 28 284 22 289 37 C292 23 302 23 298 43 L298 357 C307 344 316 351 303 362 C291 376 282 365 278 351 L73 351 C78 370 68 373 61 357 C62 376 51 375 47 361 C45 379 32 377 34 360 C19 356 22 344 39 341 L39 59 C22 55 19 43 34 47 C22 38 25 27 34 30 Z M50 60 L250 60 L250 340 L50 340 Z'/%3E%3Cpath fill-rule='evenodd' fill='%23fff06a' d='M48 45 C47 34 56 32 57 47 C61 34 69 35 67 51 L267 51 C263 39 273 34 278 48 L278 349 C284 340 291 346 281 353 C273 360 267 352 265 343 L67 343 C69 359 61 360 57 346 C56 361 47 359 48 345 C35 342 38 333 51 331 L51 65 C38 61 35 52 48 55 Z M58 70 L242 70 L242 330 L58 330 Z'/%3E%3C/svg%3E") center/100% 100% no-repeat!important;
+  filter:drop-shadow(0 0 5px #ff2400) drop-shadow(0 0 12px #ff7a00)!important;
+  animation:correctFlameRim .55s ease-in-out infinite alternate!important;
+}
+.arcade-player.active:after{
+  content:""!important;
+  position:absolute!important;
+  inset:-7px!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  border:2px solid #ffd21a!important;
+  border-radius:24px!important;
+  background:transparent!important;
+  box-shadow:0 0 8px #ff6a00,0 0 18px #ff2400!important;
+  opacity:.72!important;
+  animation:correctFlameCore .4s ease-in-out infinite alternate!important;
+}
+.arcade-player.active>*{
+  position:relative!important;
+  z-index:2!important;
+}
+@keyframes correctFlameRim{
+  from{transform:scale(.99);filter:drop-shadow(0 0 4px #ff2400) drop-shadow(0 0 9px #ff7a00)}
+  to{transform:scale(1.015);filter:drop-shadow(0 0 8px #ff2400) drop-shadow(0 0 17px #ffb000)}
+}
+@keyframes correctFlameCore{from{opacity:.42}to{opacity:.86}}
