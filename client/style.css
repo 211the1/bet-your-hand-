@@ -381,3 +381,33 @@ body.player-page .join-panel.prejoin .join-box{
 @media(max-width:520px){
   .turn-banner{margin:3px auto 6px;padding:7px 8px;font-size:13px;border-width:2px;border-radius:10px}
 }
+
+
+/* Mobile: give the hand carousel nearly the full phone width instead of squeezing it between side panels */
+@media(max-width:520px){
+  body.player-page .arcade-main{
+    grid-template-columns:42px minmax(0,1fr) 42px!important;
+    gap:4px!important;
+  }
+  body.player-page .arcade-hand-wrap{
+    width:calc(100% + 72px)!important;
+    margin-left:-36px!important;
+    grid-template-columns:24px minmax(0,1fr) 24px!important;
+  }
+  body.player-page .arcade-hand{
+    min-width:0!important;
+    width:100%!important;
+    gap:7px!important;
+    padding-left:5px!important;
+    padding-right:5px!important;
+  }
+  body.player-page .arcade-card{
+    flex-basis:88px!important;
+    width:88px!important;
+    min-width:88px!important;
+    height:122px!important;
+  }
+  body.player-page .arcade-card:not(.special-skip):not(.special-reverse):not(.special-wild):not(.special-play_your_hand) img{
+    height:82px!important;
+  }
+}
