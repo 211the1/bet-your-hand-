@@ -411,3 +411,21 @@ body.player-page .join-panel.prejoin .join-box{
     height:82px!important;
   }
 }
+
+
+/* Clean power wheel + direct card play */
+.wheel-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#07132e;border:3px solid #fff;color:#fff;font:900 11px/1 system-ui,sans-serif;letter-spacing:.5px;box-shadow:0 0 16px #fff8;z-index:2}
+.color-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;max-width:360px;margin:5px auto 2px}
+.color-choice{height:42px!important;margin:0!important;padding:4px!important;border:3px solid #fff!important;border-radius:10px!important;color:#fff!important;font:900 12px system-ui,sans-serif!important}
+.color-choice-red{background:#a9151d!important;border-color:#ff4b55!important}
+.color-choice-blue{background:#172c92!important;border-color:#1687ff!important}
+.color-choice-green{background:#07883f!important;border-color:#20e36d!important}
+.color-choice-yellow{background:#d89c00!important;border-color:#ffd83d!important;color:#111!important}
+.arcade-actions{grid-template-columns:1fr 1fr!important}
+.arcade-card:active{transform:translateY(-8px) scale(1.04)!important;z-index:5}
+@media(max-width:520px){
+  .wheel-center{width:42px;height:42px;font-size:9px;border-width:2px}
+  .color-buttons{gap:4px}
+  .color-choice{height:36px!important;font-size:9px!important;border-width:2px!important;border-radius:8px!important}
+  .arcade-actions{grid-template-columns:1fr 1fr!important}
+}
