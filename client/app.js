@@ -59,7 +59,18 @@ function connect(){if(connecting||ws?.readyState===WebSocket.OPEN||!session)retu
   joinButton.disabled=false;
   const msg=m.error||'Something went wrong.';
   setStatus(msg,true);
-  // During a live game, a rejected move is a game-action error — keep the player in the game.
+  // A missing/invalid reconnect session means the old room is gone or the host restarted it.
+  // Clear the stale player session so refresh cannot trap the phone in the old lobby.
+  const staleSessionError=/room not found|invalid reconnect/i.test(msg);
+  if(staleSessionError){
+    localStorage.removeItem('byhPlayerSession');
+    session=null;me=null;joined=false;
+    try{ws?.close()}catch{}
+    showJoinScreen(false);
+    setStatus('ROOM NO LONGER EXISTS — ENTER A NEW ROOM CODE',true);
+    return;
+  }
+  // During a live game, other rejected moves are game-action errors — keep the player in the game.
   if(joined && session?.playerId){
     setTimeout(()=>setStatus(isMyTurn?'YOUR TURN — PLAY OR DRAW':`WAITING FOR ${current?.name||'THE OTHER PLAYER'}`),2200);
     return;
