@@ -56,6 +56,11 @@ function connect(){if(connecting||ws?.readyState===WebSocket.OPEN||!session)retu
   joinButton.disabled=false;
   const msg=m.error||'Something went wrong.';
   setStatus(msg,true);
+  // During a live game, a rejected move is a game-action error — keep the player in the game.
+  if(joined && session?.playerId){
+    setTimeout(()=>setStatus(isMyTurn?'YOUR TURN — PLAY OR DRAW':`WAITING FOR ${current?.name||'THE OTHER PLAYER'}`),2200);
+    return;
+  }
   if(session?.playerId){
     localStorage.removeItem('byhPlayerSession');
     session=null;me=null;joined=false;
@@ -133,7 +138,7 @@ gameEl.innerHTML=`
     <div class="arcade-tools"><button id="menu-toggle" type="button">MENU<small>MENU</small></button></div>
   </header>
   <section class="arcade-players">${playerTiles}</section>
-  <div class="turn-banner ${isMyTurn?'my-turn':'waiting-turn'}">${isMyTurn?'🔥 YOUR TURN — PLAY OR DRAW':'⏳ WAITING FOR '+escapeHtml(current?.name||'THE OTHER PLAYER')}</div>
+  <div class="turn-banner ${isMyTurn?'my-turn':'waiting-turn'}">${isMyTurn?'YOUR TURN — PLAY OR DRAW':'WAITING FOR '+escapeHtml(current?.name||'THE OTHER PLAYER')}</div>
   <div class="arcade-main">
     <aside class="arcade-side left-side">${callButton}${nextPlayer}<button class="arcade-side-btn" type="button">VIEW DECK</button></aside>
     <section class="arcade-center">
