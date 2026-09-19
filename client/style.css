@@ -155,3 +155,31 @@ body.player-page #game{width:100%;margin:0;padding:0}
  .arcade-card.special-wild .special-symbol{font-size:21px!important}
  .arcade-card.special-play_your_hand .special-symbol{font-size:18px!important}
 }
+
+/* Special-card symbols: clean text, no broken Unicode glyphs */
+.arcade-card.special-skip:after,
+.arcade-card.special-reverse:after,
+.arcade-card.special-wild:after,
+.arcade-card.special-play_your_hand:after{content:none!important}
+.arcade-card.special-skip .special-symbol,
+.arcade-card.special-reverse .special-symbol,
+.arcade-card.special-wild .special-symbol,
+.arcade-card.special-play_your_hand .special-symbol{font-family:Impact,Arial,sans-serif!important;letter-spacing:.5px!important}
+.arcade-card.special-skip .special-symbol:before{content:'SKIP';display:block}
+.arcade-card.special-reverse .special-symbol:before{content:'↻';display:block;font-family:Arial,sans-serif}
+.arcade-card.special-wild .special-symbol:before{content:'WILD';display:block}
+.arcade-card.special-play_your_hand .special-symbol:before{content:'PLAY YOUR HAND';display:block}
+.arcade-card.special-skip .special-symbol,
+.arcade-card.special-reverse .special-symbol,
+.arcade-card.special-wild .special-symbol,
+.arcade-card.special-play_your_hand .special-symbol{font-size:0!important}
+.arcade-card.special-skip .special-symbol:before{font-size:40px}
+.arcade-card.special-reverse .special-symbol:before{font-size:62px}
+.arcade-card.special-wild .special-symbol:before{font-size:27px}
+.arcade-card.special-play_your_hand .special-symbol:before{font-size:22px;line-height:1.05}
+@media(max-width:520px){
+ .arcade-card.special-skip .special-symbol:before{font-size:34px}
+ .arcade-card.special-reverse .special-symbol:before{font-size:48px}
+ .arcade-card.special-wild .special-symbol:before{font-size:22px}
+ .arcade-card.special-play_your_hand .special-symbol:before{font-size:18px}
+}
