@@ -322,3 +322,7 @@ body.player-page .character-choice.taken i{width:auto;border-radius:5px;padding:
  body.player-page .character-choice i{right:3px;top:3px;width:16px;height:16px;line-height:16px;font-size:10px}
  body.player-page .character-picker-title{font-size:13px;margin:5px 0}
 }
+/* Opening screen: join form visible, menu-only controls hidden */
+body.player-page .join-panel.prejoin .close-join,
+body.player-page .join-panel.prejoin .menu-sound-control{display:none!important}
+body.player-page .join-panel.prejoin{display:flex!important}
