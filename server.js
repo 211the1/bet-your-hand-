@@ -22,6 +22,9 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
     const code=s.code;
     await rooms.leavePlayer(code,s.playerId,ws);
     sessions.delete(ws);
+    // Tell every remaining player immediately. With exactly 2 players,
+    // leavePlayer ends the active game and leaves the room open for a new join.
+    await rooms.sendState(code);
     send(ws,{type:'LEFT_ROOM'});
     try{ws.close(1000,'Player left room')}catch{}
     return;
