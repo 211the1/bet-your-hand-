@@ -87,3 +87,10 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - The wheel result shows POWER PLAY, selected COLOR, and the landed character.
 - The wheel is rendered in the existing player game screen; no separate image upload is required.
 - Engine wheel sections are defined in game/engine.js as WHEEL_SECTIONS.
+
+## Latest Power Wheel / laptop hand-scroll fix (2026-09-19)
+- Fixed the PLAY YOUR HAND wheel flow after a last-card event: when the last-card video finishes, the client now resets the wheel-spin guard so a pending SPIN_WHEEL action is shown and can run normally.
+- Fixed laptop hand scrolling so dragging the hand background no longer competes with dragging/playing an individual card.
+- Added a clearer desktop horizontal scrollbar for the hand.
+- Player cache bumped to app.js?v=54.
+- Commits: 10abfceee8b841e11f209719f770bcd2ac4dd19b, cb2e582c7a04611db95a420acad0730a9d6b78e6, 2296551e056f86efb15f5348d52e2c974b86edcc.
