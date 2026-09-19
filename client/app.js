@@ -182,7 +182,7 @@ gameEl.innerHTML=`
       <div class="arcade-tv">
         <div class="tv-screen">
           <div class="tv-watermark">PLAY YOUR HAND</div>
-          <div class="tv-card color-${escapeHtml(cardColor(top).toLowerCase())} ${top.type==='WILD'?'wild':''} ${top.type==='PLAY_YOUR_HAND'?'play-special':''}">
+          <div class="tv-card ${top.type==='SKIP'||top.type==='REVERSE'?'special-modern-host':''} color-${escapeHtml(cardColor(top).toLowerCase())} ${top.type==='WILD'?'wild':''} ${top.type==='PLAY_YOUR_HAND'?'play-special':''}">
             ${topSpecialImage?topCardVisual:(topImage?`<span class="tv-number">${escapeHtml(top.character||top.type||'')}</span><img src="${topImage}" alt=""><strong>${escapeHtml(top.character||'CARD')}</strong><small>${escapeHtml(cardColor(top)||'')}</small>`:`<div class="special-card-symbol">${escapeHtml((top.type||'CARD').replaceAll('_',' '))}</div>`)}
           </div>
         </div>
