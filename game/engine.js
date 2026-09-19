@@ -24,5 +24,24 @@ function chooseWildColor(g,playerId,color){if(g.pending?.type!=='WILD_COLOR_CHOI
 function spinWheel(g,playerId,rng=Math.random){if(g.pending?.type!=='SPIN_WHEEL'||g.pending.playerId!==playerId)throw new Error('Wheel is not pending');const index=Math.floor(rng()*9),powers=['EXTRA_PLAY','SHIELD','COLOR_CHOICE','EXTRA_PLAY','TURN_SWITCH','SHIELD','COLOR_CHOICE','EXTRA_PLAY','TURN_SWITCH'],power=powers[index],p=currentPlayer(g);p[camel(power)]=true;g.wheelResult={section:index+1,power};g.pending={type:'POWER_USED',power,playerId};return g.wheelResult}
 function usePower(g,playerId,power,data={}){const p=g.players.find(x=>x.id===playerId);if(!p||currentPlayer(g).id!==playerId)throw new Error('Not your turn');if(!['EXTRA_PLAY','SHIELD','COLOR_CHOICE','TURN_SWITCH'].includes(power))throw new Error('Unknown power');const key=camel(power);if(!p[key])throw new Error('Power not available');p[key]=false;if(power==='COLOR_CHOICE'){if(!COLORS.includes(data.color))throw new Error('Color required');g.currentColor=data.color}if(power==='TURN_SWITCH')g.direction*=-1;if(power==='EXTRA_PLAY')p.extraPlay=true;if(power==='SHIELD')p.shield=true;g.pending=null;if(power==='EXTRA_PLAY')startTurn(g);else{advance(g);if(g.phase==='playing')startTurn(g)}return power}
 function camel(x){return x.toLowerCase().replace(/_([a-z])/g,(_,c)=>c.toUpperCase())}
+function removePlayer(g,playerId){
+ const idx=g.players.findIndex(p=>String(p.id)===String(playerId));
+ if(idx<0)return false;
+ const wasCurrent=idx===g.turnIndex;
+ const dir=g.direction||1;
+ g.players.splice(idx,1);
+ g.pending=null;g.wheelResult=null;
+ if(g.players.length===0){g.turnIndex=0;g.phase='waiting';return true}
+ if(g.players.length===1){g.turnIndex=0;g.phase='waiting';return true}
+ if(wasCurrent){
+   let next=dir===-1?idx-1:idx;
+   if(next<0)next=g.players.length-1;
+   if(next>=g.players.length)next=0;
+   g.turnIndex=next;
+ }else if(idx<g.turnIndex)g.turnIndex--;
+ if(g.turnIndex>=g.players.length)g.turnIndex=0;
+ if(g.phase==='playing')startTurn(g);
+ return true;
+}
 function completeRound(g){if(g.phase!=='round_complete')throw new Error('Round is not complete');if(g.round===2){g.phase='finished';g.winner=[...g.players].sort((a,b)=>b.points-a.points)[0].id;return}g.round=2;g.phase='playing';g.deck=shuffle(buildDeck());g.discard=[];g.currentColor=null;g.pending=null;g.wheelResult=null;g.turnIndex=0;g.direction=1;for(const p of g.players){p.hand=[];p.shield=false;p.extraPlay=false;p.colorChoice=false;p.turnSwitch=false}for(const p of g.players)p.hand=g.deck.splice(0,STARTING_HAND);let first;do{first=g.deck.shift();g.deck.push(first)}while(first.type==='PLAY_YOUR_HAND');g.discard=[first];g.currentColor=cardColor(first)||null;startTurn(g)}
-module.exports={COLORS,CHARACTERS,MIN_PLAYERS,MAX_PLAYERS,STARTING_HAND,STARTING_POINTS,SPECIAL_POINTS,buildDeck,shuffle,createGame,isPlayable,startTurn,playCard,chooseWildColor,spinWheel,usePower,completeRound,currentPlayer,currentColor,topCard,cardColor,drawUntilPlayable,drawCard};
+module.exports={COLORS,CHARACTERS,MIN_PLAYERS,MAX_PLAYERS,STARTING_HAND,STARTING_POINTS,SPECIAL_POINTS,buildDeck,shuffle,createGame,isPlayable,startTurn,playCard,chooseWildColor,spinWheel,usePower,removePlayer,completeRound,currentPlayer,currentColor,topCard,cardColor,drawUntilPlayable,drawCard};
