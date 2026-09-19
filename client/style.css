@@ -345,3 +345,39 @@ body.player-page .join-panel.prejoin{
 body.player-page .join-panel.prejoin .join-box{
   width:min(360px,92vw)!important;
 }
+
+
+/* Prominent turn indicator */
+.turn-banner{
+  width:min(760px,96%);
+  margin:6px auto 10px;
+  padding:10px 14px;
+  border:3px solid #1687ff;
+  border-radius:14px;
+  background:#07132e;
+  color:#fff;
+  text-align:center;
+  font-family:system-ui,sans-serif;
+  font-size:18px;
+  font-weight:1000;
+  letter-spacing:.5px;
+  box-shadow:0 0 16px #1687ff66;
+}
+.turn-banner.my-turn{
+  border-color:#ffd21c;
+  background:linear-gradient(90deg,#402500,#7a4b00,#402500);
+  color:#fff;
+  text-shadow:0 0 10px #ffd21c;
+  box-shadow:0 0 24px #ff9f00aa;
+  animation:turnPulse .7s infinite alternate;
+}
+.turn-banner.waiting-turn{
+  border-color:#1687ff;
+}
+@keyframes turnPulse{
+  from{transform:scale(1);filter:brightness(1)}
+  to{transform:scale(1.025);filter:brightness(1.18)}
+}
+@media(max-width:520px){
+  .turn-banner{margin:3px auto 6px;padding:7px 8px;font-size:13px;border-width:2px;border-radius:10px}
+}
