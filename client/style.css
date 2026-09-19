@@ -263,3 +263,12 @@ body.player-page .close-join{position:absolute!important;top:9px;right:9px;width
  body.player-page .open-join{width:180px;padding:7px 10px;font-size:14px;margin:2px auto 4px}
  body.player-page .join-box{padding:20px 15px 16px}
 }
+
+.game-menu-panel{position:fixed;inset:0;z-index:99995;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(5px)}
+.game-menu-panel.show{display:flex}
+.game-menu-box{position:relative;width:min(340px,90vw);padding:25px 18px 20px;border:3px solid #1687ff;border-radius:24px;background:radial-gradient(circle at 50% 15%,#182f6d,#070b20 72%);box-shadow:0 0 35px #1687ff99}
+.game-menu-box h2{margin:0 0 12px;font-size:28px;text-shadow:0 0 12px #1687ff}
+.game-menu-box>button:not(.menu-close){margin:9px auto;width:90%;padding:12px;border:2px solid #1687ff;border-radius:12px;background:#09255f;color:#fff;font-weight:900;font-size:16px}
+.menu-close{position:absolute!important;right:9px;top:9px;width:36px!important;height:36px!important;margin:0!important;padding:0!important;border:2px solid #ff4b4b!important;border-radius:50%!important;background:#3a0b12!important;color:#fff!important}
+.menu-help-text{margin:10px 5px 2px;padding:12px;border:2px solid #713cff;border-radius:12px;background:#080d22;font-family:system-ui;font-size:12px;line-height:1.35}
+.menu-help-text p{margin:7px 0}
