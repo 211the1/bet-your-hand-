@@ -101,3 +101,12 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - Fixed card input so a normal tap plays the card, while an upward swipe still plays it and horizontal dragging remains available for scrolling.
 - Cache bumped to app.js?v=55.
 - Commit: 568a48e35151a6b52ab321c47765a9de68c816c8.
+
+## Power Wheel / desktop card fix (2026-09-19)
+- PLAY YOUR HAND cards now have a desktop click fallback in addition to pointer/tap handling, so a laptop mouse click can trigger PLAY_CARD reliably.
+- The nine-section wheel now displays each section's character, actual game color, and Power Play label.
+- The wheel result now visibly lands on the actual server-selected section instead of always stopping at the same visual position.
+- The result panel explicitly shows POWER PLAY, CHARACTER, and NEXT COLOR.
+- GAME INFO now displays the wheel-selected color from wheelResult first, keeping the information panel synchronized with the Power Wheel.
+- Player app cache bumped to app.js?v=56.
+- Commits: ec5fb767a996298b983858f9a33d91e2bb52f7bb, a846678b876dac93215a00b84e1ac962070d2d5c, 9010bb5a14cefe34f30a20791fd56afcc1b94295.
