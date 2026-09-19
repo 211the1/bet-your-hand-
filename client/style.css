@@ -596,3 +596,25 @@ body.player-page .join-panel.prejoin .join-box{
   .wheel-center b{font-size:13px}
   .wheel-center small{font-size:8px}
 }
+
+/* Wheel must never sit on top of the normal game controls. The wheel is display-only; its power controls remain clickable. */
+body.player-page .wheel-box{pointer-events:none!important;position:relative!important;z-index:1!important}
+body.player-page .wheel-box .power-panel{pointer-events:auto!important;position:relative!important;z-index:30!important}
+body.player-page .arcade-header,
+body.player-page .arcade-players,
+body.player-page .turn-banner,
+body.player-page .arcade-main,
+body.player-page .arcade-side,
+body.player-page .arcade-center,
+body.player-page .arcade-hand-wrap,
+body.player-page .arcade-actions{position:relative;z-index:10}
+body.player-page .arcade-actions button,
+body.player-page .hand-arrow,
+body.player-page #menu-toggle,
+body.player-page #view-deck,
+body.player-page #call-players,
+body.player-page #draw-card,
+body.player-page #sort-cards{pointer-events:auto!important;position:relative;z-index:20}
+/* A pending wheel power should not make the entire hand look dead; only the actual card/draw actions wait for the power. */
+body.player-page .power-panel button,
+body.player-page .power-panel .color-choice{pointer-events:auto!important;position:relative;z-index:40}
