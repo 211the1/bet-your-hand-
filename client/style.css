@@ -484,3 +484,32 @@ body.player-page .join-panel.prejoin .join-box{
     overflow:hidden!important;
   }
 }
+
+/* CALL button text fit — keep existing CALL / WAKE PLAYER wording */
+.arcade-call{
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  white-space:normal!important;
+  text-align:center!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  line-height:1!important;
+  padding:8px 4px!important;
+}
+.arcade-call span{
+  display:block!important;
+  width:100%!important;
+  margin-top:4px!important;
+  white-space:normal!important;
+  line-height:1.05!important;
+}
+@media(max-width:900px){
+  .arcade-call{font-size:22px!important;padding:5px 2px!important}
+  .arcade-call span{font-size:7px!important;margin-top:3px!important}
+}
+@media(max-width:520px){
+  .arcade-call{font-size:18px!important;padding:4px 1px!important}
+  .arcade-call span{font-size:6px!important;line-height:1!important;margin-top:3px!important}
+}
