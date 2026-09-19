@@ -153,7 +153,8 @@ const playerTiles=(game.players||[]).map(p=>{
     <div class="arcade-avatar">${img?`<img src="${img}" alt="${escapeHtml(p.character)}">`:''}</div>
     <b>${escapeHtml(p.character||'PLAYER')}</b>
     <span>${escapeHtml(p.name||'')}</span>
-    <em>${Number(p.handCount||0)}</em>
+    <strong class="player-score">SCORE: ${Number(p.points||0)}</strong>
+    <em>${Number(p.handCount||0)} CARDS</em>
     ${active?'<label>YOUR TURN</label>':''}
   </div>`
 }).join('');
