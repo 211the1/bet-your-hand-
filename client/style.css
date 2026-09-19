@@ -106,3 +106,13 @@ body.player-page #game{width:100%;margin:0;padding:0}
  .arcade-card strong{font-size:12px}.arcade-card small{font-size:8px}
  .arcade-card.special-skip .special-symbol{font-size:43px}.arcade-card.special-reverse .special-symbol{font-size:48px}.arcade-card.special-wild .special-symbol{font-size:23px}.arcade-card.special-play_your_hand .special-symbol{font-size:19px}
 }
+
+/* Character cards: solid game color runs right up to the white photo frame */
+.arcade-card:not(.special-skip):not(.special-reverse):not(.special-wild):not(.special-play_your_hand){padding:5px!important}
+.arcade-card:not(.special-skip):not(.special-reverse):not(.special-wild):not(.special-play_your_hand) img{width:calc(100% - 2px);height:88px;margin:0 0 7px;border:3px solid #fff;border-radius:10px;object-fit:cover;box-sizing:border-box}
+@media(max-width:900px){
+ .arcade-card:not(.special-skip):not(.special-reverse):not(.special-wild):not(.special-play_your_hand) img{height:82px}
+}
+@media(max-width:520px){
+ .arcade-card:not(.special-skip):not(.special-reverse):not(.special-wild):not(.special-play_your_hand) img{height:80px}
+}
