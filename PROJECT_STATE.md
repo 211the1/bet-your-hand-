@@ -151,3 +151,10 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - No game rules, laptop controls, CALL/WAKE PLAYER behavior, or existing card artwork were changed.
 - Player cache bumped to app.js?v=64 and style.css?v=43.
 - Commits: 624a1bc55a8450b5b1f1e829a7f9eb084b977cdb, 50f45ebf9077e7428389890613265336aba473ca, 3684f19fed36a9229f4933abddc5dfda131d15cb.
+
+
+## Power badge placement update (2026-09-19)
+- Moved persistent player power badges out of the top player tiles.
+- Power badges now appear directly below the TV screen and identify the character/player who currently owns the unused power.
+- Existing power state and consumption logic is unchanged.
+- Commits: b8531c139ce227ea3dec970fe9ba665daace1fff, 443801bd10d223f38469a5bf7b709d837129f659, 7f0e3cb4435d729470d362bbed16b2c050d29353.
