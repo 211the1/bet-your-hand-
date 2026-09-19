@@ -110,3 +110,10 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - GAME INFO now displays the wheel-selected color from wheelResult first, keeping the information panel synchronized with the Power Wheel.
 - Player app cache bumped to app.js?v=56.
 - Commits: ec5fb767a996298b983858f9a33d91e2bb52f7bb, a846678b876dac93215a00b84e1ac962070d2d5c, 9010bb5a14cefe34f30a20791fd56afcc1b94295.
+
+## Wheel control-block fix (2026-09-19)
+- Full player/client/server scan traced the new Power Wheel path and normal controls.
+- Added defensive layering so the display-only Power Wheel cannot intercept mouse/touch clicks meant for MENU, CALL, CARD PILES, hand arrows, DRAW, SORT, or other game controls.
+- Power-panel buttons remain explicitly clickable.
+- Player cache bumped to app.js?v=57.
+- Commit: bc5126580b36b453226099d131c95111ca5d9333; cache commit: 8eeb69c36c67c9d12f2f61596eb3ab086e9a0e72.
