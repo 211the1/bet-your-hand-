@@ -140,3 +140,14 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - No controls, scoring, wheel, card rules, or special-card artwork were changed.
 - Player cache bumped to app.js?v=63.
 - Commits: 9af3b6fdc45d95ddfdcdfca06a6a9edf88ee5982, 0733d345197dab670f41998cfef7871dfc1881f3.
+
+
+## Latest Power Wheel asset hookup (2026-09-19)
+- Connected the uploaded `assets/power_wheel_style2.png` artwork to the live player Power Wheel.
+- The existing server-selected wheel section/result logic remains unchanged; the artwork rotates to the selected section and the existing result panel still shows POWER PLAY, PLAYER/CHARACTER, and NEXT COLOR.
+- Added a persistent power badge to each player tile when that player has an unused power.
+- SHIELD uses the uploaded blue shield artwork at `power-play/shields/shield_blue.png`; the badge remains until the existing engine consumes the SHIELD power.
+- Other powers show compact text badges until consumed.
+- No game rules, laptop controls, CALL/WAKE PLAYER behavior, or existing card artwork were changed.
+- Player cache bumped to app.js?v=64 and style.css?v=43.
+- Commits: 624a1bc55a8450b5b1f1e829a7f9eb084b977cdb, 50f45ebf9077e7428389890613265336aba473ca, 3684f19fed36a9229f4933abddc5dfda131d15cb.
