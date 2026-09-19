@@ -184,12 +184,12 @@ gameEl.innerHTML=`
       <div class="arcade-tv">
         <div class="tv-screen">
           <div class="tv-watermark">PLAY YOUR HAND</div>
-      ${playerPowerPanel}
           <div class="tv-card ${top.type==='SKIP'||top.type==='REVERSE'?'special-modern-host':''} color-${escapeHtml(cardColor(top).toLowerCase())} ${top.type==='WILD'?'wild':''} ${top.type==='PLAY_YOUR_HAND'?'play-special':''}">
             ${topCardVisual}
           </div>
         </div>
       </div>
+      ${playerPowerPanel}
       <div class="arcade-hint">${playableHint}</div>
       ${special}
       <div class="arcade-hand-title">YOUR HAND <span>${hand.length} CARDS</span></div>
