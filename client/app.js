@@ -145,22 +145,21 @@ if(game.pending?.type==='SPIN_WHEEL'&&game.pending.playerId===game.viewerId){
   autoSpinSent=false;special=wheelHtml(game.wheelResult,false)+powerControls(game)
 }else autoSpinSent=false;
 
-const powerBadge=(p)=>{const powers=[['shield','SHIELD'],['extraPlay','EXTRA PLAY'],['colorChoice','COLOR CHOICE'],['turnSwitch','TURN SWITCH']];const found=powers.find(([k])=>Boolean(p[k]));if(!found)return '';if(found[0]==='shield'){const shieldSrc='/power-play/shields/shield_blue.png?v=1';return `<div class="player-power-badge shield-badge"><img src="${shieldSrc}" alt="Shield power"><span>POWER: SHIELD</span></div>`;}return `<div class="player-power-badge text-power-badge">⚡ POWER: ${found[1]}</div>`};
+const powerBadge=(p)=>{const powers=[['shield','SHIELD'],['extraPlay','EXTRA PLAY'],['colorChoice','COLOR CHOICE'],['turnSwitch','TURN SWITCH']];const found=powers.find(([k])=>Boolean(p[k]));if(!found)return '';if(found[0]==='shield'){const shieldSrc='/power-play/shields/shield_blue.png?v=1';return '<div class="player-power-badge shield-badge"><img src="'+shieldSrc+'" alt="Shield power"><span>POWER: SHIELD</span></div>';}return '<div class="player-power-badge text-power-badge">⚡ POWER: '+found[1]+'</div>';};
+const playerPowerPanel=(game.players||[]).map(p=>{const badge=powerBadge(p);if(!badge)return '';const mine=String(p.id)===String(game.viewerId);return '<div class="tv-power-owner '+(mine?'mine':'')+'"><b>'+escapeHtml(p.character||'PLAYER')+'</b><span>'+escapeHtml(p.name||'')+'</span>'+badge+'</div>';}).join('');
 const playerTiles=(game.players||[]).map(p=>{
   const mine=String(p.id)===String(game.viewerId);
   const active=String(p.id)===String(game.turnPlayerId);
   const img=characterImage(p.character);
-  return `<div class="arcade-player ${active?'active':''} ${mine?'mine':''}">
-    <div class="arcade-avatar">${img?`<img src="${img}" alt="${escapeHtml(p.character)}">`:''}</div>
-    <b>${escapeHtml(p.character||'PLAYER')}</b>
-    <span>${escapeHtml(p.name||'')}</span>
-    <strong class="player-score">SCORE: ${Number(p.points||0)}</strong>
-    <em>${Number(p.handCount||0)} CARDS</em>
-    ${powerBadge(p)}
-    ${active?'<label>YOUR TURN</label>':''}
-  </div>`
+  return '<div class="arcade-player '+(active?'active':'')+' '+(mine?'mine':'')+'">'+
+    '<div class="arcade-avatar">'+(img?'<img src="'+img+'" alt="'+escapeHtml(p.character)+'">':'')+'</div>'+
+    '<b>'+escapeHtml(p.character||'PLAYER')+'</b>'+
+    '<span>'+escapeHtml(p.name||'')+'</span>'+
+    '<strong class="player-score">SCORE: '+Number(p.points||0)+'</strong>'+
+    '<em>'+Number(p.handCount||0)+' CARDS</em>'+
+    (active?'<label>YOUR TURN</label>':'')+
+  '</div>';
 }).join('');
-
 const nextPlayer=current?'<div class="side-player"><b>NEXT PLAYER</b><div>'+escapeHtml(current.name||'—')+'</div></div>':'';
 const shownColor=game.currentColor||'—';const info=`<div class="game-info"><b>GAME INFO</b><div>Direction <strong>${game.direction===-1?'LEFT':'RIGHT'}</strong></div><div>Color: <strong class="info-color">${escapeHtml(shownColor)}</strong></div><div>Cards Left: <strong>${Number(game.deckCount||game.cardsLeft||0)}</strong></div></div>`;
 const callButton='<button id="call-players" class="arcade-call" type="button">CALL<span>WAKE PLAYER</span></button>';
@@ -185,6 +184,7 @@ gameEl.innerHTML=`
       <div class="arcade-tv">
         <div class="tv-screen">
           <div class="tv-watermark">PLAY YOUR HAND</div>
+      ${playerPowerPanel}
           <div class="tv-card ${top.type==='SKIP'||top.type==='REVERSE'?'special-modern-host':''} color-${escapeHtml(cardColor(top).toLowerCase())} ${top.type==='WILD'?'wild':''} ${top.type==='PLAY_YOUR_HAND'?'play-special':''}">
             ${topCardVisual}
           </div>
