@@ -58,7 +58,7 @@ function escapeHtml(value){
 }
 
 function updateButtons(){
-  generateBtn.disabled=Boolean(session)||creating||started;
+  generateBtn.disabled=creating||started;
   startBtn.disabled=started || players.length<2 || !session;
   if(started){
     generateBtn.style.display='none';
