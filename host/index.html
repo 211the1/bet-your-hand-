@@ -28,15 +28,15 @@ body.host-page{background:#030713;color:#fff;overflow-x:hidden}body.host-page ma
 @media(max-width:600px){.host-room-stage{width:100vw}.host-room-stage .host-create-hotspot,.host-room-stage .host-start-hotspot{top:84.2%;height:13.8%}}
 
 .host-display-card{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:18;pointer-events:none;display:flex;align-items:center;justify-content:center}
-.host-display-card .play-card{width:clamp(150px,16vw,245px);min-height:clamp(215px,23vw,345px);border:5px solid #fff;border-radius:18px;box-shadow:0 12px 28px #000b,0 0 30px #1687ff99;overflow:hidden;background:#07152d;position:relative;color:#fff;font-family:system-ui,sans-serif;text-align:center}
-.host-display-card .card-face{display:block;width:100%;height:72%;object-fit:cover;object-position:center top}
-.host-display-card .card-name{font-weight:1000;font-size:clamp(18px,2.2vw,34px);line-height:1;padding:8px 4px;text-shadow:3px 3px 0 #000}
-.host-display-card .card-color,.host-display-card .card-type{font-weight:900;font-size:clamp(10px,1.2vw,16px);padding:3px 8px;text-transform:uppercase}
+.host-display-card .play-card{width:96px;min-height:132px;border:3px solid #fff;border-radius:12px;box-shadow:0 8px 18px #000b,0 0 18px #1687ff99;overflow:hidden;background:#07152d;position:relative;color:#fff;font-family:system-ui,sans-serif;text-align:center}
+.host-display-card .card-face{display:block;width:100%;height:82px;object-fit:cover;object-position:center top}
+.host-display-card .card-name{font-weight:1000;font-size:14px;line-height:1;padding:5px 2px;text-shadow:2px 2px 0 #000}
+.host-display-card .card-color,.host-display-card .card-type{font-weight:900;font-size:9px;padding:2px 4px;text-transform:uppercase}
 .host-display-card .modern-special{width:100%;height:100%;border:0;border-radius:12px;box-shadow:none}
-.host-display-card .modern-special-icon{font-size:clamp(70px,8vw,125px)}
-.host-display-card .modern-special-name{font-size:clamp(25px,3vw,48px)}
-.host-display-card .modern-special-color{font-size:clamp(10px,1vw,15px)}
+.host-display-card .modern-special-icon{font-size:48px}
+.host-display-card .modern-special-name{font-size:19px}
+.host-display-card .modern-special-color{font-size:9px}
 .host-display-card.is-new .play-card{animation:hostDisplayCardIn .45s cubic-bezier(.2,.85,.25,1)}
 @keyframes hostDisplayCardIn{0%{opacity:0;transform:scale(.62) rotate(-6deg)}70%{transform:scale(1.06) rotate(2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-@media(max-width:600px){.host-display-card{top:44%}.host-display-card .play-card{width:125px;min-height:180px;border-width:3px;border-radius:13px}.host-display-card .card-name{font-size:18px;padding:6px 2px}}
+@media(max-width:600px){.host-display-card{top:46%}.host-display-card .play-card{width:72px;min-height:100px;border-width:2px;border-radius:9px}.host-display-card .card-face{height:61px}.host-display-card .card-name{font-size:10px;padding:3px 1px}.host-display-card .card-color,.host-display-card .card-type{font-size:7px;padding:1px 2px}.host-display-card .modern-special-icon{font-size:36px}.host-display-card .modern-special-name{font-size:14px}.host-display-card .modern-special-color{font-size:7px}}
 </style></head><body class="host-page"><main><h1>PLAY YOUR HAND</h1><div id="status" class="host-status">CONNECTING TO GAME SERVER…</div><button id="create">CREATE ROOM CODE</button><div id="room"></div><div id="players"></div><button id="start" hidden>START GAME</button><button id="restart" hidden>RESTART GAME</button><section id="game" class="host-room-stage"></section></main><script src="/host/app.js?v=7"></script></body></html>
