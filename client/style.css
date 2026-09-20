@@ -703,3 +703,12 @@ body.player-page .power-panel .color-choice{pointer-events:auto!important;positi
   body.player-page .arcade-card strong{font-size:8px!important;line-height:1!important;margin-top:2px!important}
   body.player-page .arcade-card small{font-size:6px!important;line-height:1!important}
 }
+
+/* Final phone card layout: match the laptop card proportions instead of squeezing the photos. */
+@media(max-width:520px){
+  body.player-page .arcade-card{flex:0 0 88px!important;width:88px!important;height:122px!important;padding:6px!important;box-sizing:border-box!important;align-items:center!important;justify-content:flex-end!important;overflow:hidden!important}
+  body.player-page .arcade-card img{width:62px!important;height:62px!important;max-width:100%!important;object-fit:cover!important;object-position:center center!important;border-radius:9px!important;border:2px solid #fff!important;margin:0 auto auto!important;flex:0 0 62px!important}
+  body.player-page .arcade-card strong{font-size:10px!important;line-height:1.05!important;margin:3px 0 0!important;text-align:center!important;white-space:nowrap!important}
+  body.player-page .arcade-card small{display:none!important}
+  body.player-page .arcade-card-number{font-size:12px!important;top:3px!important;left:5px!important}
+}
