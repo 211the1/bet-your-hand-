@@ -43,29 +43,17 @@ function send(message){
 
 function renderPlayers(){
   players=players||[];
-  countEl.textContent=players.length+' / 9 PLAYERS';
-  const seatByCharacter={
-    'Bug':1,
-    'Face':2,
-    'Ling Ling':3,
-    'Beanz':4,
-    'The One':5,
-    'Boone':6,
-    'Chicken Joe':7,
-    'Juby':8,
-    'Meemaw':9
-  };
-  seatsEl.innerHTML=players.slice(0,9).map(p=>{
-    const seat=seatByCharacter[p.character];
-    if(!seat)return '';
+  const seatedPlayers=players.slice(0,6);
+  countEl.textContent=seatedPlayers.length+' / 6 PLAYERS';
+  seatsEl.innerHTML=seatedPlayers.map((p,i)=>{
     const img=seatImages[p.character]||'';
+    const seat=i+1;
     return '<div class="seat s'+seat+'">'+
       (img?'<img src="'+img+'" alt="">':'')+
       '<div class="seat-label"><b>'+escapeHtml(p.character||'')+'</b>'+escapeHtml(p.name||'')+'</div>'+
       '</div>';
   }).join('');
 }
-
 function escapeHtml(value){
   return String(value??'').replace(/[&<>'"]/g,c=>({
     '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
