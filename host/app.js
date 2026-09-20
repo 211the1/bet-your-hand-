@@ -44,9 +44,22 @@ function send(message){
 function renderPlayers(){
   players=players||[];
   countEl.textContent=players.length+' / 9 PLAYERS';
-  seatsEl.innerHTML=players.slice(0,9).map((p,i)=>{
+  const seatByCharacter={
+    'Bug':1,
+    'Face':2,
+    'Ling Ling':3,
+    'Beanz':4,
+    'The One':5,
+    'Boone':6,
+    'Chicken Joe':7,
+    'Juby':8,
+    'Meemaw':9
+  };
+  seatsEl.innerHTML=players.slice(0,9).map(p=>{
+    const seat=seatByCharacter[p.character];
+    if(!seat)return '';
     const img=seatImages[p.character]||'';
-    return '<div class="seat s'+(i+1)+'">'+
+    return '<div class="seat s'+seat+'">'+
       (img?'<img src="'+img+'" alt="">':'')+
       '<div class="seat-label"><b>'+escapeHtml(p.character||'')+'</b>'+escapeHtml(p.name||'')+'</div>'+
       '</div>';
