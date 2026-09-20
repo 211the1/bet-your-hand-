@@ -637,3 +637,32 @@ body.player-page .power-panel .color-choice{pointer-events:auto!important;positi
 
 /* Keep the mobile game controls reachable after the power badge was added. */
 @media(max-width:600px){body.player-page,body.player-page main{overflow-x:hidden!important;overflow-y:auto!important}.arcade-shell{overflow-x:hidden!important;overflow-y:auto!important;min-height:100vh}.tv-power-owner{min-height:26px;padding:2px 5px;margin:3px auto}.tv-power-owner .player-power-badge{min-height:18px;margin:0}.tv-power-owner .player-power-badge img{width:20px;height:20px;flex-basis:20px}}
+
+/* Phone-only one-screen game board: compact the entire arcade layout without changing laptop sizing. */
+@media(max-width:520px){
+  body.player-page{overflow:hidden!important;height:100svh!important}
+  body.player-page main{height:100svh!important;min-height:0!important;overflow:hidden!important;padding:0!important}
+  body.player-page .arcade-shell{height:111.112svh!important;min-height:111.112svh!important;width:111.112%!important;margin-left:-5.556%!important;box-sizing:border-box!important;zoom:.9;overflow:hidden!important;padding:3px 5px 8px!important}
+  body.player-page .arcade-header{margin-bottom:4px!important;gap:3px!important}
+  body.player-page .arcade-players{margin-bottom:5px!important;gap:3px!important}
+  body.player-page .arcade-player{padding:2px!important}
+  body.player-page .arcade-avatar{height:44px!important}
+  body.player-page .arcade-player b{font-size:9px!important}
+  body.player-page .arcade-player span{font-size:7px!important}
+  body.player-page .arcade-player em{font-size:8px!important}
+  body.player-page .arcade-main{gap:4px!important}
+  body.player-page .arcade-tv{padding:4px!important}
+  body.player-page .tv-screen{min-height:142px!important}
+  body.player-page .tv-card{width:64px!important;min-height:92px!important}
+  body.player-page .arcade-hint{margin:1px 0!important}
+  body.player-page .tv-power-owner{margin:2px auto!important;padding:2px 5px!important;min-height:22px!important}
+  body.player-page .arcade-hand-title{margin:5px auto 1px!important;font-size:14px!important}
+  body.player-page .arcade-hand-wrap{margin:0 auto!important}
+  body.player-page .arcade-card{flex-basis:70px!important;width:70px!important;height:96px!important}
+  body.player-page .arcade-card img{width:42px!important;height:42px!important}
+  body.player-page .arcade-card strong{font-size:8px!important}
+  body.player-page .arcade-card small{font-size:6px!important}
+  body.player-page .arcade-slide-label{font-size:7px!important;margin-top:-2px!important}
+  body.player-page .arcade-actions{margin-top:2px!important}
+  body.player-page .arcade-actions button{height:43px!important;font-size:13px!important}
+}
