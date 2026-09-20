@@ -65,7 +65,12 @@ body.host-page main>h1{display:none!important}
 #game.host-room-stage .host-room-stage-inner{position:relative;width:100%;height:100%;line-height:0;overflow:hidden}
 #game.host-room-stage .host-room-art{display:block;width:100%;height:100%;margin:0;padding:0;object-fit:fill}
 #game.host-room-stage .host-room-seats{position:absolute;inset:0}
-@media (max-width:600px){
-  body.host-page main,#game.host-room-stage{height:100svh!important;min-height:100svh!important}
-}
-</style></style></head><body class="host-page"><main><h1>PLAY YOUR HAND</h1><div id="status" class="host-status">CONNECTING TO GAME SERVER…</div><button id="create">CREATE ROOM CODE</button><div id="room"></div><div id="players"></div><button id="start" hidden>START GAME</button><button id="restart" hidden>RESTART GAME</button><section id="game" class="host-room-stage"><div class="host-room-stage-inner"><img class="host-room-art" src="/host-room.png" alt="PLAY YOUR HAND host room"><div class="host-room-code-overlay">HOST</div><div class="host-player-count-overlay">0/9 PLAYERS</div><div class="host-live-status">HOST READY</div></div></section></main><script src="/host/app.js?v=8"></script></body></html>
+</style></style><style>
+/* HOST CONTROLS — visible, one-screen, functional */
+.host-action-bar{position:absolute;left:50%;bottom:2.5%;transform:translateX(-50%);z-index:40;display:flex;align-items:center;justify-content:center;gap:12px;width:min(92vw,720px);pointer-events:auto}
+.host-action-btn{border:3px solid #fff;border-radius:14px;padding:13px 24px;min-width:190px;font:1000 18px/1 system-ui,sans-serif;color:#fff;background:#0869ff;box-shadow:0 0 18px #1687ff,0 7px 16px #0009;cursor:pointer;text-shadow:2px 2px 0 #000}
+.host-action-btn.start{background:#12a84a;box-shadow:0 0 18px #21f17d,0 7px 16px #0009}
+.host-action-btn:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed;box-shadow:0 5px 12px #0007}
+.host-room-code-big{position:absolute;left:50%;top:5%;transform:translateX(-50%);z-index:40;padding:8px 18px;border:3px solid #fff;border-radius:14px;background:rgba(3,7,19,.82);color:#42ffe4;font:1000 clamp(20px,4vw,46px)/1 system-ui,sans-serif;letter-spacing:5px;text-shadow:0 0 10px #00eaff;box-shadow:0 0 18px #00eaff;pointer-events:none}
+@media(max-width:600px){.host-action-bar{bottom:2%;gap:7px;width:96vw}.host-action-btn{min-width:0;flex:1;padding:11px 7px;font-size:14px;border-width:2px;border-radius:10px}.host-room-code-big{top:3%;padding:6px 12px;border-width:2px;letter-spacing:3px}}
+</style></head><body class="host-page"><main><h1>PLAY YOUR HAND</h1><div id="status" class="host-status">CONNECTING TO GAME SERVER…</div><button id="create">CREATE ROOM CODE</button><div id="room"></div><div id="players"></div><button id="start" hidden>START GAME</button><button id="restart" hidden>RESTART GAME</button><section id="game" class="host-room-stage"><div class="host-room-stage-inner"><img class="host-room-art" src="/host-room.png" alt="PLAY YOUR HAND host room"><div class="host-room-code-big" id="host-code-display">----</div><div class="host-action-bar"><button class="host-action-btn" id="host-generate-btn" type="button">GENERATE CODE</button><button class="host-action-btn start" id="host-start-btn" type="button" disabled>START GAME</button></div></div></section></main><script src="/host/app.js?v=8"></script></body></html>
