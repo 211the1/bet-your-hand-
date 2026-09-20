@@ -17,18 +17,21 @@ button{flex:1;border:3px solid #fff;border-radius:14px;padding:14px 18px;font:10
 button.start{background:#12a84a;box-shadow:0 0 18px #21f17d,0 7px 16px #0009}
 button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 #seats{position:absolute;inset:0;z-index:4;pointer-events:none}
-.seat{position:absolute;transform:translate(-50%,-50%);width:clamp(70px,10vw,150px);text-align:center}
+.seat{position:absolute;transform:translate(-50%,-50%);width:clamp(82px,11vw,150px);text-align:center}
+.seat img{height:clamp(130px,17vw,210px)!important}
+.s1{left:17%;top:50%}.s2{left:31%;top:50%}.s3{left:45%;top:50%}.s4{left:59%;top:50%}.s5{left:73%;top:50%}.s6{left:87%;top:50%}
+.s7,.s8,.s9{display:none}
 .seat img{display:block;width:100%;height:clamp(85px,13vw,190px);object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 10px #0009)}
 .seat-label{margin-top:-3px;padding:3px 6px;border:2px solid #1687ff;border-radius:8px;background:#030713e8;color:#fff;font-size:clamp(7px,1vw,13px);font-weight:1000;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .seat-label b{display:block;color:#ffd21c}
-.s1{left:8%;top:52%}.s2{left:17%;top:23%}.s3{left:35%;top:13%}.s4{left:65%;top:13%}.s5{left:84%;top:23%}.s6{left:92%;top:52%}.s7{left:80%;top:78%}.s8{left:50%;top:87%}.s9{left:20%;top:78%}
+
 @media(max-width:600px){
  #controls{bottom:2%;gap:7px;width:96vw}
  button{padding:11px 7px;border-width:2px;border-radius:10px;font-size:14px}
  #room-code{top:3%;padding:6px 12px;border-width:2px;letter-spacing:3px}
  #player-count{top:12%}
  #status{top:18%}
- .seat{width:70px}.seat img{height:92px}.seat-label{font-size:7px;padding:2px 4px}
+ .seat{width:70px}.seat img{height:115px!important}.seat-label{font-size:7px;padding:2px 4px}
 }
 </style>
 </head>
@@ -36,7 +39,7 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 <div id="game">
   <img id="room-art" src="/host-room.png" alt="PLAY YOUR HAND host room">
   <div id="room-code">----</div>
-  <div id="player-count">0 / 9 PLAYERS</div>
+  <div id="player-count">0 / 6 PLAYERS</div>
   <div id="status">CONNECTING…</div>
   <div id="seats"></div>
   <div id="controls">
