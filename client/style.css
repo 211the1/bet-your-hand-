@@ -687,3 +687,11 @@ body.player-page .power-panel .color-choice{pointer-events:auto!important;positi
   body.player-page .arcade-card{flex-basis:68px!important;width:68px!important}
   body.player-page .arcade-hand{gap:5px!important;padding-left:1px!important;padding-right:1px!important}
 }
+
+/* Phone card window: requested 25% wider viewing area. */
+@media(max-width:520px){
+  body.player-page .arcade-main{grid-template-columns:30px minmax(0,1fr) 30px!important}
+  body.player-page .arcade-hand-wrap{grid-template-columns:8px minmax(0,1fr) 8px!important}
+  body.player-page .hand-arrow{font-size:32px!important;width:100%!important;height:54px!important}
+  body.player-page .arcade-hand{gap:4px!important;padding-left:0!important;padding-right:0!important}
+}
