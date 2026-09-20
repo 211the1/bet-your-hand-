@@ -641,14 +641,18 @@ body.player-page .power-panel .color-choice{pointer-events:auto!important;positi
 /* Clean phone layout: scale the entire game board as one unit. Keep every box, font, card, and control proportional to the laptop layout. */
 @media(max-width:520px){
   body.player-page{
-    height:100svh!important;
-    overflow:hidden!important;
+    height:calc(100svh + 2px)!important;
+    min-height:calc(100svh + 2px)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior-y:auto!important;
+    touch-action:pan-y!important;
   }
   body.player-page main{
     width:100%!important;
     height:100svh!important;
     min-height:0!important;
-    overflow:hidden!important;
+    overflow:visible!important;
     padding:0!important;
   }
   body.player-page .arcade-shell{
