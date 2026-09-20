@@ -260,12 +260,12 @@ startBtn.addEventListener('click',()=>{
 
 if(seatTestMode){
   players=[
-    {character:'Bug',name:'TEST 1'},
-    {character:'Face',name:'TEST 2'},
-    {character:'Ling Ling',name:'TEST 3'},
-    {character:'Beanz',name:'TEST 4'},
-    {character:'The One',name:'TEST 5'},
-    {character:'Boone',name:'TEST 6'}
+    {character:'Beanz',name:'TEST 1'},
+    {character:'The One',name:'TEST 2'},
+    {character:'Boone',name:'TEST 3'},
+    {character:'Chicken Joe',name:'TEST 4'},
+    {character:'Juby',name:'TEST 5'},
+    {character:'Meemaw',name:'TEST 6'}
   ];
   started=false;
   session={code:'TEST',hostId:'TEST',hostToken:'TEST'};
