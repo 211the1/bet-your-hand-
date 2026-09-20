@@ -9,6 +9,7 @@
   "theme_color":"#050a24",
   "description":"PLAY YOUR HAND mobile game",
   "icons":[
-    {"src":"/pwa-icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"}
+    {"src":"/pwa-icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/pwa-icon-192.png","sizes":"192x192","type":"image/png","purpose":"maskable"}
   ]
 }
