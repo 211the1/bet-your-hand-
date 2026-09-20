@@ -15,6 +15,8 @@ let started=false;
 let players=[];
 let reconnectTimer=null;
 let reconnecting=false;
+const seatTestMode=new URLSearchParams(location.search).get('test')==='seats';
+
 
 try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{session=null}
 
@@ -255,6 +257,24 @@ startBtn.addEventListener('click',()=>{
   }
   status('STARTING GAME…');
 });
+
+if(seatTestMode){
+  players=[
+    {character:'Bug',name:'TEST 1'},
+    {character:'Face',name:'TEST 2'},
+    {character:'Ling Ling',name:'TEST 3'},
+    {character:'Beanz',name:'TEST 4'},
+    {character:'The One',name:'TEST 5'},
+    {character:'Boone',name:'TEST 6'}
+  ];
+  started=false;
+  session={code:'TEST',hostId:'TEST',hostToken:'TEST'};
+  codeEl.textContent='TEST';
+  status('SIX-SEAT TEST MODE');
+  renderPlayers();
+  updateButtons();
+  return;
+}
 
 renderPlayers();
 updateButtons();
