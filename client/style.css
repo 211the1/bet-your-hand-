@@ -634,3 +634,6 @@ body.player-page .power-panel .color-choice{pointer-events:auto!important;positi
 .tv-power-owner{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;width:min(360px,92%);margin:7px auto 5px;padding:5px 9px;border:2px solid #ffd43b;border-radius:12px;background:#070d20;box-shadow:0 0 14px #ffd43b55;color:#fff;font-family:system-ui,sans-serif}
 .tv-power-owner b{font-size:13px;color:#ffd43b;text-transform:uppercase}.tv-power-owner>span{font-size:11px;opacity:.9}.tv-power-owner .player-power-badge{margin:0;border:0;box-shadow:none;background:transparent}.tv-power-owner.mine{border-color:#1687ff;box-shadow:0 0 16px #1687ff66}
 @media(max-width:600px){.tv-power-owner{width:94%;gap:4px;margin:5px auto;padding:4px 6px}.tv-power-owner b{font-size:11px}.tv-power-owner>span{font-size:9px}.tv-power-owner .player-power-badge{font-size:8px}}
+
+/* Keep the mobile game controls reachable after the power badge was added. */
+@media(max-width:600px){body.player-page,body.player-page main{overflow-x:hidden!important;overflow-y:auto!important}.arcade-shell{overflow-x:hidden!important;overflow-y:auto!important;min-height:100vh}.tv-power-owner{min-height:26px;padding:2px 5px;margin:3px auto}.tv-power-owner .player-power-badge{min-height:18px;margin:0}.tv-power-owner .player-power-badge img{width:20px;height:20px;flex-basis:20px}}
