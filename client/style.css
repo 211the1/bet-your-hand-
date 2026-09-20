@@ -638,77 +638,64 @@ body.player-page .power-panel .color-choice{pointer-events:auto!important;positi
 /* Keep the mobile game controls reachable after the power badge was added. */
 @media(max-width:600px){body.player-page,body.player-page main{overflow-x:hidden!important;overflow-y:auto!important}.arcade-shell{overflow-x:hidden!important;overflow-y:auto!important;min-height:100vh}.tv-power-owner{min-height:26px;padding:2px 5px;margin:3px auto}.tv-power-owner .player-power-badge{min-height:18px;margin:0}.tv-power-owner .player-power-badge img{width:20px;height:20px;flex-basis:20px}}
 
-/* Phone-only one-screen game board: compact the entire arcade layout without changing laptop sizing. */
+/* Clean phone layout: scale the entire game board as one unit. Keep every box, font, card, and control proportional to the laptop layout. */
 @media(max-width:520px){
-  body.player-page{overflow:hidden!important;height:100svh!important}
-  body.player-page main{height:100svh!important;min-height:0!important;overflow:hidden!important;padding:0!important}
-  body.player-page .arcade-shell{height:111.112svh!important;min-height:111.112svh!important;width:111.112%!important;margin-left:-5.556%!important;box-sizing:border-box!important;zoom:.9;overflow:hidden!important;padding:3px 5px 8px!important}
-  body.player-page .arcade-header{margin-bottom:4px!important;gap:3px!important}
-  body.player-page .arcade-players{margin-bottom:5px!important;gap:3px!important}
-  body.player-page .arcade-player{padding:2px!important}
-  body.player-page .arcade-avatar{height:44px!important}
-  body.player-page .arcade-player b{font-size:9px!important}
-  body.player-page .arcade-player span{font-size:7px!important}
-  body.player-page .arcade-player em{font-size:8px!important}
-  body.player-page .arcade-main{gap:4px!important}
-  body.player-page .arcade-tv{padding:4px!important}
-  body.player-page .tv-screen{min-height:142px!important}
-  body.player-page .tv-card{width:64px!important;min-height:92px!important}
-  body.player-page .arcade-hint{margin:1px 0!important}
-  body.player-page .tv-power-owner{margin:2px auto!important;padding:2px 5px!important;min-height:22px!important}
-  body.player-page .arcade-hand-title{margin:5px auto 1px!important;font-size:14px!important}
-  body.player-page .arcade-hand-wrap{margin:0 auto!important}
-  body.player-page .arcade-card{flex-basis:70px!important;width:70px!important;height:96px!important}
-  body.player-page .arcade-card img{width:42px!important;height:42px!important}
-  body.player-page .arcade-card strong{font-size:8px!important}
-  body.player-page .arcade-card small{font-size:6px!important}
-  body.player-page .arcade-slide-label{font-size:7px!important;margin-top:-2px!important}
-  body.player-page .arcade-actions{margin-top:2px!important}
-  body.player-page .arcade-actions button{height:43px!important;font-size:13px!important}
-}
-
-/* Correct phone width: compact vertically without widening the board or clipping side controls. */
-@media(max-width:520px){
-  body.player-page .arcade-shell{width:100%!important;margin-left:0!important;zoom:1!important;box-sizing:border-box!important;}
-  body.player-page .arcade-header{grid-template-columns:58px 1fr 58px!important;}
-  body.player-page .arcade-main{grid-template-columns:48px minmax(0,1fr) 48px!important;}
-  body.player-page .arcade-side{min-width:0!important;}
-  body.player-page .arcade-center{min-width:0!important;overflow:visible!important;}
-  body.player-page .arcade-tv{width:100%!important;box-sizing:border-box!important;}
-  body.player-page .arcade-hand-wrap{grid-template-columns:24px minmax(0,1fr) 24px!important;width:100%!important;box-sizing:border-box!important;}
-  body.player-page .arcade-actions{width:100%!important;box-sizing:border-box!important;}
-}
-
-/* Phone hand window: give the player's cards more horizontal viewing room. */
-@media(max-width:520px){
-  body.player-page .arcade-main{grid-template-columns:40px minmax(0,1fr) 40px!important}
-  body.player-page .arcade-hand-wrap{grid-template-columns:14px minmax(0,1fr) 14px!important}
-  body.player-page .hand-arrow{font-size:38px!important;height:58px!important}
-  body.player-page .arcade-card{flex-basis:68px!important;width:68px!important}
-  body.player-page .arcade-hand{gap:5px!important;padding-left:1px!important;padding-right:1px!important}
-}
-
-/* Phone card window: requested 25% wider viewing area. */
-@media(max-width:520px){
-  body.player-page .arcade-main{grid-template-columns:30px minmax(0,1fr) 30px!important}
-  body.player-page .arcade-hand-wrap{grid-template-columns:8px minmax(0,1fr) 8px!important}
-  body.player-page .hand-arrow{font-size:32px!important;width:100%!important;height:54px!important}
-  body.player-page .arcade-hand{gap:4px!important;padding-left:0!important;padding-right:0!important}
-}
-
-/* Phone hand cards: photos nearly fill the card width while preserving the colored rim and labels. */
-@media(max-width:520px){
-  body.player-page .arcade-card{padding:4px 2px 5px!important}
-  body.player-page .arcade-card img{width:62px!important;max-width:100%!important;height:48px!important;object-fit:cover!important;border-radius:8px!important;border-width:2px!important}
-  body.player-page .arcade-card strong{font-size:8px!important;line-height:1!important;margin-top:2px!important}
-  body.player-page .arcade-card small{font-size:6px!important;line-height:1!important}
-}
-
-/* Final phone card layout: match the laptop card proportions instead of squeezing the photos. */
-@media(max-width:520px){
-  body.player-page .arcade-card{flex:0 0 88px!important;width:88px!important;height:122px!important;padding:6px!important;box-sizing:border-box!important;align-items:center!important;justify-content:flex-end!important;overflow:hidden!important}
-  body.player-page .arcade-card img{width:62px!important;height:62px!important;max-width:100%!important;object-fit:cover!important;object-position:center center!important;border-radius:9px!important;border:2px solid #fff!important;margin:0 auto auto!important;flex:0 0 62px!important}
-  body.player-page .arcade-card strong{font-size:10px!important;line-height:1.05!important;margin:3px 0 0!important;text-align:center!important;white-space:nowrap!important}
-  body.player-page .arcade-card small{display:none!important}
-  body.player-page .arcade-card-number{font-size:12px!important;top:3px!important;left:5px!important}
+  body.player-page{
+    height:100svh!important;
+    overflow:hidden!important;
+  }
+  body.player-page main{
+    width:100%!important;
+    height:100svh!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    padding:0!important;
+  }
+  body.player-page .arcade-shell{
+    width:117.647%!important;
+    min-height:117.647svh!important;
+    margin-left:-8.8235%!important;
+    padding:6px 6px 12px!important;
+    box-sizing:border-box!important;
+    transform:scale(.85)!important;
+    transform-origin:top center!important;
+    overflow:visible!important;
+  }
+  body.player-page .arcade-main{
+    grid-template-columns:50px minmax(0,1fr) 50px!important;
+  }
+  body.player-page .arcade-hand-wrap{
+    grid-template-columns:50px minmax(0,1fr) 50px!important;
+  }
+  body.player-page .arcade-hand{
+    gap:8px!important;
+    padding:8px 4px 14px!important;
+  }
+  body.player-page .arcade-card{
+    flex:0 0 130px!important;
+    width:130px!important;
+    height:170px!important;
+    padding:7px!important;
+    box-sizing:border-box!important;
+  }
+  body.player-page .arcade-card img{
+    width:82px!important;
+    height:82px!important;
+    object-fit:cover!important;
+    object-position:center center!important;
+    margin-bottom:auto!important;
+  }
+  body.player-page .arcade-card strong{
+    font-size:16px!important;
+    line-height:1.05!important;
+    margin:0!important;
+  }
+  body.player-page .arcade-card small{
+    display:none!important;
+  }
+  body.player-page .arcade-card-number{
+    font-size:18px!important;
+    top:4px!important;
+    left:8px!important;
+  }
 }
