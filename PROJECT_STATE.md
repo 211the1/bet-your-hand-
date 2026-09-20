@@ -166,3 +166,10 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - Menu includes the approved regular reactions plus the user's custom image at assets/custom_emoji.jpg.
 - Emoji reactions do not change game rules, scoring, turns, cards, or laptop game controls.
 - Player app cache bumped to app.js?v=68.
+
+## Host table layout update (2026-09-19)
+- Host screen now has a responsive dark/neon PLAY YOUR HAND oval-table layout.
+- Live players populate individual seats around the table using the existing character assets; the current-turn seat gets the existing flame-style highlight.
+- Room code, player count, host controls, table center, and live game card remain connected to the existing host/game state.
+- This is a coded live layout, not a static mockup image, so seats can change as players join/leave.
+- Commits: 18530f330e336cef88c77e8159b0ace6734c01ba, 89aa332991dafae3193c995aaded1f665c7ebc3a, 7210a9c381f4d13759d41b9f076a5c408c907639, 59fe0b8cc6941b828f1fa3d1e1ca11dc55f167a4.
