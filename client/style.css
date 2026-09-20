@@ -666,3 +666,15 @@ body.player-page .power-panel .color-choice{pointer-events:auto!important;positi
   body.player-page .arcade-actions{margin-top:2px!important}
   body.player-page .arcade-actions button{height:43px!important;font-size:13px!important}
 }
+
+/* Correct phone width: compact vertically without widening the board or clipping side controls. */
+@media(max-width:520px){
+  body.player-page .arcade-shell{width:100%!important;margin-left:0!important;zoom:1!important;box-sizing:border-box!important;}
+  body.player-page .arcade-header{grid-template-columns:58px 1fr 58px!important;}
+  body.player-page .arcade-main{grid-template-columns:48px minmax(0,1fr) 48px!important;}
+  body.player-page .arcade-side{min-width:0!important;}
+  body.player-page .arcade-center{min-width:0!important;overflow:visible!important;}
+  body.player-page .arcade-tv{width:100%!important;box-sizing:border-box!important;}
+  body.player-page .arcade-hand-wrap{grid-template-columns:24px minmax(0,1fr) 24px!important;width:100%!important;box-sizing:border-box!important;}
+  body.player-page .arcade-actions{width:100%!important;box-sizing:border-box!important;}
+}
