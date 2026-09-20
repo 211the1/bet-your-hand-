@@ -695,3 +695,11 @@ body.player-page .power-panel .color-choice{pointer-events:auto!important;positi
   body.player-page .hand-arrow{font-size:32px!important;width:100%!important;height:54px!important}
   body.player-page .arcade-hand{gap:4px!important;padding-left:0!important;padding-right:0!important}
 }
+
+/* Phone hand cards: photos nearly fill the card width while preserving the colored rim and labels. */
+@media(max-width:520px){
+  body.player-page .arcade-card{padding:4px 2px 5px!important}
+  body.player-page .arcade-card img{width:62px!important;max-width:100%!important;height:48px!important;object-fit:cover!important;border-radius:8px!important;border-width:2px!important}
+  body.player-page .arcade-card strong{font-size:8px!important;line-height:1!important;margin-top:2px!important}
+  body.player-page .arcade-card small{font-size:6px!important;line-height:1!important}
+}
