@@ -39,4 +39,20 @@ body.host-page{background:#030713;color:#fff;overflow-x:hidden}body.host-page ma
 .host-display-card.is-new .play-card{animation:hostDisplayCardIn .45s cubic-bezier(.2,.85,.25,1)}
 @keyframes hostDisplayCardIn{0%{opacity:0;transform:scale(.62) rotate(-6deg)}70%{transform:scale(1.06) rotate(2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
 @media(max-width:600px){.host-display-card{left:57.8%;top:52.3%}.host-display-card .play-card{width:86px;min-height:108px;border-width:2px;border-radius:9px}.host-display-card .card-face{height:72px}.host-display-card .card-name{font-size:12px;padding:3px 1px}.host-display-card .card-color,.host-display-card .card-type{font-size:7px;padding:1px 2px}.host-display-card .modern-special-icon{font-size:36px}.host-display-card .modern-special-name{font-size:14px}.host-display-card .modern-special-color{font-size:7px}}
+</style><style>
+.host-room-stage-inner{position:relative;width:100%;line-height:0}
+.host-room-seats{position:absolute;inset:0;z-index:10;pointer-events:none}
+.room-seat{position:absolute;transform:translate(-50%,-50%);width:clamp(90px,10.5vw,170px);text-align:center;z-index:11}
+.room-seat-character{height:clamp(120px,15vw,245px);display:flex;align-items:flex-end;justify-content:center}
+.room-seat-character img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 10px 10px rgba(0,0,0,.55))}
+.room-seat-label{display:flex;flex-direction:column;align-items:center;margin-top:-2px;padding:4px 8px;border:2px solid #1687ff;border-radius:10px;background:rgba(3,7,19,.9);box-shadow:0 0 12px rgba(22,135,255,.55);font-family:system-ui,sans-serif;font-size:clamp(8px,1.1vw,14px);line-height:1.05;color:#fff;white-space:nowrap}
+.room-seat-label b{color:#ffd21c;font-weight:1000}
+.room-seat-label span{color:#fff;font-weight:800;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.room-seat.active .room-seat-character img{filter:drop-shadow(0 0 10px #ff6a00) drop-shadow(0 0 22px #ffd21c);animation:roomSeatActive .55s ease-in-out infinite alternate}
+.room-seat.active .room-seat-label{border-color:#ffd21c;box-shadow:0 0 14px #ff6a00}
+@keyframes roomSeatActive{from{transform:translateY(2px) scale(.99)}to{transform:translateY(-3px) scale(1.03)}}
+.room-seat.empty{display:none}
+.room-seat-1{left:9%;top:52%}.room-seat-2{left:18%;top:22%}.room-seat-3{left:36%;top:10%}.room-seat-4{left:64%;top:10%}.room-seat-5{left:82%;top:22%}.room-seat-6{left:91%;top:52%}.room-seat-7{left:79%;top:80%}.room-seat-8{left:50%;top:88%}.room-seat-9{left:21%;top:80%}
+@media(max-width:900px){.room-seat{width:92px}.room-seat-character{height:125px}.room-seat-label{font-size:9px;padding:3px 5px;border-width:2px}.room-seat-1{left:8%;top:52%}.room-seat-2{left:17%;top:23%}.room-seat-3{left:35%;top:12%}.room-seat-4{left:65%;top:12%}.room-seat-5{left:83%;top:23%}.room-seat-6{left:92%;top:52%}.room-seat-7{left:80%;top:79%}.room-seat-8{left:50%;top:88%}.room-seat-9{left:20%;top:79%}}
+@media(max-width:600px){.room-seat{width:70px}.room-seat-character{height:92px}.room-seat-label{font-size:7px;padding:2px 4px;border-radius:7px}.room-seat-1{left:8%;top:51%}.room-seat-2{left:16%;top:23%}.room-seat-3{left:35%;top:13%}.room-seat-4{left:65%;top:13%}.room-seat-5{left:84%;top:23%}.room-seat-6{left:92%;top:51%}.room-seat-7{left:80%;top:78%}.room-seat-8{left:50%;top:87%}.room-seat-9{left:20%;top:78%}}
 </style></head><body class="host-page"><main><h1>PLAY YOUR HAND</h1><div id="status" class="host-status">CONNECTING TO GAME SERVER…</div><button id="create">CREATE ROOM CODE</button><div id="room"></div><div id="players"></div><button id="start" hidden>START GAME</button><button id="restart" hidden>RESTART GAME</button><section id="game" class="host-room-stage"></section></main><script src="/host/app.js?v=7"></script></body></html>
