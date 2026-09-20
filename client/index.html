@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><link rel="stylesheet" href="/client/style.css?v=53"><link rel="stylesheet" href="/client/flame-fix.css?v=2"></head><body class="player-page"><main>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><meta name="theme-color" content="#050a24"><link rel="manifest" href="/client/manifest.webmanifest"><link rel="stylesheet" href="/client/style.css?v=53"><link rel="stylesheet" href="/client/flame-fix.css?v=2"></head><body class="player-page"><main>
   <button id="open-join" class="open-join" hidden>MENU</button>
   <div id="join-panel" class="join-panel prejoin show" aria-hidden="false">
     <div class="join-box">
@@ -12,7 +12,7 @@
     </div>
   </div>
   <section id="game"></section>
-</main><script src="/client/app.js?v=77"></script><script>
+</main><script src="/client/app.js?v=78"></script><script>
 (()=>{
  const code=document.getElementById('code'),sel=document.getElementById('char'),status=document.getElementById('status'),game=document.getElementById('game');
  let preview=null,timer=null,gameOverShown=false;
@@ -54,4 +54,4 @@
 </script><script>
 (()=>{const open=document.getElementById('open-join'),panel=document.getElementById('join-panel');
 if(open&&panel)open.addEventListener('click',()=>{panel.classList.add('show');panel.setAttribute('aria-hidden','false');document.getElementById('code')?.focus()});
-})();</script></body></html>
+})();</script><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{});}</script></body></html>
