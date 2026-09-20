@@ -1,76 +1,49 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND HOST</title><link rel="stylesheet" href="/client/style.css?v=40"><link rel="stylesheet" href="/client/flame-fix.css?v=1"><style>
-body.host-page{background:#030713;color:#fff;overflow-x:hidden}body.host-page main{max-width:none;width:100%;padding:8px 10px 18px}
-.host-status{font-family:system-ui;font-weight:900;color:#21f17d;margin-bottom:8px}
-.host-table-wrap{max-width:1500px;margin:0 auto}.host-table-head{display:grid;grid-template-columns:1fr 2fr 1fr;gap:10px;align-items:center;margin-bottom:10px}
-.host-panel{border:3px solid #1687ff;border-radius:16px;background:#050b1d;box-shadow:0 0 18px #1687ff66;padding:9px;font-family:system-ui;font-weight:900}.host-panel h3{margin:0 0 4px;color:#ffd21c}.host-panel .room-code{font-size:clamp(22px,4vw,42px);letter-spacing:2px}.host-panel small{display:block;font-size:12px}
-.host-title{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",system-ui,sans-serif;font-size:clamp(28px,5vw,64px);line-height:.9;letter-spacing:2px;color:#fff;text-shadow:0 0 8px #1687ff,0 0 24px #1687ff,3px 3px 0 #164dbe;border:3px solid #1687ff;border-radius:20px;padding:9px;background:#07163a;box-shadow:0 0 24px #1687ff;text-align:center}
-.host-controls{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap}.host-controls button{width:auto;min-width:85px;margin:0;padding:9px;font-family:system-ui;font-weight:1000}
-.host-table{position:relative;height:min(70vw,720px);min-height:560px;max-height:720px;border-radius:50%;border:8px solid #1687ff;background:radial-gradient(ellipse at center,#102d64 0,#07142f 48%,#020713 100%);box-shadow:0 0 35px #1687ff99,inset 0 0 45px #000;overflow:visible}.host-table:before{content:"";position:absolute;inset:9%;border:3px solid #1687ff55;border-radius:50%;box-shadow:inset 0 0 30px #1687ff33}
-.host-table-logo{position:absolute;left:50%;top:39%;transform:translate(-50%,-50%);font-family:Impact,Haettenschweiler,"Arial Narrow Bold",system-ui,sans-serif;font-size:clamp(30px,5vw,68px);line-height:.9;color:#fff;text-shadow:0 0 10px #1687ff,3px 3px 0 #164dbe;text-align:center;white-space:nowrap}.host-table-tagline{position:absolute;left:50%;top:51%;transform:translateX(-50%);font-family:system-ui;font-size:clamp(10px,1.6vw,17px);font-weight:1000;color:#45c4ff;white-space:nowrap;letter-spacing:1px}
-.host-table-cards{position:absolute;left:50%;top:67%;transform:translate(-50%,-50%);display:flex;gap:10px;align-items:center}.host-table-cards .table-card{width:95px;min-height:132px}.host-deck{width:78px;height:108px;border:4px solid #fff;border-radius:12px;background:linear-gradient(145deg,#071a45,#1687ff);box-shadow:0 8px 16px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Impact,system-ui;font-size:15px;line-height:.9;transform:rotate(-5deg)}.host-deck b{font-size:18px;color:#fff}.host-table-cards .host-deck+ .table-card{transform:rotate(4deg)}
-.host-seat{position:absolute;width:clamp(105px,12vw,180px);transform:translate(-50%,-50%);z-index:5}.host-seat .seat-chair{border:4px solid #1687ff;border-radius:28px;padding:6px;background:linear-gradient(#17234d,#080b19);box-shadow:0 0 18px #1687ff55}.host-seat .seat-avatar{width:100%;height:clamp(88px,10vw,150px);object-fit:cover;object-position:center;border-radius:18px;border:3px solid #fff;display:block}.host-seat .seat-name{margin-top:5px;border:3px solid #1687ff;border-radius:10px;background:#050b1d;padding:4px 5px;font-family:system-ui;font-size:clamp(10px,1.5vw,17px);font-weight:1000;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.host-seat .seat-score{font-family:system-ui;color:#ffd21c;font-size:clamp(9px,1.2vw,14px);font-weight:1000}.host-seat.active .seat-chair{border-color:#ffd21c;box-shadow:0 0 20px #ff6a00,0 0 35px #ff240066;animation:hostSeatPulse .55s ease-in-out infinite alternate}.host-seat.active .seat-name{border-color:#ffd21c;color:#ffd21c}@keyframes hostSeatPulse{from{transform:scale(.99)}to{transform:scale(1.03)}}
-.host-seat.seat-1{left:9%;top:50%}.host-seat.seat-2{left:18%;top:19%}.host-seat.seat-3{left:38%;top:7%}.host-seat.seat-4{left:62%;top:7%}.host-seat.seat-5{left:82%;top:19%}.host-seat.seat-6{left:91%;top:50%}.host-seat.seat-7{left:78%;top:83%}.host-seat.seat-8{left:50%;top:92%}.host-seat.seat-9{left:22%;top:83%}
-.host-empty{position:absolute;transform:translate(-50%,-50%);width:80px;height:55px;border:2px dashed #1687ff55;border-radius:16px;color:#1687ff66;font-family:system-ui;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center}.host-empty.e1{left:9%;top:50%}.host-empty.e2{left:18%;top:19%}.host-empty.e3{left:38%;top:7%}.host-empty.e4{left:62%;top:7%}.host-empty.e5{left:82%;top:19%}.host-empty.e6{left:91%;top:50%}.host-empty.e7{left:78%;top:83%}.host-empty.e8{left:50%;top:92%}.host-empty.e9{left:22%;top:83%}
-.host-under-table{max-width:900px;margin:10px auto;font-family:system-ui}.host-game-info{border:3px solid #1687ff;border-radius:16px;background:#07112b;padding:10px;box-shadow:0 0 15px #1687ff55}.host-game-info b{color:#ffd21c}.host-legacy-game>h2,.host-legacy-game>.table-area{display:none}
-@media(max-width:900px){body.host-page main{padding:4px 6px 12px}.host-table-head{grid-template-columns:78px 1fr 78px;gap:5px}.host-panel{padding:6px;border-width:2px;border-radius:10px;font-size:9px}.host-panel .room-code{font-size:15px}.host-panel small{font-size:8px}.host-title{font-size:22px;border-width:2px;border-radius:11px;padding:6px}.host-controls{gap:3px}.host-controls button{min-width:0;width:100%;padding:7px 3px;font-size:9px}.host-table{height:720px;min-height:720px;border-width:5px}.host-seat{width:105px}.host-seat .seat-avatar{height:88px}.host-seat .seat-name{font-size:10px}.host-table-logo{font-size:34px}.host-table-tagline{font-size:9px}.host-table-cards{top:67%}.host-table-cards .table-card{width:72px;min-height:100px}.host-deck{width:58px;height:82px;font-size:11px}.host-deck b{font-size:13px}}
-@media(max-width:520px){.host-table{height:620px;min-height:620px}.host-seat{width:82px}.host-seat .seat-avatar{height:68px;border-width:2px;border-radius:12px}.host-seat .seat-chair{border-width:2px;border-radius:16px;padding:3px}.host-seat .seat-name{font-size:8px;border-width:2px;padding:3px}.host-seat .seat-score{font-size:8px}.host-table-logo{font-size:25px}.host-table-tagline{font-size:7px}.host-table-cards{top:68%}.host-table-cards .table-card{width:55px;min-height:78px}.host-deck{width:44px;height:64px;font-size:8px;border-width:2px}.host-deck b{font-size:10px}}
-</style><style>
-#legacy-host-title,#status,#create,#room,#players,#start,#restart{display:none!important}
-.host-page main{padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
-.host-room-stage{position:relative;width:100%;max-width:1536px;margin:0 auto;line-height:0;overflow:hidden;background:#000}
-.host-room-stage .host-room-art{display:block;width:100%;height:auto;margin:0;padding:0}
-.host-room-stage .host-hotspot{position:absolute;display:block;border:0;background:transparent;padding:0;margin:0;z-index:20;cursor:pointer}
-.host-room-stage .host-create-hotspot{left:29.2%;top:84.8%;width:19.8%;height:12.8%}
-.host-room-stage .host-start-hotspot{left:50.1%;top:84.8%;width:20.2%;height:12.8%}
-.host-room-stage .host-room-code-overlay{position:absolute;left:15.2%;top:4.2%;width:13.2%;text-align:center;color:#42ffe4;font:bold clamp(22px,4vw,62px)/1 system-ui,sans-serif;text-shadow:0 0 8px #00eaff,0 0 18px #00eaff;z-index:15;pointer-events:none}
-.host-room-stage .host-player-count-overlay{position:absolute;left:15.2%;top:20.1%;width:13.2%;text-align:center;color:#16eaff;font:bold clamp(12px,2vw,28px)/1 system-ui,sans-serif;text-shadow:0 0 8px #00eaff;z-index:15;pointer-events:none}
-.host-room-stage .host-live-status{position:absolute;right:12.8%;top:5.2%;width:21%;text-align:center;color:#fff;font:bold clamp(12px,1.8vw,24px)/1.1 system-ui,sans-serif;text-shadow:0 0 8px #00eaff;z-index:15;pointer-events:none}
-@media(max-width:600px){.host-room-stage{width:100vw}.host-room-stage .host-create-hotspot,.host-room-stage .host-start-hotspot{top:84.2%;height:13.8%}}
-
-.host-display-card{position:absolute;left:57.8%;top:52.3%;transform:translate(-50%,-50%);z-index:18;pointer-events:none;display:flex;align-items:center;justify-content:center}
-.host-display-card .play-card{width:86px;min-height:108px;border:3px solid #fff;border-radius:12px;box-shadow:0 8px 18px #000b,0 0 18px #1687ff99;overflow:hidden;background:#07152d;position:relative;color:#fff;font-family:system-ui,sans-serif;text-align:center}
-.host-display-card .card-face{display:block;width:100%;height:72px;object-fit:cover;object-position:center top}
-.host-display-card .card-name{font-weight:1000;font-size:12px;line-height:1;padding:5px 2px;text-shadow:2px 2px 0 #000}
-.host-display-card .card-color,.host-display-card .card-type{font-weight:900;font-size:8px;padding:2px 4px;text-transform:uppercase}
-.host-display-card .modern-special{width:100%;height:100%;border:0;border-radius:12px;box-shadow:none}
-.host-display-card .modern-special-icon{font-size:48px}
-.host-display-card .modern-special-name{font-size:19px}
-.host-display-card .modern-special-color{font-size:9px}
-.host-display-card.is-new .play-card{animation:hostDisplayCardIn .45s cubic-bezier(.2,.85,.25,1)}
-@keyframes hostDisplayCardIn{0%{opacity:0;transform:scale(.62) rotate(-6deg)}70%{transform:scale(1.06) rotate(2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-@media(max-width:600px){.host-display-card{left:57.8%;top:52.3%}.host-display-card .play-card{width:86px;min-height:108px;border-width:2px;border-radius:9px}.host-display-card .card-face{height:72px}.host-display-card .card-name{font-size:12px;padding:3px 1px}.host-display-card .card-color,.host-display-card .card-type{font-size:7px;padding:1px 2px}.host-display-card .modern-special-icon{font-size:36px}.host-display-card .modern-special-name{font-size:14px}.host-display-card .modern-special-color{font-size:7px}}
-</style><style>
-.host-room-stage-inner{position:relative;width:100%;line-height:0}
-.host-room-seats{position:absolute;inset:0;z-index:10;pointer-events:none}
-.room-seat{position:absolute;transform:translate(-50%,-50%);width:clamp(90px,10.5vw,170px);text-align:center;z-index:11}
-.room-seat-character{height:clamp(120px,15vw,245px);display:flex;align-items:flex-end;justify-content:center}
-.room-seat-character img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 10px 10px rgba(0,0,0,.55))}
-.room-seat-label{display:flex;flex-direction:column;align-items:center;margin-top:-2px;padding:4px 8px;border:2px solid #1687ff;border-radius:10px;background:rgba(3,7,19,.9);box-shadow:0 0 12px rgba(22,135,255,.55);font-family:system-ui,sans-serif;font-size:clamp(8px,1.1vw,14px);line-height:1.05;color:#fff;white-space:nowrap}
-.room-seat-label b{color:#ffd21c;font-weight:1000}
-.room-seat-label span{color:#fff;font-weight:800;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.room-seat.active .room-seat-character img{filter:drop-shadow(0 0 10px #ff6a00) drop-shadow(0 0 22px #ffd21c);animation:roomSeatActive .55s ease-in-out infinite alternate}
-.room-seat.active .room-seat-label{border-color:#ffd21c;box-shadow:0 0 14px #ff6a00}
-@keyframes roomSeatActive{from{transform:translateY(2px) scale(.99)}to{transform:translateY(-3px) scale(1.03)}}
-.room-seat.empty{display:none}
-.room-seat-1{left:9%;top:52%}.room-seat-2{left:18%;top:22%}.room-seat-3{left:36%;top:10%}.room-seat-4{left:64%;top:10%}.room-seat-5{left:82%;top:22%}.room-seat-6{left:91%;top:52%}.room-seat-7{left:79%;top:80%}.room-seat-8{left:50%;top:88%}.room-seat-9{left:21%;top:80%}
-@media(max-width:900px){.room-seat{width:92px}.room-seat-character{height:125px}.room-seat-label{font-size:9px;padding:3px 5px;border-width:2px}.room-seat-1{left:8%;top:52%}.room-seat-2{left:17%;top:23%}.room-seat-3{left:35%;top:12%}.room-seat-4{left:65%;top:12%}.room-seat-5{left:83%;top:23%}.room-seat-6{left:92%;top:52%}.room-seat-7{left:80%;top:79%}.room-seat-8{left:50%;top:88%}.room-seat-9{left:20%;top:79%}}
-@media(max-width:600px){.room-seat{width:70px}.room-seat-character{height:92px}.room-seat-label{font-size:7px;padding:2px 4px;border-radius:7px}.room-seat-1{left:8%;top:51%}.room-seat-2{left:16%;top:23%}.room-seat-3{left:35%;top:13%}.room-seat-4{left:65%;top:13%}.room-seat-5{left:84%;top:23%}.room-seat-6{left:92%;top:51%}.room-seat-7{left:80%;top:78%}.room-seat-8{left:50%;top:87%}.room-seat-9{left:20%;top:78%}}
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PLAY YOUR HAND HOST</title>
 <style>
-/* HOST: one-screen layout — no page scrolling */
-html,body{margin:0!important;padding:0!important;width:100%;height:100%;overflow:hidden!important}
-body.host-page{overflow:hidden!important}
-body.host-page main{width:100%!important;max-width:none!important;height:100dvh!important;min-height:100dvh!important;margin:0!important;padding:0!important;overflow:hidden!important}
-body.host-page main>h1{display:none!important}
-#game.host-room-stage{position:relative;width:100%!important;max-width:none!important;height:100dvh!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;border-radius:0!important}
-#game.host-room-stage .host-room-stage-inner{position:relative;width:100%;height:100%;line-height:0;overflow:hidden}
-#game.host-room-stage .host-room-art{display:block;width:100%;height:100%;margin:0;padding:0;object-fit:fill}
-#game.host-room-stage .host-room-seats{position:absolute;inset:0}
-</style></style><style>
-/* HOST CONTROLS — visible, one-screen, functional */
-.host-action-bar{position:absolute;left:50%;bottom:2.5%;transform:translateX(-50%);z-index:40;display:flex;align-items:center;justify-content:center;gap:12px;width:min(92vw,720px);pointer-events:auto}
-.host-action-btn{border:3px solid #fff;border-radius:14px;padding:13px 24px;min-width:190px;font:1000 18px/1 system-ui,sans-serif;color:#fff;background:#0869ff;box-shadow:0 0 18px #1687ff,0 7px 16px #0009;cursor:pointer;text-shadow:2px 2px 0 #000}
-.host-action-btn.start{background:#12a84a;box-shadow:0 0 18px #21f17d,0 7px 16px #0009}
-.host-action-btn:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed;box-shadow:0 5px 12px #0007}
-.host-room-code-big{position:absolute;left:50%;top:5%;transform:translateX(-50%);z-index:40;padding:8px 18px;border:3px solid #fff;border-radius:14px;background:rgba(3,7,19,.82);color:#42ffe4;font:1000 clamp(20px,4vw,46px)/1 system-ui,sans-serif;letter-spacing:5px;text-shadow:0 0 10px #00eaff;box-shadow:0 0 18px #00eaff;pointer-events:none}
-@media(max-width:600px){.host-action-bar{bottom:2%;gap:7px;width:96vw}.host-action-btn{min-width:0;flex:1;padding:11px 7px;font-size:14px;border-width:2px;border-radius:10px}.host-room-code-big{top:3%;padding:6px 12px;border-width:2px;letter-spacing:3px}}
-</style></head><body class="host-page"><main><h1>PLAY YOUR HAND</h1><div id="status" class="host-status">CONNECTING TO GAME SERVER…</div><button id="create">CREATE ROOM CODE</button><div id="room"></div><div id="players"></div><button id="start" hidden>START GAME</button><button id="restart" hidden>RESTART GAME</button><section id="game" class="host-room-stage"><div class="host-room-stage-inner"><img class="host-room-art" src="/host-room.png" alt="PLAY YOUR HAND host room"><div class="host-room-code-big" id="host-code-display">----</div><div class="host-action-bar"><button class="host-action-btn" id="host-generate-btn" type="button">GENERATE CODE</button><button class="host-action-btn start" id="host-start-btn" type="button" disabled>START GAME</button></div></div></section></main><script src="/host/app.js?v=10"></script></body></html>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+body{font-family:system-ui,sans-serif}
+#game{position:relative;width:100vw;height:100dvh;overflow:hidden}
+#room-art{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block}
+#room-code{position:absolute;left:50%;top:5%;transform:translateX(-50%);z-index:5;color:#42ffe4;background:rgba(3,7,19,.82);border:3px solid #fff;border-radius:14px;padding:7px 18px;font-weight:1000;font-size:clamp(22px,4vw,48px);letter-spacing:5px;text-shadow:0 0 10px #00eaff;box-shadow:0 0 18px #00eaff;pointer-events:none}
+#player-count{position:absolute;left:50%;top:15%;transform:translateX(-50%);z-index:5;color:#fff;font-weight:1000;font-size:clamp(13px,2vw,25px);text-shadow:0 0 8px #00eaff;pointer-events:none}
+#status{position:absolute;left:50%;top:22%;transform:translateX(-50%);z-index:5;color:#21f17d;font-weight:900;font-size:clamp(11px,1.5vw,18px);text-align:center;text-shadow:0 0 8px #000;pointer-events:none}
+#controls{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);z-index:10;display:flex;gap:12px;width:min(92vw,700px)}
+button{flex:1;border:3px solid #fff;border-radius:14px;padding:14px 18px;font:1000 clamp(14px,2vw,20px)/1 system-ui,sans-serif;color:#fff;cursor:pointer;text-shadow:2px 2px 0 #000;box-shadow:0 0 18px #1687ff,0 7px 16px #0009;background:#0869ff}
+button.start{background:#12a84a;box-shadow:0 0 18px #21f17d,0 7px 16px #0009}
+button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
+#seats{position:absolute;inset:0;z-index:4;pointer-events:none}
+.seat{position:absolute;transform:translate(-50%,-50%);width:clamp(70px,10vw,150px);text-align:center}
+.seat img{display:block;width:100%;height:clamp(85px,13vw,190px);object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 10px #0009)}
+.seat-label{margin-top:-3px;padding:3px 6px;border:2px solid #1687ff;border-radius:8px;background:#030713e8;color:#fff;font-size:clamp(7px,1vw,13px);font-weight:1000;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seat-label b{display:block;color:#ffd21c}
+.s1{left:8%;top:52%}.s2{left:17%;top:23%}.s3{left:35%;top:13%}.s4{left:65%;top:13%}.s5{left:84%;top:23%}.s6{left:92%;top:52%}.s7{left:80%;top:78%}.s8{left:50%;top:87%}.s9{left:20%;top:78%}
+@media(max-width:600px){
+ #controls{bottom:2%;gap:7px;width:96vw}
+ button{padding:11px 7px;border-width:2px;border-radius:10px;font-size:14px}
+ #room-code{top:3%;padding:6px 12px;border-width:2px;letter-spacing:3px}
+ #player-count{top:12%}
+ #status{top:18%}
+ .seat{width:70px}.seat img{height:92px}.seat-label{font-size:7px;padding:2px 4px}
+}
+</style>
+</head>
+<body>
+<div id="game">
+  <img id="room-art" src="/host-room.png" alt="PLAY YOUR HAND host room">
+  <div id="room-code">----</div>
+  <div id="player-count">0 / 9 PLAYERS</div>
+  <div id="status">CONNECTING…</div>
+  <div id="seats"></div>
+  <div id="controls">
+    <button id="generate">GENERATE CODE</button>
+    <button id="start" class="start" disabled>START GAME</button>
+  </div>
+</div>
+<script src="/host/app.js?v=11"></script>
+</body>
+</html>
