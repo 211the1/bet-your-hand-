@@ -13,6 +13,8 @@ let session=null;
 let creating=false;
 let started=false;
 let players=[];
+let reconnectTimer=null;
+let reconnecting=false;
 
 try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{session=null}
 
@@ -78,6 +80,14 @@ function resetToReady(message){
   renderPlayers();
   updateButtons();
   status(message||'READY — GENERATE A CODE');
+}
+
+function scheduleReconnect(){
+  if(reconnectTimer||creating||!session)return;
+  reconnectTimer=setTimeout(()=>{
+    reconnectTimer=null;
+    reconnectSavedHost();
+  },1500);
 }
 
 function connectAndCreate(){
@@ -174,16 +184,21 @@ function connectAndCreate(){
       creating=false;
       updateButtons();
       status('NOT CONNECTED — TAP GENERATE CODE',true);
+    }else if(session && !started){
+      status('HOST DISCONNECTED — RECONNECTING…',true);
+      scheduleReconnect();
     }
   });
 }
 
 function reconnectSavedHost(){
-  if(!session)return;
+  if(!session||reconnecting)return;
+  reconnecting=true;
   const protocol=location.protocol==='https:'?'wss:':'ws:';
   ws=new WebSocket(protocol+'//'+location.host);
 
   ws.addEventListener('open',()=>{
+    reconnecting=false;
     status('RECONNECTING HOST…');
     send({
       type:'RECONNECT',
@@ -220,7 +235,13 @@ function reconnectSavedHost(){
   });
 
   ws.addEventListener('error',()=>{
-    status('HOST CONNECTION ERROR — GENERATE A NEW CODE',true);
+    reconnecting=false;
+    status('HOST CONNECTION ERROR — RECONNECTING…',true);
+    scheduleReconnect();
+  });
+  ws.addEventListener('close',()=>{
+    reconnecting=false;
+    if(session&&!started)scheduleReconnect();
   });
 }
 
