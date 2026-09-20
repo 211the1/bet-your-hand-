@@ -1,42 +1,246 @@
 (() => {
 'use strict';
-const style=document.createElement('style');style.textContent='.last-card-overlay{position:fixed;inset:0;z-index:99999;overflow:hidden;pointer-events:auto;background:rgba(8,3,18,.78);display:flex;align-items:center;justify-content:center}.last-card-title{position:relative;z-index:4;font-size:clamp(60px,11vw,150px);font-weight:1000;color:#fff;text-shadow:0 0 14px #1687ff,0 0 36px #1687ff;animation:lastCardTitle .8s ease-in-out infinite alternate}.last-card-runner{position:absolute;width:110px;height:140px;object-fit:cover;object-position:center;border:0;border-radius:14px;box-shadow:0 0 22px #fff;animation:lastCardRun 2.35s linear forwards}.last-card-runner:nth-child(1){top:8%}.last-card-runner:nth-child(2){top:18%}.last-card-runner:nth-child(3){top:31%}.last-card-runner:nth-child(4){top:45%}.last-card-runner:nth-child(5){top:58%}.last-card-runner:nth-child(6){top:70%}.last-card-runner:nth-child(7){top:82%}.last-card-runner:nth-child(8){top:26%}.last-card-runner:nth-child(9){top:64%}@keyframes lastCardRun{0%{left:-150px;transform:translateY(10px) rotate(-6deg) scale(.8)}25%{transform:translateY(-12px) rotate(5deg) scale(1.05)}50%{left:45%;transform:translateY(8px) rotate(-5deg) scale(1.1)}75%{transform:translateY(-12px) rotate(5deg) scale(1.05)}100%{left:calc(100% + 150px);transform:translateY(8px) rotate(-6deg) scale(.8)}}@keyframes lastCardTitle{from{transform:scale(.9)}to{transform:scale(1.08)}}';style.textContent+=".modern-special{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;background:#07152d;border:3px solid #fff;border-radius:14px;color:#fff;text-align:center;font-family:system-ui,sans-serif;font-weight:1000;box-shadow:0 0 18px currentColor,inset 0 0 24px #0008}.modern-special:before{content:\"\";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.09) 0 2px,transparent 2px 12px);pointer-events:none}.modern-special-icon{position:relative;font-size:52px;line-height:.9;text-shadow:2px 2px 0 #000,0 0 10px #fff}.modern-special-name{position:relative;font-size:25px;letter-spacing:1px;text-shadow:3px 3px 0 #000}.modern-special-color{position:relative;margin-top:8px;padding:5px 22px;border-radius:8px;background:#111;color:#fff;border:2px solid #fff;font-size:14px;text-transform:uppercase;letter-spacing:1px}.modern-red{background:linear-gradient(145deg,#ff2525,#7c0710);color:#ff3c45;border-color:#ff3c45}.modern-blue{background:linear-gradient(145deg,#1268ff,#07185f);color:#1687ff;border-color:#1687ff}.modern-green{background:linear-gradient(145deg,#12d65d,#035b2c);color:#20e36d;border-color:#20e36d}.modern-yellow{background:linear-gradient(145deg,#ffd51a,#9b6500);color:#ffd83d;border-color:#ffd83d}.play-card .modern-special{width:150px;height:205px;margin:auto}@media(max-width:600px){.play-card .modern-special{width:120px;height:175px}.modern-special-icon{font-size:48px}.modern-special-name{font-size:21px}.modern-special-color{font-size:11px;padding:4px 14px}}";document.head.appendChild(style);
-const colors=['Red','Blue','Green','Yellow'];
-const createButton=document.getElementById('create'),roomEl=document.getElementById('room'),playersEl=document.getElementById('players'),startButton=document.getElementById('start'),restartButton=document.getElementById('restart'),gameEl=document.getElementById('game'),statusEl=document.getElementById('status');
-let ws=null,connecting=false,created=Boolean(localStorage.getItem('pyhHostSession')),createPending=false,retryTimer=null,pingTimer=null,lastSeenEvent=null,latestPlayers=[];
-let session=null;try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{}
-const setStatus=(x,bad=false)=>{statusEl.textContent=x;statusEl.style.color=bad?'#ff6b6b':'#21f17d'};
-const saveSession=s=>localStorage.setItem('pyhHostSession',JSON.stringify(s));
-const clearHostSession=()=>{localStorage.removeItem('pyhHostSession');session=null;created=false};
-const send=m=>{if(ws?.readyState!==WebSocket.OPEN)return false;ws.send(JSON.stringify(m));return true};
-function scheduleReconnect(){if(retryTimer||!session)return;retryTimer=setTimeout(()=>{retryTimer=null;connect()},1000)}
-function characterImage(name){return name?({'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'}[name]||''):''}
-function seatImage(name){return name?({'Bug':'/bug-seat.png','Face':'/face-seat.png','Ling Ling':'/ling-ling-seat.png','Beanz':'/beanz-seat.png','The One':'/the-one-seat.png','Boone':'/boone-seat.png','Chicken Joe':'/chicken-joe-seat.png','Juby':'/juby-seat.png','Meemaw':'/meemaw-seat.png'}[name]||''):''}
-function seatMarkup(players,game){const list=(players||[]).slice(0,9);return Array.from({length:9},(_,i)=>{const p=list[i];if(!p)return '<div class="room-seat room-seat-'+(i+1)+' empty" aria-hidden="true"></div>';const img=seatImage(p.character);const active=game&&p.id===game.turnPlayerId?' active':'';return '<div class="room-seat room-seat-'+(i+1)+active+'"><div class="room-seat-character">'+(img?'<img src="'+img+'" alt="'+escapeHtml(p.character)+'">':'')+'</div><div class="room-seat-label"><b>'+escapeHtml(p.character||'')+'</b><span>'+escapeHtml(p.name||'')+'</span></div></div>'}).join('')}
-function cardColor(card){if(!card)return '';if(card.type==='CHARACTER'){const c=String(card.id||'').split('-')[0];return colors.includes(c)?c:(colors.includes(card.color)?card.color:'')}if(card.type==='SKIP'||card.type==='REVERSE'){const n=Number(String(card.id||'').split('-')[1]);return Number.isFinite(n)?colors[n%4]:(colors.includes(card.color)?card.color:'')}return colors.includes(card.color)?card.color:''}
-function specialModern(card){const c=card||{},type=c.type;if(type!=='SKIP'&&type!=='REVERSE')return '';const col=cardColor(c),icon=type==='SKIP'?'»':'↻';return `<div class="modern-special ${type.toLowerCase()} modern-${String(col).toLowerCase()}"><div class="modern-special-icon" aria-hidden="true">${icon}</div><div class="modern-special-name">${type}</div><div class="modern-special-color">${escapeHtml(col)}</div></div>`}
-function cardHtml(card,extraClass=''){const c=card||{},type=c.type||'CARD',name=c.character||({SKIP:'SKIP',REVERSE:'REVERSE',WILD:'WILD',PLAY_YOUR_HAND:'PLAY YOUR HAND'}[c.type]||'CARD'),img=characterImage(c.character),authoritativeColor=cardColor(c),color=authoritativeColor.toLowerCase();if(type==='SKIP'||type==='REVERSE')return `<div class="card table-card play-card ${extraClass} color-${escapeHtml(color)}">${specialModern(c)}</div>`;return `<div class="card table-card play-card ${extraClass} color-${escapeHtml(color)}">${img?`<img class="card-face" src="${img}" alt="${escapeHtml(name)}">`:''}<div class="card-name">${escapeHtml(name)}</div>${authoritativeColor?`<div class="card-color">${escapeHtml(authoritativeColor)}</div>`:`<div class="card-type">${escapeHtml(type.replaceAll('_',' '))}</div>`}</div>`}
-function hostVisual(roomCode='',players=[],started=false,game=null){const code=roomCode||'----';const canStart=(players||[]).length>=2&&!started;return '<div class="host-room-stage-inner"><img class="host-room-art" src="/host-room.png" alt="PLAY YOUR HAND host room"><div class="host-room-seats">'+seatMarkup(players,game)+'</div><div class="host-room-code-big">'+escapeHtml(code)+'</div><div class="host-action-bar"><button class="host-action-btn" id="host-generate-btn" type="button" '+(roomCode?'disabled':'')+'>GENERATE CODE</button><button class="host-action-btn start" id="host-start-btn" type="button" '+(canStart?'':'disabled')+'>START GAME</button></div></div>}
-function renderHostTable(players,game,roomCode){
-  return hostVisual(roomCode,players,true,game);
+
+const generateBtn=document.getElementById('generate');
+const startBtn=document.getElementById('start');
+const codeEl=document.getElementById('room-code');
+const countEl=document.getElementById('player-count');
+const statusEl=document.getElementById('status');
+const seatsEl=document.getElementById('seats');
+
+let ws=null;
+let session=null;
+let creating=false;
+let started=false;
+let players=[];
+
+try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{session=null}
+
+const seatImages={
+  'Bug':'/bug-seat.png',
+  'Face':'/face-seat.png',
+  'Ling Ling':'/ling-ling-seat.png',
+  'Beanz':'/beanz-seat.png',
+  'The One':'/the-one-seat.png',
+  'Boone':'/boone-seat.png',
+  'Chicken Joe':'/chicken-joe-seat.png',
+  'Juby':'/juby-seat.png',
+  'Meemaw':'/meemaw-seat.png'
+};
+
+function status(text,bad=false){
+  statusEl.textContent=text;
+  statusEl.style.color=bad?'#ff7070':'#21f17d';
 }
-function updateHostButtons(players=[],started=false,roomCode=''){const gen=document.getElementById('host-generate-btn');const start=document.getElementById('host-start-btn');const codeEl=document.getElementById('host-code-display');if(codeEl)codeEl.textContent=roomCode||'----';if(gen){gen.disabled=Boolean(roomCode)||createPending;gen.onclick=requestCreateRoom}if(start){start.disabled=Boolean(started)||((players||[]).length<2);start.onclick=()=>{if(start.disabled)return;if(!send({type:'START_GAME'}))setStatus('NOT CONNECTED — TRY AGAIN',true)}}}
-function renderDisplayCard(game){
-  const card=game&&game.topCard;
-  if(!card)return '';
-  return '<div class="host-display-card is-new" aria-label="Current card being played">'+cardHtml(card)+'</div>';
+
+function send(message){
+  if(!ws || ws.readyState!==WebSocket.OPEN)return false;
+  ws.send(JSON.stringify(message));
+  return true;
 }
-function updateDisplayCard(game){
-  const stage=gameEl.querySelector('.host-room-stage-inner');
-  if(!stage)return;
-  const old=stage.querySelector('.host-display-card');
-  if(old)old.remove();
-  const markup=renderDisplayCard(game);
-  if(markup)stage.insertAdjacentHTML('beforeend',markup);
-}function playEasterLaugh(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=new C();const now=ctx.currentTime;const master=ctx.createGain();master.gain.value=.62;master.connect(ctx.destination);for(let i=0;i<8;i++){const t=now+i*.19;const o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();o.type='sawtooth';o.frequency.setValueAtTime(125+(i%3)*18,t);o.frequency.exponentialRampToValueAtTime(92,t+.14);f.type='lowpass';f.frequency.value=900;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.8,t+.025);g.gain.exponentialRampToValueAtTime(.0001,t+.15);o.connect(f).connect(g).connect(master);o.start(t);o.stop(t+.16)}setTimeout(()=>ctx.close(),1900)}catch{}}
-function showLastCard(event){if(!event||event.id===lastSeenEvent)return;lastSeenEvent=event.id;const overlay=document.createElement('div');overlay.className='last-card-video-overlay';const video=document.createElement('video');video.className='last-card-video';video.src='/last-card.mp4';video.autoplay=true;video.muted=false;video.playsInline=true;video.preload='auto';overlay.appendChild(video);const sound=document.createElement('button');sound.className='last-card-sound';sound.textContent='🔊 TAP FOR SOUND';sound.onclick=()=>{video.muted=false;video.play().catch(()=>{});sound.remove()};overlay.appendChild(sound);document.body.appendChild(overlay);const finish=()=>{if(overlay.isConnected)overlay.remove()};video.addEventListener('ended',finish,{once:true});video.addEventListener('error',finish,{once:true});video.play().catch(()=>{video.muted=true;video.play().catch(finish)})}
-function requestCreateRoom(){if(createPending)return;createPending=true;created=false;session=null;latestPlayers=[];localStorage.removeItem('pyhHostSession');createButton.disabled=true;const visible=document.getElementById('host-generate-btn');if(visible)visible.disabled=true;setStatus('CREATING NEW ROOM…');if(ws){try{ws.close()}catch{}ws=null}connecting=false;connect()}
-function connect(){if(connecting||ws?.readyState===WebSocket.OPEN)return;connecting=true;setStatus(session?'RECONNECTING TO GAME SERVER…':'CONNECTING TO GAME SERVER…');const protocol=location.protocol==='https:'?'wss:':'ws:';ws=new WebSocket(`${protocol}//${location.host}`);ws.addEventListener('open',()=>{connecting=false;setStatus(session?'HOST RECONNECTED':'CONNECTED');if(session)send({type:'RECONNECT',code:session.code,playerId:session.hostId,reconnectToken:session.hostToken});else if(createPending)send({type:'CREATE_ROOM',name:'Host'});else createButton.disabled=false;clearInterval(pingTimer);pingTimer=setInterval(()=>send({type:'PING'}),10000)});ws.addEventListener('message',event=>{let m;try{m=JSON.parse(event.data)}catch{return};if(m.type==='ERROR'){const msg=m.error||'Server error';createPending=false;if(session&&(msg==='Invalid reconnect'||msg==='Room not found'||msg==='Room restarted by host')){clearHostSession();latestPlayers=[];gameEl.innerHTML=hostVisual();updateHostButtons([],false,'');setStatus('READY — GENERATE A NEW CODE',true)}else{setStatus(msg,true);updateHostButtons(latestPlayers,false,session?.code||'')}createButton.disabled=false;return}if(m.type==='EASTER_EGG'){playEasterLaugh();const flash=document.createElement('div');flash.className='easter-egg-flash';flash.innerHTML='<div class="easter-egg-text">YOU’RE STUPID!</div>';document.body.appendChild(flash);setTimeout(()=>flash.remove(),3200);return}if(m.type==='ROOM_CREATED'){createPending=false;session={code:m.code,hostId:m.hostId,hostToken:m.hostToken};saveSession(session);created=true;createButton.disabled=true;roomEl.innerHTML=`<h2>ROOM ${escapeHtml(m.code)}</h2>`;startButton.hidden=false;restartButton.hidden=false;gameEl.innerHTML=hostVisual(m.code,[],false);setStatus('HOST CONNECTED');return}if(m.type==='RECONNECTED'){created=true;createPending=false;createButton.disabled=true;startButton.hidden=false;restartButton.hidden=false;gameEl.innerHTML=hostVisual(session?.code||'',latestPlayers,false,null);setStatus('HOST RECONNECTED — READY');return}if(m.type==='HOST_GAME_STARTED')m.type='STATE';if(m.type!=='STATE')return;latestPlayers=m.players||[];roomEl.innerHTML=`<h2>ROOM ${escapeHtml(m.roomCode)}</h2>`;playersEl.innerHTML=m.players.map(p=>`<div>${escapeHtml(p.name)} — ${escapeHtml(p.character)} ${p.connected?'🟢':'⚪'}</div>`).join('');if(m.game){try{if(m.game.lastCardEvent)showLastCard(m.game.lastCardEvent);gameEl.innerHTML=renderHostTable(m.players,m.game,m.roomCode);updateHostButtons(m.players,true,m.roomCode);updateDisplayCard(m.game);startButton.hidden=true;restartButton.hidden=false;createButton.disabled=true;createPending=false;roomEl.innerHTML='';setStatus('HOST CONNECTED — GAME IN PROGRESS')}catch(err){console.error('Host room render failed',err);gameEl.innerHTML=hostVisual(m.roomCode,m.players,true,m.game);updateHostButtons(m.players,true,m.roomCode);updateDisplayCard(m.game);setStatus('HOST DISPLAY ERROR',true)}}else{gameEl.innerHTML=hostVisual(m.roomCode,m.players,false,null);updateHostButtons(m.players,false,m.roomCode);startButton.hidden=m.players.length<2;restartButton.hidden=false;createButton.disabled=true;createPending=false;roomEl.innerHTML='';setStatus('HOST CONNECTED — WAITING FOR PLAYERS')}});ws.addEventListener('error',()=>{createPending=false;setStatus('CONNECTION LOST — RETRYING…',true)});ws.addEventListener('close',()=>{connecting=false;clearInterval(pingTimer);ws=null;setStatus(session?'CONNECTION LOST — RETRYING…':'NOT CONNECTED',true);scheduleReconnect()})}
-function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-createButton.disabled=true;startButton.hidden=true;restartButton.hidden=true;gameEl.innerHTML=hostVisual(session?.code||'',latestPlayers,false,null);updateHostButtons(latestPlayers,false,session?.code||'');connect();createButton.addEventListener('click',requestCreateRoom);startButton.addEventListener('click',()=>{if(!send({type:'START_GAME'}))setStatus('NOT CONNECTED — GENERATE A CODE FIRST',true)});restartButton.addEventListener('click',()=>{if(confirm('Restart this game and return to an empty lobby? All current players will be removed.'))send({type:'RESTART_GAME'})});gameEl.addEventListener('click',e=>{const b=e.target.closest('.host-action-btn');if(!b)return;if(b.id==='host-generate-btn'){requestCreateRoom();return}if(b.id==='host-start-btn'){if(!b.disabled)send({type:'START_GAME'});return}});
+
+function renderPlayers(){
+  players=players||[];
+  countEl.textContent=players.length+' / 9 PLAYERS';
+  seatsEl.innerHTML=players.slice(0,9).map((p,i)=>{
+    const img=seatImages[p.character]||'';
+    return '<div class="seat s'+(i+1)+'">'+
+      (img?'<img src="'+img+'" alt="">':'')+
+      '<div class="seat-label"><b>'+escapeHtml(p.character||'')+'</b>'+escapeHtml(p.name||'')+'</div>'+
+      '</div>';
+  }).join('');
+}
+
+function escapeHtml(value){
+  return String(value??'').replace(/[&<>'"]/g,c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
+  }[c]));
+}
+
+function updateButtons(){
+  generateBtn.disabled=Boolean(session)||creating||started;
+  startBtn.disabled=started || players.length<2 || !session;
+  if(started){
+    generateBtn.style.display='none';
+    startBtn.style.display='none';
+  }else{
+    generateBtn.style.display='';
+    startBtn.style.display='';
+  }
+}
+
+function resetToReady(message){
+  session=null;
+  players=[];
+  started=false;
+  localStorage.removeItem('pyhHostSession');
+  codeEl.textContent='----';
+  renderPlayers();
+  updateButtons();
+  status(message||'READY — GENERATE A CODE');
+}
+
+function connectAndCreate(){
+  if(creating)return;
+  creating=true;
+  session=null;
+  localStorage.removeItem('pyhHostSession');
+  codeEl.textContent='----';
+  players=[];
+  renderPlayers();
+  updateButtons();
+  status('CONNECTING — CREATING ROOM…');
+
+  if(ws){
+    try{ws.close()}catch{}
+    ws=null;
+  }
+
+  const protocol=location.protocol==='https:'?'wss:':'ws:';
+  ws=new WebSocket(protocol+'//'+location.host);
+
+  ws.addEventListener('open',()=>{
+    status('CONNECTED — CREATING ROOM…');
+    send({type:'CREATE_ROOM',name:'Host'});
+  });
+
+  ws.addEventListener('message',event=>{
+    let message;
+    try{message=JSON.parse(event.data)}catch{return}
+
+    if(message.type==='ERROR'){
+      creating=false;
+      resetToReady(message.error||'SERVER ERROR — TRY AGAIN');
+      status(message.error||'SERVER ERROR — TRY AGAIN',true);
+      return;
+    }
+
+    if(message.type==='ROOM_CREATED'){
+      creating=false;
+      session={
+        code:message.code,
+        hostId:message.hostId,
+        hostToken:message.hostToken
+      };
+      localStorage.setItem('pyhHostSession',JSON.stringify(session));
+      codeEl.textContent=message.code;
+      players=[];
+      renderPlayers();
+      updateButtons();
+      status('ROOM READY — PLAYERS CAN JOIN');
+      return;
+    }
+
+    if(message.type==='RECONNECTED'){
+      creating=false;
+      codeEl.textContent=session?.code||'----';
+      updateButtons();
+      status('ROOM RECONNECTED — PLAYERS CAN JOIN');
+      return;
+    }
+
+    if(message.type==='HOST_GAME_STARTED'){
+      started=true;
+      players=message.players||players;
+      renderPlayers();
+      updateButtons();
+      status('GAME STARTED');
+      return;
+    }
+
+    if(message.type==='STATE'){
+      players=message.players||[];
+      codeEl.textContent=message.roomCode||session?.code||'----';
+      if(message.game){
+        started=true;
+        status('GAME STARTED');
+      }else{
+        started=false;
+        status('ROOM READY — WAITING FOR PLAYERS');
+      }
+      renderPlayers();
+      updateButtons();
+    }
+  });
+
+  ws.addEventListener('error',()=>{
+    creating=false;
+    updateButtons();
+    status('CONNECTION ERROR — TAP GENERATE CODE AGAIN',true);
+  });
+
+  ws.addEventListener('close',()=>{
+    if(!session && !started){
+      creating=false;
+      updateButtons();
+      status('NOT CONNECTED — TAP GENERATE CODE',true);
+    }
+  });
+}
+
+function reconnectSavedHost(){
+  if(!session)return;
+  const protocol=location.protocol==='https:'?'wss:':'ws:';
+  ws=new WebSocket(protocol+'//'+location.host);
+
+  ws.addEventListener('open',()=>{
+    status('RECONNECTING HOST…');
+    send({
+      type:'RECONNECT',
+      code:session.code,
+      playerId:session.hostId,
+      reconnectToken:session.hostToken
+    });
+  });
+
+  ws.addEventListener('message',event=>{
+    let message;
+    try{message=JSON.parse(event.data)}catch{return}
+
+    if(message.type==='ERROR'){
+      resetToReady('READY — GENERATE A NEW CODE');
+      status('READY — GENERATE A NEW CODE');
+      return;
+    }
+
+    if(message.type==='RECONNECTED'){
+      codeEl.textContent=session.code;
+      status('ROOM RECONNECTED — PLAYERS CAN JOIN');
+      return;
+    }
+
+    if(message.type==='STATE'){
+      players=message.players||[];
+      started=Boolean(message.game);
+      codeEl.textContent=message.roomCode||session.code;
+      renderPlayers();
+      updateButtons();
+      status(started?'GAME STARTED':'ROOM READY — WAITING FOR PLAYERS');
+    }
+  });
+
+  ws.addEventListener('error',()=>{
+    status('HOST CONNECTION ERROR — GENERATE A NEW CODE',true);
+  });
+}
+
+generateBtn.addEventListener('click',connectAndCreate);
+startBtn.addEventListener('click',()=>{
+  if(startBtn.disabled)return;
+  if(!send({type:'START_GAME'})){
+    status('NOT CONNECTED — TRY AGAIN',true);
+    return;
+  }
+  status('STARTING GAME…');
+});
+
+renderPlayers();
+updateButtons();
+
+if(session){
+  codeEl.textContent=session.code||'----';
+  reconnectSavedHost();
+}else{
+  status('READY — GENERATE A CODE');
+}
 })();
