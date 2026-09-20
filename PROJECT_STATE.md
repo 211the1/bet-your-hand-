@@ -158,3 +158,11 @@ Do NOT rebuild from scratch. Continue from fresh-rebuild and Git history. Check 
 - Power badges now appear directly below the TV screen and identify the character/player who currently owns the unused power.
 - Existing power state and consumption logic is unchanged.
 - Commits: b8531c139ce227ea3dec970fe9ba665daace1fff, 443801bd10d223f38469a5bf7b709d837129f659, 7f0e3cb4435d729470d362bbed16b2c050d29353.
+
+
+## Emoji reaction system (2026-09-20)
+- EMOJI SMILE now opens a player-targeted reaction menu.
+- Players can send the selected reaction to another player; the recipient sees it pop up, float upward, and fade away without interrupting the game.
+- Menu includes the approved regular reactions plus the user's custom image at assets/custom_emoji.jpg.
+- Emoji reactions do not change game rules, scoring, turns, cards, or laptop game controls.
+- Player app cache bumped to app.js?v=68.
