@@ -258,24 +258,6 @@ startBtn.addEventListener('click',()=>{
   status('STARTING GAME…');
 });
 
-if(seatTestMode){
-  players=[
-    {character:'Beanz',name:'TEST 1'},
-    {character:'The One',name:'TEST 2'},
-    {character:'Boone',name:'TEST 3'},
-    {character:'Chicken Joe',name:'TEST 4'},
-    {character:'Juby',name:'TEST 5'},
-    {character:'Meemaw',name:'TEST 6'}
-  ];
-  started=false;
-  session={code:'TEST',hostId:'TEST',hostToken:'TEST'};
-  codeEl.textContent='TEST';
-  status('SIX-SEAT TEST MODE');
-  renderPlayers();
-  updateButtons();
-  return;
-}
-
 renderPlayers();
 updateButtons();
 
