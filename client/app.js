@@ -132,7 +132,7 @@ const cards=orderedHand.map(card=>{
   const specialClass=special?` special-${String(card.type).toLowerCase()}`:'';
   return `<button type="button" class="arcade-card color-${escapeHtml(col)}${specialClass} ${selected?'selected':''}" data-card-id="${escapeHtml(card.id)}">
     ${specialImg?`<img class="special-art" src="${specialImg}" alt="${escapeHtml(nm)}">`:special?specialModern(card,'hand'):img?`<img src="${img}" alt="${escapeHtml(nm)}">`:''}
-    ${specialImg||special?'':`<strong>${escapeHtml(nm)}</strong><small>${cardColor(card)?escapeHtml(cardColor(card)):escapeHtml((card.type||'CARD').replaceAll('_',' '))}</small>`}
+    ${specialImg||special?'':`<strong>${escapeHtml(nm)}</strong>`}
   </button>`}).join('');
 const playableColor=game.currentColor||cardColor(top)||'';const playableHint=top.character?`MATCH ${escapeHtml(playableColor)} OR ${escapeHtml(top.character.toUpperCase())}`:`MATCH ${escapeHtml(playableColor)} • WILD / PLAY YOUR HAND ALWAYS PLAY`;
 let special='';
