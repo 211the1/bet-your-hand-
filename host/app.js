@@ -15,6 +15,7 @@ const hostMenuClose=document.getElementById('host-menu-close');
 const hostSoundButton=document.getElementById('host-sound');
 const hostRestartButton=document.getElementById('host-restart');
 const hostGenerateButton=document.getElementById('host-generate');
+const hostStartButton=document.getElementById('host-start');
 let hostSoundEnabled=true;
 
 let ws=null;
@@ -268,13 +269,9 @@ function escapeHtml(value){
 function updateButtons(){
   generateBtn.disabled=creating||started;
   startBtn.disabled=started || players.length<2 || !session;
-  if(started){
-    generateBtn.style.display='none';
-    startBtn.style.display='none';
-  }else{
-    generateBtn.style.display='';
-    startBtn.style.display='';
-  }
+  if(hostStartButton)hostStartButton.disabled=started || players.length<2 || !session;
+  generateBtn.style.display='none';
+  startBtn.style.display='none';
 }
 
 function resetToReady(message){
@@ -465,6 +462,15 @@ hostSoundButton?.addEventListener('click',()=>{
 hostGenerateButton?.addEventListener('click',()=>{
   closeHostMenu();
   connectAndCreate();
+});
+hostStartButton?.addEventListener('click',()=>{
+  if(hostStartButton.disabled)return;
+  if(!send({type:'START_GAME'})){
+    status('NOT CONNECTED — TRY AGAIN',true);
+    return;
+  }
+  closeHostMenu();
+  status('STARTING GAME…');
 });
 hostRestartButton?.addEventListener('click',()=>{
   if(!session||!send({type:'RESTART_GAME'})){
