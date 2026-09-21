@@ -1,3 +1,46 @@
-const test=require('node:test');const assert=require('node:assert/strict');const {RoomServer}=require('../server/room-server');
-test('room lifecycle: host separate, 2-6 players, reconnect',()=>{const r=new RoomServer();const h=r.createRoom('Host');assert.equal(h.code.length,4);const a=r.joinRoom(h.code,'A','Bug');const b=r.joinRoom(h.code,'B','Face');assert.equal(r.getRoom(h.code).players.size,2);assert.equal(r.reconnect(h.code,a.playerId,a.reconnectToken).playerId,a.playerId);const snap=r.startGame(h.code);assert.equal(snap.game.round,1);assert.equal(snap.game.players.length,2);assert(snap.game.players.every(p=>p.handCount>=8))});
-test('host restart preserves room and players but returns game to waiting state',()=>{const r=new RoomServer();const h=r.createRoom('Host');r.joinRoom(h.code,'A','Bug');r.joinRoom(h.code,'B','Face');r.startGame(h.code);const snap=r.restartGame(h.code);assert.equal(snap.started,false);assert.equal(snap.game,null);assert.equal(snap.players.length,2);assert.equal(snap.players[0].name,'A');assert.equal(snap.players[1].name,'B')});
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const {RoomServer}=require('../server/room-server');
+
+test('room lifecycle: host separate, 2-6 players, reconnect',async()=>{
+  const r=new RoomServer();
+  await r.ready;
+  const h=await r.createRoom('Host');
+  assert.equal(h.code.length,4);
+  const a=await r.joinRoom(h.code,'A','Bug');
+  const b=await r.joinRoom(h.code,'B','Face');
+  const room=await r.getRoom(h.code);
+  assert.equal(room.players.size,2);
+  const reconnected=await r.reconnect(h.code,a.playerId,a.reconnectToken);
+  assert.equal(reconnected.playerId,a.playerId);
+  const snap=await r.startGame(h.code);
+  assert.equal(snap.game.round,1);
+  assert.equal(snap.game.players.length,2);
+  assert(snap.game.players.every(p=>p.handCount===8));
+  await r.store.close();
+});
+
+test('host restart creates a fresh waiting room and clears old players',async()=>{
+  const r=new RoomServer();
+  await r.ready;
+  const h=await r.createRoom('Host');
+  await r.joinRoom(h.code,'A','Bug');
+  await r.joinRoom(h.code,'B','Face');
+  await r.startGame(h.code);
+
+  const oldCode=h.code;
+  const fresh=await r.restartGame(oldCode);
+
+  assert.equal(fresh.code.length,4);
+  assert.notEqual(fresh.code,oldCode);
+  assert.equal(fresh.started,undefined);
+  assert.equal(fresh.host,true);
+  assert.equal(fresh.name,'Host');
+
+  const room=await r.getRoom(fresh.code);
+  assert.equal(room.players.size,0);
+  assert.equal(room.game,null);
+
+  await assert.rejects(()=>r.getRoom(oldCode),/Room restarted by host|Room not found/);
+  await r.store.close();
+});
