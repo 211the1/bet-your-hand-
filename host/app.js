@@ -35,23 +35,27 @@ function topCardColor(card){
   }
   return String(card.color||'').toLowerCase();
 }
-function renderTopCard(card){
-  if(!cardDisplay)return;
-  if(!card){cardDisplay.innerHTML='';return;}
+function renderTopCard(card,game){
+  const discardEl=document.getElementById('host-discard-card');
+  const deckCountEl=document.getElementById('host-deck-count');
+  const discardCountEl=document.getElementById('host-discard-count');
+  if(deckCountEl)deckCountEl.textContent='CARDS LEFT: '+Number(game?.deckCount??game?.cardsLeft??0);
+  if(discardCountEl)discardCountEl.textContent='CARDS PLAYED: '+Number(game?.discardCount??0);
+  if(!discardEl)return;
+  if(!card){discardEl.innerHTML='';return;}
   const type=String(card.type||'').toUpperCase();
   const name=card.character||({'SKIP':'SKIP','REVERSE':'REVERSE','WILD':'WILD','PLAY_YOUR_HAND':'PLAY YOUR HAND'}[type]||'CARD');
   const color=topCardColor(card);
   const img=cardImages[card.character];
-  const special=type==='WILD'||type==='PLAY_YOUR_HAND';
   const specialUrl=type==='WILD'?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/WILD.png':type==='PLAY_YOUR_HAND'?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/PLAY_YOUR_HAND.png':'';
   if(specialUrl){
-    cardDisplay.innerHTML='<div class="card-display-card '+(type==='WILD'?'wild':'play-special')+'"><img src="'+specialUrl+'" alt="'+escapeHtml(name)+'"></div>';
+    discardEl.innerHTML='<div class="card-display-card '+(type==='WILD'?'wild':'play-special')+'"><img src="'+specialUrl+'" alt="'+escapeHtml(name)+'"></div>';
   }else if(type==='SKIP'||type==='REVERSE'){
-    cardDisplay.innerHTML='<div class="card-display-card color-'+escapeHtml(color)+' special">'+escapeHtml(name)+'</div>';
+    discardEl.innerHTML='<div class="card-display-card color-'+escapeHtml(color)+' special">'+escapeHtml(name)+'</div>';
   }else if(img){
-    cardDisplay.innerHTML='<div class="card-display-card color-'+escapeHtml(color)+'"><img src="'+img+'" alt="'+escapeHtml(name)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(color.toUpperCase())+'</small></div>';
+    discardEl.innerHTML='<div class="card-display-card color-'+escapeHtml(color)+'"><img src="'+img+'" alt="'+escapeHtml(name)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(color||'')+'</small></div>';
   }else{
-    cardDisplay.innerHTML='<div class="card-display-card color-'+escapeHtml(color)+' special">'+escapeHtml(name)+'</div>';
+    discardEl.innerHTML='<div class="card-display-card color-'+escapeHtml(color)+' special">'+escapeHtml(name)+'</div>';
   }
 }
 
@@ -249,7 +253,7 @@ function connectAndCreate(){
     if(message.type==='HOST_GAME_STARTED'){
       started=true;
       players=message.players||players;
-      renderTopCard(message.game?.topCard||null);
+      renderTopCard(message.game?.topCard||null,message.game);
       renderPlayers();
       updateButtons();
       status('GAME STARTED');
@@ -259,7 +263,7 @@ function connectAndCreate(){
     if(message.type==='STATE'){
       players=message.players||[];
       codeEl.textContent=message.roomCode||session?.code||'----';
-      renderTopCard(message.game?.topCard||null);
+      renderTopCard(message.game?.topCard||null,message.game);
       if(message.game){
         started=true;
         status('GAME STARTED');
@@ -322,7 +326,7 @@ function reconnectSavedHost(){
       players=message.players||[];
       started=Boolean(message.game);
       codeEl.textContent=message.roomCode||session.code;
-      renderTopCard(message.game?.topCard||null);
+      renderTopCard(message.game?.topCard||null,message.game);
       renderPlayers();
       updateButtons();
       status(started?'GAME STARTED':'ROOM READY — WAITING FOR PLAYERS');
