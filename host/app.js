@@ -80,6 +80,22 @@ function cardHtml(card){
     '</div>';
 }
 
+function specialImage(card){
+  if(!card)return '';
+  const base='https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3';
+  if(card.type==='WILD')return base+'/WILD.png';
+  if(card.type==='PLAY_YOUR_HAND')return base+'/PLAY_YOUR_HAND.png';
+  return '';
+}
+
+function specialModern(card,where='tv'){
+  const c=card||{},type=c.type;
+  if(type!=='SKIP'&&type!=='REVERSE')return '';
+  const col=cardColor(c);
+  const iconClass=type==='SKIP'?'skip-icon':'reverse-icon';
+  return '<div class="modern-special '+type.toLowerCase()+' modern-'+String(col).toLowerCase()+' '+where+'"><div class="modern-special-icon '+iconClass+'" aria-hidden="true"></div><div class="modern-special-name">'+type+'</div></div>';
+}
+
 function renderTopCard(card,game){
   const discardEl=document.getElementById('host-discard-card');
   const deckCountEl=document.getElementById('host-deck-count');
@@ -90,31 +106,21 @@ function renderTopCard(card,game){
   if(!card){discardEl.innerHTML='';return;}
 
   const c=card||{},
-    name=c.character||({
-      SKIP:'SKIP',
-      REVERSE:'REVERSE',
-      WILD:'WILD',
-      PLAY_YOUR_HAND:'PLAY YOUR HAND'
-    }[c.type]||'CARD'),
+    name=c.character||({SKIP:'SKIP',REVERSE:'REVERSE',WILD:'WILD',PLAY_YOUR_HAND:'PLAY YOUR HAND'}[c.type]||'CARD'),
     img=characterImage(c.character),
-    color=cardColor(c).toLowerCase();
+    color=cardColor(c).toLowerCase(),
+    specialUrl=specialImage(c);
 
-  const specialUrl=
-    c.type==='WILD'
-      ?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/WILD.png'
-      :c.type==='PLAY_YOUR_HAND'
-        ?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/PLAY_YOUR_HAND.png'
-        :'';
+  const visual=specialUrl
+    ?'<img class="tv-special-art" src="'+specialUrl+'" alt="'+escapeHtml(name)+'">'
+    :(c.type==='SKIP'||c.type==='REVERSE')
+      ?specialModern(c,'tv')
+      :img
+        ?'<img src="'+img+'" alt="'+escapeHtml(name)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(cardColor(c)||'')+'</small>'
+        :'<div class="special-card-symbol">'+escapeHtml((c.type||'CARD').replaceAll('_',' '))+'</div>';
 
-  if(specialUrl){
-    discardEl.innerHTML='<img class="host-special-art" src="'+specialUrl+'" alt="'+escapeHtml(name)+'">';
-  }else if(img){
-    discardEl.innerHTML='<div class="tv-card color-'+escapeHtml(color)+'"><img src="'+img+'" alt="'+escapeHtml(name)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(cardColor(c))+'</small></div>';
-  }else{
-    discardEl.innerHTML='<div class="tv-card color-'+escapeHtml(color)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(cardColor(c))+'</small></div>';
-  }
+  discardEl.innerHTML='<div class="tv-card '+(c.type==='SKIP'||c.type==='REVERSE'?'special-modern-host ':'')+'color-'+escapeHtml(color)+' '+(c.type==='WILD'?'wild ':'')+(c.type==='PLAY_YOUR_HAND'?'play-special':'')+'">'+visual+'</div>';
 }
-
 function updateJoinQr(code){
   if(!qrEl)return;
   const value=String(code||'').trim();
