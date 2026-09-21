@@ -30,7 +30,7 @@ test('matching is color OR character; wild and Play Your Hand are playable',()=>
   assert(e.isPlayable({type:'PLAY_YOUR_HAND'},g));
 });
 
-test('startTurn only reports whether a playable card exists; drawing is explicit',()=>{
+test('startTurn awards 150 when a playable card exists and none when drawing is needed',()=>{
   const g=e.createGame({playerIds:['a','b'],rng:()=>.4});
   g.players[0].hand=[{id:'x',type:'CHARACTER',color:'Blue',character:'Bug'}];
   g.currentColor='Red';
@@ -40,6 +40,12 @@ test('startTurn only reports whether a playable card exists; drawing is explicit
   assert.equal(result.player.id,'a');
   assert.equal(result.playable,false);
   assert.equal(g.players[0].points,before);
+
+  g.players[0].hand=[{id:'y',type:'CHARACTER',color:'Red',character:'Bug'}];
+  const playableBefore=g.players[0].points;
+  const playableResult=e.startTurn(g);
+  assert.equal(playableResult.playable,true);
+  assert.equal(g.players[0].points,playableBefore+150);
   assert.equal(g.players[0].hand.length,1);
 });
 
