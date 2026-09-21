@@ -134,6 +134,31 @@ function updateJoinQr(code){
   qrEl.style.display='block';
 }
 
+function playHostCallSound(){
+  if(!hostSoundEnabled)return;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=new C(),now=ctx.currentTime;
+    [0,0.28,0.56].forEach((t,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sine';o.frequency.value=i===1?880:660;
+      g.gain.setValueAtTime(.0001,now+t);
+      g.gain.exponentialRampToValueAtTime(.45,now+t+.03);
+      g.gain.exponentialRampToValueAtTime(.0001,now+t+.2);
+      o.connect(g).connect(ctx.destination);o.start(now+t);o.stop(now+t+.22);
+    });
+    setTimeout(()=>ctx.close(),1000);
+  }catch{}
+}
+function showHostActionEffect(type){
+  document.querySelectorAll('.host-action-effect').forEach(x=>x.remove());
+  const el=document.createElement('div');
+  el.className='host-action-effect '+(type==='CALL_PLAYER'?'wake':'play-hand');
+  el.innerHTML='<div class="host-action-flash"></div><div class="host-action-text">'+(type==='CALL_PLAYER'?'WAKE UP!':'PLAY YOUR HAND!')+'</div>';
+  document.body.appendChild(el);
+  if(type==='CALL_PLAYER')playHostCallSound();else playHostTone(880,.22);
+  setTimeout(()=>{if(el.isConnected)el.remove()},3200);
+}
 function playHostTone(freq=660,duration=.12){
   if(!hostSoundEnabled)return;
   try{
@@ -330,7 +355,7 @@ function connectAndCreate(){
     let message;
     try{message=JSON.parse(event.data)}catch{return}
 
-    if(message.type==='PLAYER_EMOJI'){showPlayerEmoji(message);return}
+    if(message.type==='CALL_PLAYER'){showHostActionEffect('CALL_PLAYER');return}\n    if(message.type==='PLAY_YOUR_HAND_EVENT'){showHostActionEffect('PLAY_YOUR_HAND');return}\n    if(message.type==='PLAYER_EMOJI'){showPlayerEmoji(message);return}
 
     if(message.type==='ERROR'){
       creating=false;
