@@ -9,38 +9,37 @@ const statusEl=document.getElementById('status');
 const seatsEl=document.getElementById('seats');
 const cardDisplay=document.getElementById('card-display');
 const cardImages={'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'};
+function topCardColor(card){
+  if(!card)return '';
+  if(card.type==='CHARACTER'){
+    const c=String(card.id||'').split('-')[0].toLowerCase();
+    return ['red','blue','green','yellow'].includes(c)?c:(String(card.color||'').toLowerCase());
+  }
+  if(card.type==='SKIP'||card.type==='REVERSE'){
+    const n=Number(String(card.id||'').split('-')[1]);
+    return Number.isFinite(n)?['red','blue','green','yellow'][n%4]:String(card.color||'').toLowerCase();
+  }
+  return String(card.color||'').toLowerCase();
+}
 function renderTopCard(card){
   if(!cardDisplay)return;
   if(!card){cardDisplay.innerHTML='';return;}
   const type=String(card.type||'').toUpperCase();
   const name=card.character||({'SKIP':'SKIP','REVERSE':'REVERSE','WILD':'WILD','PLAY_YOUR_HAND':'PLAY YOUR HAND'}[type]||'CARD');
+  const color=topCardColor(card);
   const img=cardImages[card.character];
-  cardDisplay.innerHTML='<div class="card-display-card">'+(img?'<img src="'+img+'" alt="">':'<div class="card-display-label">'+escapeHtml(name)+'</div>')+'</div>';
+  const special=type==='WILD'||type==='PLAY_YOUR_HAND';
+  const specialUrl=type==='WILD'?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/WILD.png':type==='PLAY_YOUR_HAND'?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/PLAY_YOUR_HAND.png':'';
+  if(specialUrl){
+    cardDisplay.innerHTML='<div class="card-display-card '+(type==='WILD'?'wild':'play-special')+'"><img src="'+specialUrl+'" alt="'+escapeHtml(name)+'"></div>';
+  }else if(type==='SKIP'||type==='REVERSE'){
+    cardDisplay.innerHTML='<div class="card-display-card color-'+escapeHtml(color)+' special">'+escapeHtml(name)+'</div>';
+  }else if(img){
+    cardDisplay.innerHTML='<div class="card-display-card color-'+escapeHtml(color)+'"><img src="'+img+'" alt="'+escapeHtml(name)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(color.toUpperCase())+'</small></div>';
+  }else{
+    cardDisplay.innerHTML='<div class="card-display-card color-'+escapeHtml(color)+' special">'+escapeHtml(name)+'</div>';
+  }
 }
-
-let ws=null;
-let session=null;
-let creating=false;
-let started=false;
-let players=[];
-let reconnectTimer=null;
-let reconnecting=false;
-const seatAssignments=new Map();
-const seatTimers=new Map();
-
-try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{session=null}
-
-const seatImages={
-  'Bug':'/bug-seat.png',
-  'Face':'/face-seat.png',
-  'Ling Ling':'/ling-ling-seat.png',
-  'Beanz':'/beanz-seat.png',
-  'The One':'/the-one-seat.png',
-  'Boone':'/boone-seat.png',
-  'Chicken Joe':'/chicken-joe-seat.png',
-  'Juby':'/juby-seat.png',
-  'Meemaw':'/meemaw-seat.png'
-};
 
 function status(text,bad=false){
   statusEl.textContent=text;
