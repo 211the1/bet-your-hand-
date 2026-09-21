@@ -38,5 +38,27 @@ if(t==='CALL_PLAYER'){if(!r.game)throw Error('Game has not started');for(const q
   throw Error('Unknown action');
  }catch(err){send(ws,{type:'ERROR',error:err.message||'Server error'})}});
  ws.on('close',()=>{const s=sessions.get(ws);if(s)rooms.detach(s.code,s.playerId,ws).then(changed=>{if(changed)return rooms.sendState(s.code)}).catch(()=>{});sessions.delete(ws)})});
- const heartbeat=setInterval(()=>{wss.clients.forEach(ws=>{if(ws.isAlive===false)return ws.terminate();ws.isAlive=false;try{ws.ping()}catch{}})},20000);wss.on('close',()=>{clearInterval(heartbeat);rooms.store.close().catch(()=>{})});return{httpServer,wss}}
-if(require.main===module){const port=Number(process.env.PORT)||10000;createServer().httpServer.listen(port,'0.0.0.0',()=>console.log('PLAY YOUR HAND server ready on 0.0.0.0:'+port));}module.exports={createServer};
+ const heartbeat=setInterval(()=>{wss.clients.forEach(ws=>{if(ws.isAlive===false)return ws.terminate();ws.isAlive=false;try{ws.ping()}catch{}})},20000);
+ const close=async()=>{
+  clearInterval(heartbeat);
+  for(const ws of wss.clients)try{ws.close(1001,'Server shutting down')}catch{}
+  await new Promise(resolve=>wss.close(()=>resolve()));
+  await new Promise(resolve=>httpServer.close(()=>resolve()));
+  await rooms.store.close();
+ };
+ return{httpServer,wss,close}}
+if(require.main===module){
+ const port=Number(process.env.PORT)||10000;
+ const app=createServer();
+ app.httpServer.listen(port,'0.0.0.0',()=>console.log('PLAY YOUR HAND server ready on 0.0.0.0:'+port));
+ let shuttingDown=false;
+ const shutdown=async(signal)=>{
+  if(shuttingDown)return;
+  shuttingDown=true;
+  console.log('PLAY YOUR HAND server shutting down: '+signal);
+  try{await app.close()}finally{process.exit(0)}
+ };
+ process.once('SIGTERM',()=>shutdown('SIGTERM'));
+ process.once('SIGINT',()=>shutdown('SIGINT'));
+}
+module.exports={createServer};
