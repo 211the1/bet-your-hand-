@@ -413,7 +413,6 @@ function connectAndCreate(){
       players=message.players||players;
       renderTopCard(message.game?.topCard||null,message.game);
       renderPowerWheel(message.game);
-      renderPowerWheel(message.game);
       renderPlayers();
       updateButtons();
       status('GAME STARTED');
