@@ -4,6 +4,7 @@
 const generateBtn=document.getElementById('generate');
 const startBtn=document.getElementById('start');
 const codeEl=document.getElementById('room-code');
+const roundEl=document.getElementById('round-display');
 const qrEl=document.getElementById('join-qr');
 const countEl=document.getElementById('player-count');
 const statusEl=document.getElementById('status');
@@ -210,6 +211,10 @@ function updateHostSoundButton(){
 }
 function closeHostMenu(){if(hostMenuPanel)hostMenuPanel.classList.remove('show')}
 
+function updateRound(round){
+  if(roundEl)roundEl.textContent=Number(round)>0?'ROUND '+Number(round):'ROUND --';
+}
+
 function status(text,bad=false){
   statusEl.textContent=text;
   statusEl.style.color=bad?'#ff7070':'#21f17d';
@@ -372,6 +377,7 @@ function resetToReady(message){
   for(let i=1;i<=6;i++)clearSeatTimer(i);
   localStorage.removeItem('pyhHostSession');
   codeEl.textContent='----';
+  updateRound(null);
   renderPlayers();
   updateButtons();
   status(message||'READY — GENERATE A CODE');
@@ -431,6 +437,7 @@ function connectAndCreate(){
       session={code:message.code,hostId:message.hostId,hostToken:message.hostToken};
       localStorage.setItem('pyhHostSession',JSON.stringify(session));
       codeEl.textContent=message.code;
+      updateRound(null);
       updateJoinQr(message.code);
       players=[];
       renderPlayers();
@@ -451,6 +458,7 @@ function connectAndCreate(){
       started=true;
       players=message.players||players;
       renderTopCard(message.game?.topCard||null,message.game);
+      updateRound(message.game?.round);
       renderPowerWheel(message.game);
       if(message.game?.lastCardEvent)showHostLastCard(message.game.lastCardEvent);else if(!message.game?.lastCardEvent)lastHostLastCardEvent=null;
       renderPlayers();
@@ -534,6 +542,7 @@ function reconnectSavedHost(){
       started=Boolean(message.game);
       codeEl.textContent=message.roomCode||session.code;
       renderTopCard(message.game?.topCard||null,message.game);
+      updateRound(message.game?.round);
       renderPowerWheel(message.game);
       renderPlayers();
       updateButtons();
