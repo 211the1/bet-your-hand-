@@ -246,7 +246,8 @@ function assignSeats(seatedPlayers){
   const used=new Set();
   for(const key of activeKeys){
     const seat=seatAssignments.get(key);
-    if(seat)used.add(seat);
+    if(seat && !used.has(seat))used.add(seat);
+    else if(seatAssignments.has(key))seatAssignments.delete(key);
   }
 
   for(const p of seatedPlayers){
@@ -304,7 +305,8 @@ function renderPlayers(){
   countEl.textContent=seatedPlayers.length+' / 6 PLAYERS';
   seatsEl.innerHTML=seatedPlayers.map(p=>{
     const img=seatImages[p.character]||'';
-    const seat=seatAssignments.get(playerKey(p));
+    const seat=seatAssignments.get(playerKey(p))||randomOpenSeat(new Set());
+    if(!seatAssignments.has(playerKey(p))&&seat)seatAssignments.set(playerKey(p),seat);
     return '<div class="seat s'+seat+'" data-seat="'+seat+'" data-player-id="'+escapeHtml(p.id||'')+'">'+
       '<div class="seat-score">SCORE: '+escapeHtml(Number(p.points??0))+'</div>'+
       (img?'<img src="'+img+'" alt="">':'')
