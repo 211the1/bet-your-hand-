@@ -10,6 +10,7 @@ body{font-family:system-ui,sans-serif}
 #game{position:relative;width:100vw;height:100dvh;overflow:hidden}
 #room-art{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block}
 #room-code{position:absolute;left:17%;top:54%;transform:translateX(-50%);z-index:5;color:#42ffe4;background:rgba(3,7,19,.82);border:3px solid #fff;border-radius:14px;padding:3px 6px;font-weight:1000;font-size:clamp(8px,1.3vw,16px);letter-spacing:2px;text-shadow:0 0 10px #00eaff;box-shadow:0 0 18px #00eaff;pointer-events:none}
+#join-qr{position:absolute;left:17%;top:60%;transform:translateX(-50%);z-index:5;width:clamp(70px,8vw,105px);height:clamp(70px,8vw,105px);padding:5px;box-sizing:border-box;background:#fff;border:3px solid #fff;border-radius:10px;box-shadow:0 0 18px #00eaff;display:none;object-fit:contain;pointer-events:none}
 #player-count{display:none;position:absolute;left:50%;top:15%;transform:translateX(-50%);z-index:5;color:#fff;font-weight:1000;font-size:clamp(13px,2vw,25px);text-shadow:0 0 8px #00eaff;pointer-events:none}
 #status{display:none;position:absolute;left:50%;top:22%;transform:translateX(-50%);z-index:5;color:#21f17d;font-weight:900;font-size:clamp(11px,1.5vw,18px);text-align:center;text-shadow:0 0 8px #000;pointer-events:none}
 #controls{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);z-index:10;display:flex;gap:12px;width:min(92vw,700px)}
@@ -91,6 +92,7 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
  #controls{bottom:2%;gap:7px;width:96vw}
  button{padding:11px 7px;border-width:2px;border-radius:10px;font-size:14px}
  #room-code{top:54%;left:17%;padding:2px 4px;border-width:1px;letter-spacing:1px}
+ #join-qr{top:60%;left:17%;width:78px;height:78px;padding:4px;border-width:2px}
  #player-count{top:12%}
  #status{top:18%}
  .seat{width:70px}.seat img{height:115px!important}.seat-label{font-size:7px;padding:2px 4px}
@@ -100,7 +102,7 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 <body>
 <div id="game">
   <img id="room-art" src="/host-room.png" alt="PLAY YOUR HAND host room">
-  <div id="room-code">----</div><div id="card-display"><div class="host-pile"><div class="host-pile-title">DRAW DECK</div><div class="deck-stack host-deck-stack"><div class="deck-card-back host-deck-back-3">PLAY<br>YOUR<br>HAND</div><div class="deck-card-back host-deck-back-2"></div><div class="deck-card-back">PLAY<br>YOUR<br>HAND</div></div><div class="host-pile-count" id="host-deck-count">CARDS LEFT: --</div></div><div class="host-pile"><div class="host-pile-title">DISCARD / PLAY PILE</div><div class="deck-stack host-discard-stack"><div id="host-discard-card"></div></div><div class="host-pile-count" id="host-discard-count">CARDS PLAYED: --</div></div></div>
+  <div id="room-code">----</div><img id="join-qr" alt="Scan to open PLAY YOUR HAND player screen"><div id="card-display"><div class="host-pile"><div class="host-pile-title">DRAW DECK</div><div class="deck-stack host-deck-stack"><div class="deck-card-back host-deck-back-3">PLAY<br>YOUR<br>HAND</div><div class="deck-card-back host-deck-back-2"></div><div class="deck-card-back">PLAY<br>YOUR<br>HAND</div></div><div class="host-pile-count" id="host-deck-count">CARDS LEFT: --</div></div><div class="host-pile"><div class="host-pile-title">DISCARD / PLAY PILE</div><div class="deck-stack host-discard-stack"><div id="host-discard-card"></div></div><div class="host-pile-count" id="host-discard-count">CARDS PLAYED: --</div></div></div>
   <div id="player-count">0 / 6 PLAYERS</div>
   <div id="status">CONNECTING…</div>
   <div id="seats"></div>
