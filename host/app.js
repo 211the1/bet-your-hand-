@@ -47,13 +47,13 @@ function renderTopCard(card,game){
   const img=cardImages[c.character], color=topCardColor(c).toLowerCase();
   const specialUrl=c.type==='WILD'?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/WILD.png':c.type==='PLAY_YOUR_HAND'?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/PLAY_YOUR_HAND.png':'';
   if(specialUrl){
-    discardEl.innerHTML='<img src="'+specialUrl+'" alt="'+escapeHtml(name)+'" style="width:103px;height:135px;object-fit:contain">';
+    discardEl.innerHTML='<img src="'+specialUrl+'" alt="'+escapeHtml(name)+'">';
   }else if(c.type==='SKIP'||c.type==='REVERSE'){
-    discardEl.innerHTML='<div class="card table-card player-current color-'+escapeHtml(color)+'" style="width:103px!important;min-height:135px!important;height:135px!important"><div class="card-name">'+escapeHtml(name)+'</div></div>';
+    discardEl.innerHTML='<div class="card table-card player-current color-'+escapeHtml(color)+'"><div class="card-name">'+escapeHtml(name)+'</div></div>';
   }else if(img){
-    discardEl.innerHTML='<div class="card table-card player-current color-'+escapeHtml(color)+'" style="width:103px!important;min-height:135px!important;height:135px!important"><img class="card-face" src="'+img+'" alt="'+escapeHtml(name)+'"><div class="card-name">'+escapeHtml(name)+'</div><div class="card-color">'+escapeHtml(topCardColor(c))+'</div></div>';
+    discardEl.innerHTML='<div class="card table-card player-current color-'+escapeHtml(color)+'"><img class="card-face" src="'+img+'" alt="'+escapeHtml(name)+'"><div class="card-name">'+escapeHtml(name)+'</div><div class="card-color">'+escapeHtml(topCardColor(c))+'</div></div>';
   }else{
-    discardEl.innerHTML='<div class="card table-card player-current color-'+escapeHtml(color)+'" style="width:103px!important;min-height:135px!important;height:135px!important"><div class="card-name">'+escapeHtml(name)+'</div></div>';
+    discardEl.innerHTML='<div class="card table-card player-current color-'+escapeHtml(color)+'"><div class="card-name">'+escapeHtml(name)+'</div></div>';
   }
 }
 
