@@ -9,6 +9,7 @@ html,body{margin:0;width:100%;height:100%;background:#000;overscroll-behavior:au
 body{font-family:system-ui,sans-serif}
 #game{position:relative;width:100vw;height:100dvh;overflow:hidden}
 #room-art{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block}
+#round-display{position:absolute;left:10%;top:60.5%;transform:translateX(-50%);z-index:5;color:#42ffe4;background:rgba(3,7,19,.88);border:3px solid #fff;border-radius:14px;padding:4px 10px;font-weight:1000;font-size:clamp(14px,2.1vw,26px);letter-spacing:2px;text-shadow:0 0 10px #00eaff;box-shadow:0 0 10px #00eaff,0 0 22px #00eaff;pointer-events:none;white-space:nowrap}
 #room-code{position:absolute;left:10%;top:68%;transform:translateX(-50%);z-index:5;color:#42ffe4;background:rgba(3,7,19,.88);border:4px solid #fff;border-radius:16px;padding:6px 12px;font-weight:1000;font-size:clamp(16px,2.6vw,32px);letter-spacing:3px;text-shadow:0 0 12px #00eaff;box-shadow:0 0 12px #00eaff,0 0 28px #00eaff;pointer-events:none}
 #join-qr{position:absolute;left:10%;top:78%;transform:translateX(-50%);z-index:5;width:clamp(82px,10vw,125px);height:clamp(82px,10vw,125px);padding:5px;box-sizing:border-box;background:#fff;border:4px solid #fff;border-radius:10px;box-shadow:0 0 12px #00eaff,0 0 28px #00eaff,0 0 48px #1687ff,0 0 70px #1687ff;display:none;object-fit:contain;pointer-events:none}
 #player-count{display:none;position:absolute;left:50%;top:15%;transform:translateX(-50%);z-index:5;color:#fff;font-weight:1000;font-size:clamp(13px,2vw,25px);text-shadow:0 0 8px #00eaff;pointer-events:none}
@@ -73,6 +74,7 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 .tv-card.special-modern-host .modern-special-name{font-size:16px}
 }
 @media(max-width:600px){
+ #round-display{top:60%;left:11%;padding:3px 8px;border-width:2px;letter-spacing:1px;font-size:clamp(13px,4.2vw,22px)}
 #card-display{top:73%;gap:22px}
 .host-pile{width:145px}
 .deck-stack{width:145px;height:195px}
@@ -137,7 +139,7 @@ button{padding:11px 7px;border-width:2px;border-radius:10px;font-size:14px}
 <body>
 <div id="game">
 <img id="room-art" src="/host-room.png" alt="PLAY YOUR HAND host room">
-<div id="room-code">----</div><img id="join-qr" alt="Scan to open PLAY YOUR HAND player screen">
+<div id="round-display">ROUND --</div><div id="room-code">----</div><img id="join-qr" alt="Scan to open PLAY YOUR HAND player screen">
 <div id="card-display"><div class="host-pile"><div class="host-pile-title">DRAW DECK</div><div class="deck-stack host-deck-stack"><div class="deck-card-back host-deck-back-3">PLAY<br>YOUR<br>HAND</div><div class="deck-card-back host-deck-back-2"></div><div class="deck-card-back">PLAY<br>YOUR<br>HAND</div></div><div class="host-pile-count" id="host-deck-count">CARDS LEFT: --</div></div><div class="host-pile"><div class="host-pile-title">DISCARD / PLAY PILE</div><div class="deck-stack host-discard-stack"><div id="host-discard-card"></div></div><div class="host-pile-count" id="host-discard-count">CARDS PLAYED: --</div></div></div>
 <div id="player-count">0 / 6 PLAYERS</div><div id="status">CONNECTING…</div><div id="seats"></div>
 <button id="host-menu-button" type="button" aria-label="Open menu"><span>☰</span>MENU</button>
