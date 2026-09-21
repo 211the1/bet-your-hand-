@@ -7,6 +7,16 @@ const codeEl=document.getElementById('room-code');
 const countEl=document.getElementById('player-count');
 const statusEl=document.getElementById('status');
 const seatsEl=document.getElementById('seats');
+const cardDisplay=document.getElementById('card-display');
+const cardImages={'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'};
+function renderTopCard(card){
+  if(!cardDisplay)return;
+  if(!card){cardDisplay.innerHTML='';return;}
+  const type=String(card.type||'').toUpperCase();
+  const name=card.character||({'SKIP':'SKIP','REVERSE':'REVERSE','WILD':'WILD','PLAY_YOUR_HAND':'PLAY YOUR HAND'}[type]||'CARD');
+  const img=cardImages[card.character];
+  cardDisplay.innerHTML='<div class="card-display-card">'+(img?'<img src="'+img+'" alt="">':'<div class="card-display-label">'+escapeHtml(name)+'</div>')+'</div>';
+}
 
 let ws=null;
 let session=null;
@@ -226,6 +236,7 @@ function connectAndCreate(){
     if(message.type==='HOST_GAME_STARTED'){
       started=true;
       players=message.players||players;
+      renderTopCard(message.game?.topCard||null);
       renderPlayers();
       updateButtons();
       status('GAME STARTED');
@@ -235,6 +246,7 @@ function connectAndCreate(){
     if(message.type==='STATE'){
       players=message.players||[];
       codeEl.textContent=message.roomCode||session?.code||'----';
+      renderTopCard(message.game?.topCard||null);
       if(message.game){
         started=true;
         status('GAME STARTED');
@@ -297,6 +309,7 @@ function reconnectSavedHost(){
       players=message.players||[];
       started=Boolean(message.game);
       codeEl.textContent=message.roomCode||session.code;
+      renderTopCard(message.game?.topCard||null);
       renderPlayers();
       updateButtons();
       status(started?'GAME STARTED':'ROOM READY — WAITING FOR PLAYERS');
