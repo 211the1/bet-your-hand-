@@ -96,6 +96,27 @@ function specialModern(card,where='tv'){
   return '<div class="modern-special '+type.toLowerCase()+' modern-'+String(col).toLowerCase()+' '+where+'"><div class="modern-special-icon '+iconClass+'" aria-hidden="true"></div><div class="modern-special-name">'+type+'</div></div>';
 }
 
+
+function renderPowerWheel(game){
+  const existing=document.getElementById('host-power-wheel-overlay');
+  const pending=game?.pending;
+  const active=pending?.type==='SPIN_WHEEL'||pending?.type==='POWER_USED';
+  if(!active){if(existing)existing.remove();return;}
+  const result=game?.wheelResult||null;
+  const landed=Number(result?.section||0);
+  const rotation=landed>0?(1440-(landed-1)*40):0;
+  const cls=pending.type==='SPIN_WHEEL'?'host-power-wheel-spin':(result?'host-power-wheel-land':'');
+  if(existing){
+    const wheel=existing.querySelector('.host-power-wheel');
+    if(wheel){wheel.className='host-power-wheel '+cls;wheel.style.setProperty('--host-wheel-land',rotation+'deg');}
+    return;
+  }
+  const overlay=document.createElement('div');
+  overlay.id='host-power-wheel-overlay';overlay.className='host-power-wheel-overlay';
+  overlay.innerHTML='<div class="host-power-wheel '+cls+'" style="--host-wheel-land:'+rotation+'deg"><img src="/assets/power_wheel_style2.png?v=1" alt="PLAY YOUR HAND Power Wheel"><div class="host-power-wheel-pointer">▼</div></div>';
+  document.body.appendChild(overlay);
+}
+
 function renderTopCard(card,game){
   const discardEl=document.getElementById('host-discard-card');
   const deckCountEl=document.getElementById('host-deck-count');
@@ -159,7 +180,16 @@ function showHostActionEffect(type){
   if(type==='CALL_PLAYER')playHostCallSound();else playHostTone(880,.22);
   setTimeout(()=>{if(el.isConnected)el.remove()},3200);
 }
-function playHostTone(freq=660,duration=.12){
+<style id="host-power-wheel-style">
+.host-power-wheel-overlay{position:fixed;inset:0;z-index:99980;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(0,37,105,.96),rgba(0,0,0,.98) 72%);pointer-events:none;opacity:1;transition:opacity .25s ease}
+.host-power-wheel{width:min(78vw,78vh);height:min(78vw,78vh);position:relative;display:flex;align-items:center;justify-content:center}
+.host-power-wheel img{width:100%;height:100%;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 28px #1687ff)}
+.host-power-wheel-spin{animation:hostPowerWheelSpin 1.1s cubic-bezier(.15,.8,.2,1) both}
+.host-power-wheel-land{animation:hostPowerWheelLand 1.35s cubic-bezier(.12,.82,.18,1) both}
+.host-power-wheel-pointer{position:absolute;top:-2%;left:50%;transform:translateX(-50%);font-size:clamp(28px,5vw,72px);color:#fff;text-shadow:0 0 12px #fff;z-index:2}
+@keyframes hostPowerWheelSpin{from{transform:rotate(0deg)}to{transform:rotate(1440deg)}}
+@keyframes hostPowerWheelLand{from{transform:rotate(0deg)}to{transform:rotate(var(--host-wheel-land))}}
+</style>\nfunction playHostTone(freq=660,duration=.12){
   if(!hostSoundEnabled)return;
   try{
     const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
@@ -390,7 +420,7 @@ function connectAndCreate(){
     if(message.type==='HOST_GAME_STARTED'){
       started=true;
       players=message.players||players;
-      renderTopCard(message.game?.topCard||null,message.game);
+      renderTopCard(message.game?.topCard||null,message.game);\n      renderPowerWheel(message.game);
       renderPlayers();
       updateButtons();
       status('GAME STARTED');
