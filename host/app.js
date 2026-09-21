@@ -420,7 +420,9 @@ function connectAndCreate(){
     if(message.type==='HOST_GAME_STARTED'){
       started=true;
       players=message.players||players;
-      renderTopCard(message.game?.topCard||null,message.game);\n      renderPowerWheel(message.game);
+      renderTopCard(message.game?.topCard||null,message.game);
+      renderPowerWheel(message.game);
+      renderPowerWheel(message.game);
       renderPlayers();
       updateButtons();
       status('GAME STARTED');
@@ -432,6 +434,7 @@ function connectAndCreate(){
       codeEl.textContent=message.roomCode||session?.code||'----';
       updateJoinQr(message.roomCode||session?.code||'');
       renderTopCard(message.game?.topCard||null,message.game);
+      renderPowerWheel(message.game);
       if(message.game){
         started=true;
         status('GAME STARTED');
@@ -498,6 +501,7 @@ function reconnectSavedHost(){
       started=Boolean(message.game);
       codeEl.textContent=message.roomCode||session.code;
       renderTopCard(message.game?.topCard||null,message.game);
+      renderPowerWheel(message.game);
       renderPlayers();
       updateButtons();
       status(started?'GAME STARTED':'ROOM READY — WAITING FOR PLAYERS');
