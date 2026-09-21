@@ -512,6 +512,8 @@ function reconnectSavedHost(){
     let message;
     try{message=JSON.parse(event.data)}catch{return}
 
+    if(message.type==='LAST_CARD_EVENT'){showHostLastCard(message.event);return}
+
     if(message.type==='PLAYER_EMOJI'){showPlayerEmoji(message);return}
 
     if(message.type==='ERROR'){
