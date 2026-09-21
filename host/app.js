@@ -23,18 +23,54 @@ try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{ses
 
 const cardImages={'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'};
 const seatImages={'Bug':'/bug-seat.png','Face':'/face-seat.png','Ling Ling':'/ling-ling-seat.png','Beanz':'/beanz-seat.png','The One':'/the-one-seat.png','Boone':'/boone-seat.png','Chicken Joe':'/chicken-joe-seat.png','Juby':'/juby-seat.png','Meemaw':'/meemaw-seat.png'};
-function topCardColor(card){
+const colors=['red','blue','green','yellow'];
+
+function characterImage(name){
+  return name?({
+    'Bug':'/Bug.jpg',
+    'Face':'/Face.jpg',
+    'Ling Ling':'/Ling_Ling.jpg',
+    'Beanz':'/Beanz.jpg',
+    'The One':'/The_One.jpg',
+    'Boone':'/Boone.jpg',
+    'Chicken Joe':'/Chicken_Joe.jpg',
+    'Juby':'/Juby.jpg',
+    'Meemaw':'/Meemaw.jpg'
+  }[name]||''):'';
+}
+
+function cardColor(card){
   if(!card)return '';
   if(card.type==='CHARACTER'){
-    const c=String(card.id||'').split('-')[0].toLowerCase();
-    return ['red','blue','green','yellow'].includes(c)?c:(String(card.color||'').toLowerCase());
+    const c=String(card.id||'').split('-')[0];
+    return colors.includes(c)?c:(colors.includes(card.color)?card.color:'');
   }
   if(card.type==='SKIP'||card.type==='REVERSE'){
     const n=Number(String(card.id||'').split('-')[1]);
-    return Number.isFinite(n)?['red','blue','green','yellow'][n%4]:String(card.color||'').toLowerCase();
+    return Number.isFinite(n)?colors[n%4]:(colors.includes(card.color)?card.color:'');
   }
-  return String(card.color||'').toLowerCase();
+  return colors.includes(card.color)?card.color:'';
 }
+
+function cardHtml(card){
+  const c=card||{},
+    name=c.character||({
+      SKIP:'SKIP',
+      REVERSE:'REVERSE',
+      WILD:'WILD',
+      PLAY_YOUR_HAND:'PLAY YOUR HAND'
+    }[c.type]||'CARD'),
+    img=characterImage(c.character),
+    authoritativeColor=cardColor(c),
+    color=authoritativeColor.toLowerCase();
+
+  return '<div class="card table-card player-current color-'+escapeHtml(color)+'">'+
+    (img?'<img class="card-face" src="'+img+'" alt="'+escapeHtml(name)+'">':'')+
+    '<div class="card-name">'+escapeHtml(name)+'</div>'+
+    (authoritativeColor?'<div class="card-color">'+escapeHtml(authoritativeColor)+'</div>':'<div class="card-type">'+escapeHtml((c.type||'CARD').replaceAll('_',' '))+'</div>')+
+    '</div>';
+}
+
 function renderTopCard(card,game){
   const discardEl=document.getElementById('host-discard-card');
   const deckCountEl=document.getElementById('host-deck-count');
@@ -42,19 +78,7 @@ function renderTopCard(card,game){
   if(deckCountEl)deckCountEl.textContent='CARDS LEFT: '+Number(game?.deckCount??game?.cardsLeft??0);
   if(discardCountEl)discardCountEl.textContent='CARDS PLAYED: '+Number(game?.discardCount??0);
   if(!discardEl)return;
-  if(!card){discardEl.innerHTML='';return;}
-  const c=card||{},name=c.character||({SKIP:'SKIP',REVERSE:'REVERSE',WILD:'WILD',PLAY_YOUR_HAND:'PLAY YOUR HAND'}[c.type]||'CARD');
-  const img=cardImages[c.character], color=topCardColor(c).toLowerCase();
-  const specialUrl=c.type==='WILD'?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/WILD.png':c.type==='PLAY_YOUR_HAND'?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/PLAY_YOUR_HAND.png':'';
-  if(specialUrl){
-    discardEl.innerHTML='<img src="'+specialUrl+'" alt="'+escapeHtml(name)+'">';
-  }else if(c.type==='SKIP'||c.type==='REVERSE'){
-    discardEl.innerHTML='<div class="card table-card player-current color-'+escapeHtml(color)+'"><div class="card-name">'+escapeHtml(name)+'</div></div>';
-  }else if(img){
-    discardEl.innerHTML='<div class="card table-card player-current color-'+escapeHtml(color)+'"><img class="card-face" src="'+img+'" alt="'+escapeHtml(name)+'"><div class="card-name">'+escapeHtml(name)+'</div><div class="card-color">'+escapeHtml(topCardColor(c))+'</div></div>';
-  }else{
-    discardEl.innerHTML='<div class="card table-card player-current color-'+escapeHtml(color)+'"><div class="card-name">'+escapeHtml(name)+'</div></div>';
-  }
+  discardEl.innerHTML=card?cardHtml(card):'';
 }
 
 function status(text,bad=false){
