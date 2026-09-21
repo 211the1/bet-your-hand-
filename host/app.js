@@ -289,6 +289,11 @@ function scheduleSeatMovement(seatEl,seat){
   seatTimers.set(seat,timer);
 }
 
+function mergeGameScores(gamePlayers){
+  const scoreMap=new Map((gamePlayers||[]).map(p=>[String(p.id),Number(p.points??500)]));
+  players=(players||[]).map(p=>({...p,points:scoreMap.has(String(p.id))?scoreMap.get(String(p.id)):Number(p.points??500)}));
+}
+
 function renderPlayers(){
   players=players||[];
   const seatedPlayers=players.slice(0,6);
@@ -458,6 +463,7 @@ function connectAndCreate(){
     if(message.type==='HOST_GAME_STARTED'){
       started=true;
       players=message.players||players;
+      mergeGameScores(message.game?.players);
       renderTopCard(message.game?.topCard||null,message.game);
       updateRound(message.game?.round);
       renderPowerWheel(message.game);
@@ -470,6 +476,7 @@ function connectAndCreate(){
 
     if(message.type==='STATE'){
       players=message.players||[];
+      mergeGameScores(message.game?.players);
       codeEl.textContent=message.roomCode||session?.code||'----';
       updateJoinQr(message.roomCode||session?.code||'');
       renderTopCard(message.game?.topCard||null,message.game);
@@ -540,6 +547,7 @@ function reconnectSavedHost(){
 
     if(message.type==='STATE'){
       players=message.players||[];
+      mergeGameScores(message.game?.players);
       started=Boolean(message.game);
       codeEl.textContent=message.roomCode||session.code;
       renderTopCard(message.game?.topCard||null,message.game);
