@@ -124,6 +124,12 @@ button{padding:11px 7px;border-width:2px;border-radius:10px;font-size:14px}
 .last-card-video-overlay{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center}
 .last-card-video{width:100%;height:100%;object-fit:contain;background:#000}
 .last-card-video-sound{position:absolute;z-index:100000;bottom:24px;left:50%;transform:translateX(-50%);padding:14px 22px;border:0;border-radius:999px;font-weight:900;font-size:18px;background:#fff;color:#111;box-shadow:0 4px 18px #0008}
+
+#host-wanderer{position:absolute;left:8%;top:18%;z-index:2;width:clamp(72px,10vw,145px);height:auto;pointer-events:none;will-change:left,top,transform;transition:left 5.5s ease-in-out,top 5.5s ease-in-out;filter:drop-shadow(0 8px 8px #0008)}
+#host-wanderer img{display:block;width:100%;height:auto;object-fit:contain}
+#host-wanderer.host-walk-right{transform:scaleX(1)}
+#host-wanderer.host-walk-left{transform:scaleX(-1)}
+@media(max-width:600px){#host-wanderer{width:76px;transition:left 4.5s ease-in-out,top 4.5s ease-in-out}}
 </style>
 <style id="host-power-wheel-style">
 .host-power-wheel-overlay{position:fixed;inset:0;z-index:99980;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(0,37,105,.96),rgba(0,0,0,.98) 72%);pointer-events:none;opacity:1;transition:opacity .25s ease}
@@ -140,6 +146,7 @@ button{padding:11px 7px;border-width:2px;border-radius:10px;font-size:14px}
 <body>
 <div id="game">
 <img id="room-art" src="/host-room.png" alt="PLAY YOUR HAND host room">
+<div id="host-wanderer" class="host-walk-right" aria-hidden="true"><img src="/host-character.png" alt=""></div>
 <div id="round-display">ROUND --</div><div id="room-code">----</div><img id="join-qr" alt="Scan to open PLAY YOUR HAND player screen">
 <div id="card-display"><div class="host-pile"><div class="host-pile-title">DRAW DECK</div><div class="deck-stack host-deck-stack"><div class="deck-card-back host-deck-back-3">PLAY<br>YOUR<br>HAND</div><div class="deck-card-back host-deck-back-2"></div><div class="deck-card-back">PLAY<br>YOUR<br>HAND</div></div><div class="host-pile-count" id="host-deck-count">CARDS LEFT: --</div></div><div class="host-pile"><div class="host-pile-title">DISCARD / PLAY PILE</div><div class="deck-stack host-discard-stack"><div id="host-discard-card"></div></div><div class="host-pile-count" id="host-discard-count">CARDS PLAYED: --</div></div></div>
 <div id="player-count">0 / 6 PLAYERS</div><div id="status">CONNECTING…</div><div id="seats"></div>
