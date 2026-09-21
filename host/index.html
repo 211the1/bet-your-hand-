@@ -49,6 +49,31 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
  .host-pile-count{font-size:10px}
 }
 #seats{position:absolute;inset:0;z-index:4;pointer-events:none}
+.host-player-emoji{
+  position:absolute;
+  left:50%;
+  top:-12px;
+  transform:translate(-50%,-100%) scale(.45);
+  z-index:20;
+  font-size:clamp(28px,4.5vw,62px);
+  line-height:1;
+  text-shadow:0 5px 12px #000,0 0 14px #fff;
+  pointer-events:none;
+  animation:hostEmojiPop 1.75s ease-out forwards;
+  white-space:nowrap
+}
+.host-player-emoji img{
+  width:clamp(42px,5vw,68px);
+  height:clamp(42px,5vw,68px);
+  object-fit:contain;
+  display:block
+}
+@keyframes hostEmojiPop{
+  0%{opacity:0;transform:translate(-50%,-65%) scale(.35)}
+  15%{opacity:1;transform:translate(-50%,-100%) scale(1.08)}
+  65%{opacity:1;transform:translate(-50%,-120%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-155%) scale(.8)}
+}
 .seat{position:absolute;transform:translate(-50%,-50%);width:clamp(82px,11vw,150px);text-align:center;transform-origin:center bottom}
 .seat img{height:clamp(130px,17vw,210px)!important}
 .s1{left:17%;top:36%}.s2{left:31%;top:34%}.s3{left:43%;top:34%}.s4{left:56%;top:34%}.s5{left:69%;top:34%}.s6{left:84%;top:36%}
