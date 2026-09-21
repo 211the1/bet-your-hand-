@@ -78,7 +78,32 @@ function renderTopCard(card,game){
   if(deckCountEl)deckCountEl.textContent='CARDS LEFT: '+Number(game?.deckCount??game?.cardsLeft??0);
   if(discardCountEl)discardCountEl.textContent='CARDS PLAYED: '+Number(game?.discardCount??0);
   if(!discardEl)return;
-  discardEl.innerHTML=card?cardHtml(card):'';
+  if(!card){discardEl.innerHTML='';return;}
+
+  const c=card||{},
+    name=c.character||({
+      SKIP:'SKIP',
+      REVERSE:'REVERSE',
+      WILD:'WILD',
+      PLAY_YOUR_HAND:'PLAY YOUR HAND'
+    }[c.type]||'CARD'),
+    img=characterImage(c.character),
+    color=cardColor(c).toLowerCase();
+
+  const specialUrl=
+    c.type==='WILD'
+      ?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/WILD.png'
+      :c.type==='PLAY_YOUR_HAND'
+        ?'https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3/PLAY_YOUR_HAND.png'
+        :'';
+
+  if(specialUrl){
+    discardEl.innerHTML='<img class="host-special-art" src="'+specialUrl+'" alt="'+escapeHtml(name)+'">';
+  }else if(img){
+    discardEl.innerHTML='<div class="tv-card color-'+escapeHtml(color)+'"><img src="'+img+'" alt="'+escapeHtml(name)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(cardColor(c))+'</small></div>';
+  }else{
+    discardEl.innerHTML='<div class="tv-card color-'+escapeHtml(color)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(cardColor(c))+'</small></div>';
+  }
 }
 
 function status(text,bad=false){
