@@ -191,7 +191,7 @@ function renderPlayers(){
   seatsEl.innerHTML=seatedPlayers.map(p=>{
     const img=seatImages[p.character]||'';
     const seat=seatAssignments.get(playerKey(p));
-    return '<div class="seat s'+seat+'" data-seat="'+seat+'">'+
+    return '<div class="seat s'+seat+'" data-seat="'+seat+'" data-player-id="'+escapeHtml(p.id||'')+'">'+
       (img?'<img src="'+img+'" alt="">':'')+
       '<div class="seat-label"><b>'+escapeHtml(p.character||'')+'</b>'+escapeHtml(p.name||'')+'</div>'+
       '</div>';
@@ -200,6 +200,25 @@ function renderPlayers(){
   seatsEl.querySelectorAll('.seat').forEach(el=>{
     scheduleSeatMovement(el,Number(el.dataset.seat));
   });
+}
+
+function showPlayerEmoji(message){
+  const targetId=String(message?.targetPlayerId||'');
+  const seatEl=seatsEl.querySelector('.seat[data-player-id="'+CSS.escape(targetId)+'"]');
+  if(!seatEl)return;
+  seatEl.querySelectorAll('.host-player-emoji').forEach(x=>x.remove());
+  const el=document.createElement('div');
+  el.className='host-player-emoji';
+  if(message.emoji==='CUSTOM'){
+    const img=document.createElement('img');
+    img.src='/assets/custom_emoji.png?v=3';
+    img.alt='Custom reaction';
+    el.appendChild(img);
+  }else{
+    el.textContent=String(message.emoji||'🙂');
+  }
+  seatEl.appendChild(el);
+  setTimeout(()=>{if(el.isConnected)el.remove()},1750);
 }
 
 function escapeHtml(value){
@@ -269,6 +288,8 @@ function connectAndCreate(){
   ws.addEventListener('message',event=>{
     let message;
     try{message=JSON.parse(event.data)}catch{return}
+
+    if(message.type==='PLAYER_EMOJI'){showPlayerEmoji(message);return}
 
     if(message.type==='ERROR'){
       creating=false;
@@ -356,6 +377,8 @@ function reconnectSavedHost(){
   ws.addEventListener('message',event=>{
     let message;
     try{message=JSON.parse(event.data)}catch{return}
+
+    if(message.type==='PLAYER_EMOJI'){showPlayerEmoji(message);return}
 
     if(message.type==='ERROR'){
       resetToReady('READY — GENERATE A NEW CODE');
