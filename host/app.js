@@ -416,6 +416,7 @@ function connectAndCreate(){
 
     if(message.type==='CALL_PLAYER'){showHostActionEffect('CALL_PLAYER');return}
     if(message.type==='PLAY_YOUR_HAND_EVENT'){showHostActionEffect('PLAY_YOUR_HAND');return};
+    if(message.type==='LAST_CARD_EVENT'){showHostLastCard(message.event);return}
     if(message.type==='PLAYER_EMOJI'){showPlayerEmoji(message);return}
 
     if(message.type==='ERROR'){
