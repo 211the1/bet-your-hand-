@@ -9,6 +9,13 @@ const countEl=document.getElementById('player-count');
 const statusEl=document.getElementById('status');
 const seatsEl=document.getElementById('seats');
 const cardDisplay=document.getElementById('card-display');
+const hostMenuButton=document.getElementById('host-menu-button');
+const hostMenuPanel=document.getElementById('host-menu-panel');
+const hostMenuClose=document.getElementById('host-menu-close');
+const hostSoundButton=document.getElementById('host-sound');
+const hostRestartButton=document.getElementById('host-restart');
+const hostGenerateButton=document.getElementById('host-generate');
+let hostSoundEnabled=true;
 
 let ws=null;
 let session=null;
@@ -119,6 +126,23 @@ function updateJoinQr(code){
   qrEl.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data='+encodeURIComponent(playerUrl);
   qrEl.style.display='block';
 }
+
+function playHostTone(freq=660,duration=.12){
+  if(!hostSoundEnabled)return;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=new C(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.0001,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.18,ctx.currentTime+.02);
+    g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+duration);
+    o.connect(g).connect(ctx.destination);o.start();o.stop(ctx.currentTime+duration);
+    setTimeout(()=>ctx.close(),300);
+  }catch{}
+}
+function updateHostSoundButton(){
+  if(hostSoundButton)hostSoundButton.textContent=hostSoundEnabled?'SOUND: ON':'SOUND: OFF';
+}
+function closeHostMenu(){if(hostMenuPanel)hostMenuPanel.classList.remove('show')}
 
 function status(text,bad=false){
   statusEl.textContent=text;
@@ -431,6 +455,25 @@ function reconnectSavedHost(){
   });
 }
 
+hostMenuButton?.addEventListener('click',()=>hostMenuPanel?.classList.toggle('show'));
+hostMenuClose?.addEventListener('click',closeHostMenu);
+hostSoundButton?.addEventListener('click',()=>{
+  hostSoundEnabled=!hostSoundEnabled;
+  updateHostSoundButton();
+  if(hostSoundEnabled)playHostTone(880,.16);
+});
+hostGenerateButton?.addEventListener('click',()=>{
+  closeHostMenu();
+  connectAndCreate();
+});
+hostRestartButton?.addEventListener('click',()=>{
+  if(!session||!send({type:'RESTART_GAME'})){
+    status('NOT CONNECTED — GENERATE A NEW CODE',true);
+    return;
+  }
+  closeHostMenu();
+  status('RESTARTING — CREATING NEW ROOM…');
+});
 generateBtn.addEventListener('click',connectAndCreate);
 startBtn.addEventListener('click',()=>{
   if(startBtn.disabled)return;
@@ -443,6 +486,7 @@ startBtn.addEventListener('click',()=>{
 
 renderPlayers();
 updateButtons();
+updateHostSoundButton();
 
 if(session){
   codeEl.textContent=session.code||'----';
