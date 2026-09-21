@@ -15,8 +15,8 @@ let started=false;
 let players=[];
 let reconnectTimer=null;
 let reconnecting=false;
-const seatTestMode=new URLSearchParams(location.search).get('test')==='seats';
-
+const seatAssignments=new Map();
+const seatTimers=new Map();
 
 try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{session=null}
 
@@ -43,19 +43,91 @@ function send(message){
   return true;
 }
 
+function playerKey(p){
+  return String(p.id||p.playerId||((p.name||'')+'|'+(p.character||'')));
+}
+
+function randomOpenSeat(used){
+  const open=[];
+  for(let i=1;i<=6;i++)if(!used.has(i))open.push(i);
+  return open[Math.floor(Math.random()*open.length)];
+}
+
+function assignSeats(seatedPlayers){
+  const activeKeys=new Set(seatedPlayers.map(playerKey));
+
+  for(const key of seatAssignments.keys()){
+    if(!activeKeys.has(key))seatAssignments.delete(key);
+  }
+
+  const used=new Set();
+  for(const key of activeKeys){
+    const seat=seatAssignments.get(key);
+    if(seat)used.add(seat);
+  }
+
+  for(const p of seatedPlayers){
+    const key=playerKey(p);
+    if(!seatAssignments.has(key)){
+      const seat=randomOpenSeat(used);
+      if(seat){
+        seatAssignments.set(key,seat);
+        used.add(seat);
+      }
+    }
+  }
+}
+
+function clearSeatTimer(seat){
+  const timer=seatTimers.get(seat);
+  if(timer){
+    clearTimeout(timer);
+    seatTimers.delete(seat);
+  }
+}
+
+function scheduleSeatMovement(seatEl,seat){
+  clearSeatTimer(seat);
+  const delay=3000+Math.random()*6000;
+  const timer=setTimeout(()=>{
+    if(!seatEl.isConnected)return;
+    const moves=['seat-rock','seat-bounce','seat-wiggle'];
+    const movement=moves[Math.floor(Math.random()*moves.length)];
+    seatEl.classList.remove(...moves);
+    void seatEl.offsetWidth;
+    seatEl.classList.add(movement);
+    const done=()=>{
+      seatEl.classList.remove(movement);
+      seatEl.removeEventListener('animationend',done);
+      scheduleSeatMovement(seatEl,seat);
+    };
+    seatEl.addEventListener('animationend',done);
+  },delay);
+  seatTimers.set(seat,timer);
+}
+
 function renderPlayers(){
   players=players||[];
   const seatedPlayers=players.slice(0,6);
+  assignSeats(seatedPlayers);
+
+  for(let i=1;i<=6;i++)clearSeatTimer(i);
+
   countEl.textContent=seatedPlayers.length+' / 6 PLAYERS';
-  seatsEl.innerHTML=seatedPlayers.map((p,i)=>{
+  seatsEl.innerHTML=seatedPlayers.map(p=>{
     const img=seatImages[p.character]||'';
-    const seat=i+1;
-    return '<div class="seat s'+seat+'">'+
+    const seat=seatAssignments.get(playerKey(p));
+    return '<div class="seat s'+seat+'" data-seat="'+seat+'">'+
       (img?'<img src="'+img+'" alt="">':'')+
       '<div class="seat-label"><b>'+escapeHtml(p.character||'')+'</b>'+escapeHtml(p.name||'')+'</div>'+
       '</div>';
   }).join('');
+
+  seatsEl.querySelectorAll('.seat').forEach(el=>{
+    scheduleSeatMovement(el,Number(el.dataset.seat));
+  });
 }
+
 function escapeHtml(value){
   return String(value??'').replace(/[&<>'"]/g,c=>({
     '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
@@ -78,6 +150,8 @@ function resetToReady(message){
   session=null;
   players=[];
   started=false;
+  seatAssignments.clear();
+  for(let i=1;i<=6;i++)clearSeatTimer(i);
   localStorage.removeItem('pyhHostSession');
   codeEl.textContent='----';
   renderPlayers();
@@ -97,6 +171,7 @@ function connectAndCreate(){
   if(creating)return;
   creating=true;
   session=null;
+  seatAssignments.clear();
   localStorage.removeItem('pyhHostSession');
   codeEl.textContent='----';
   players=[];
