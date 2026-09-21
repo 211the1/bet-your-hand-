@@ -58,7 +58,7 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 <body>
 <div id="game">
   <img id="room-art" src="/host-room.png" alt="PLAY YOUR HAND host room">
-  <div id="room-code">----</div><div id="card-display"></div>
+  <div id="room-code">----</div><div id="card-display"><div class="host-pile"><div class="host-pile-title">DRAW DECK</div><div class="host-deck-stack"><div class="host-deck-back host-deck-back-3">PLAY<br>YOUR<br>HAND</div><div class="host-deck-back host-deck-back-2"></div><div class="host-deck-back">PLAY<br>YOUR<br>HAND</div></div><div class="host-pile-count" id="host-deck-count">CARDS LEFT: --</div></div><div class="host-pile"><div class="host-pile-title">DISCARD / PLAY PILE</div><div class="host-discard" id="host-discard-card"></div><div class="host-pile-count" id="host-discard-count">CARDS PLAYED: --</div></div></div>
   <div id="player-count">0 / 6 PLAYERS</div>
   <div id="status">CONNECTING…</div>
   <div id="seats"></div>
@@ -67,6 +67,6 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
     <button id="start" class="start" disabled>START GAME</button>
   </div>
 </div>
-<script src="/host/app.js?v=14"></script>
+<script src="/host/app.js?v=15"></script>
 </body>
 </html>
