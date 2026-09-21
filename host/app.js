@@ -356,7 +356,8 @@ function connectAndCreate(){
     try{message=JSON.parse(event.data)}catch{return}
 
     if(message.type==='CALL_PLAYER'){showHostActionEffect('CALL_PLAYER');return}
-    if(message.type==='PLAY_YOUR_HAND_EVENT'){showHostActionEffect('PLAY_YOUR_HAND');return}\n    if(message.type==='PLAYER_EMOJI'){showPlayerEmoji(message);return}
+    if(message.type==='PLAY_YOUR_HAND_EVENT'){showHostActionEffect('PLAY_YOUR_HAND');return};
+    if(message.type==='PLAYER_EMOJI'){showPlayerEmoji(message);return}
 
     if(message.type==='ERROR'){
       creating=false;
