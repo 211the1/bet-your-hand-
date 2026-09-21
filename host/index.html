@@ -14,6 +14,16 @@ body{font-family:system-ui,sans-serif}
 #player-count{display:none;position:absolute;left:50%;top:15%;transform:translateX(-50%);z-index:5;color:#fff;font-weight:1000;font-size:clamp(13px,2vw,25px);text-shadow:0 0 8px #00eaff;pointer-events:none}
 #status{display:none;position:absolute;left:50%;top:22%;transform:translateX(-50%);z-index:5;color:#21f17d;font-weight:900;font-size:clamp(11px,1.5vw,18px);text-align:center;text-shadow:0 0 8px #000;pointer-events:none}
 #controls{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);z-index:10;display:flex;gap:12px;width:min(92vw,700px)}
+#host-menu-button{position:absolute;right:5%;bottom:6%;z-index:12;width:clamp(58px,8vw,92px);height:clamp(58px,8vw,92px);border:3px solid #fff;border-radius:18px;background:rgba(3,7,19,.92);color:#fff;font:1000 clamp(11px,1.5vw,17px)/1 system-ui,sans-serif;text-shadow:0 0 8px #00eaff;box-shadow:0 0 14px #00eaff,0 0 30px #1687ff;cursor:pointer}
+#host-menu-button span{display:block;font-size:clamp(25px,4vw,40px);line-height:.9;margin-bottom:4px}
+#host-menu-panel{position:absolute;right:5%;bottom:15%;z-index:30;width:min(260px,78vw);display:none}
+#host-menu-panel.show{display:block}
+.host-menu-box{padding:14px;border:3px solid #1687ff;border-radius:18px;background:rgba(3,7,19,.97);box-shadow:0 0 20px #00eaff,0 0 45px #1687ff;color:#fff}
+.host-menu-title{font-weight:1000;text-align:center;color:#42ffe4;text-shadow:0 0 10px #00eaff;font-size:18px;margin-bottom:10px}
+.host-menu-button{width:100%;margin:6px 0;padding:12px 10px;border:2px solid #fff;border-radius:12px;color:#fff;background:#0869ff;font-weight:1000;box-shadow:0 0 12px #1687ff;cursor:pointer}
+.host-menu-button.restart{background:#a71919;box-shadow:0 0 12px #ff4040}
+.host-menu-button.sound{background:#087a55;box-shadow:0 0 12px #21f17d}
+.host-menu-close{width:100%;margin-top:6px;padding:8px;border:2px solid #fff;border-radius:10px;background:#222;color:#fff;font-weight:900;cursor:pointer}
 button{flex:1;border:3px solid #fff;border-radius:14px;padding:14px 18px;font:1000 clamp(14px,2vw,20px)/1 system-ui,sans-serif;color:#fff;cursor:pointer;text-shadow:2px 2px 0 #000;box-shadow:0 0 18px #1687ff,0 7px 16px #0009;background:#0869ff}
 button.start{background:#12a84a;box-shadow:0 0 18px #21f17d,0 7px 16px #0009}
 button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
@@ -90,6 +100,8 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 @keyframes seatWiggle{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(calc(-50% - 5px),-50%)}50%{transform:translate(calc(-50% + 5px),-50%)}75%{transform:translate(calc(-50% - 3px),-50%)}}
 @media(max-width:600px){
  #controls{bottom:2%;gap:7px;width:96vw}
+ #host-menu-button{right:4%;bottom:6%;width:64px;height:64px;border-radius:14px}
+ #host-menu-panel{right:4%;bottom:14%;width:min(250px,78vw)}
  button{padding:11px 7px;border-width:2px;border-radius:10px;font-size:14px}
  #room-code{top:76%;left:11%;padding:4px 8px;border-width:3px;letter-spacing:2px;font-size:clamp(16px,5.2vw,28px)}
  #join-qr{top:88%;left:11%;width:92px;height:92px;padding:4px;border-width:3px;box-shadow:0 0 12px #00eaff,0 0 26px #00eaff,0 0 42px #1687ff}
@@ -106,6 +118,8 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
   <div id="player-count">0 / 6 PLAYERS</div>
   <div id="status">CONNECTING…</div>
   <div id="seats"></div>
+  <button id="host-menu-button" type="button" aria-label="Open menu"><span>☰</span>MENU</button>
+  <div id="host-menu-panel"><div class="host-menu-box"><div class="host-menu-title">GAME MENU</div><button id="host-sound" class="host-menu-button sound" type="button">SOUND: ON</button><button id="host-restart" class="host-menu-button restart" type="button">RESTART</button><button id="host-generate" class="host-menu-button" type="button">GENERATE CODE</button><button id="host-menu-close" class="host-menu-close" type="button">CLOSE</button></div></div>
   <div id="controls">
     <button id="generate">GENERATE CODE</button>
     <button id="start" class="start" disabled>START GAME</button>
