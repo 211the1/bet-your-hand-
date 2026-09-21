@@ -17,6 +17,7 @@ let reconnectTimer=null;
 let reconnecting=false;
 const seatAssignments=new Map();
 const seatTimers=new Map();
+const testMode=new URLSearchParams(location.search).get('test')==='seats';
 
 try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{session=null}
 
@@ -31,6 +32,15 @@ const seatImages={
   'Juby':'/juby-seat.png',
   'Meemaw':'/meemaw-seat.png'
 };
+
+const testPlayers=[
+  {id:'test-1',name:'TEST 1',character:'Bug'},
+  {id:'test-2',name:'TEST 2',character:'Face'},
+  {id:'test-3',name:'TEST 3',character:'Ling Ling'},
+  {id:'test-4',name:'TEST 4',character:'Beanz'},
+  {id:'test-5',name:'TEST 5',character:'Boone'},
+  {id:'test-6',name:'TEST 6',character:'Chicken Joe'}
+];
 
 function status(text,bad=false){
   statusEl.textContent=text;
@@ -88,7 +98,7 @@ function clearSeatTimer(seat){
 
 function scheduleSeatMovement(seatEl,seat){
   clearSeatTimer(seat);
-  const delay=3000+Math.random()*6000;
+  const delay=1500+Math.random()*4000;
   const timer=setTimeout(()=>{
     if(!seatEl.isConnected)return;
     const moves=['seat-rock','seat-bounce','seat-wiggle'];
@@ -135,9 +145,9 @@ function escapeHtml(value){
 }
 
 function updateButtons(){
-  generateBtn.disabled=creating||started;
-  startBtn.disabled=started || players.length<2 || !session;
-  if(started){
+  generateBtn.disabled=creating||started||testMode;
+  startBtn.disabled=started || players.length<2 || !session || testMode;
+  if(started||testMode){
     generateBtn.style.display='none';
     startBtn.style.display='none';
   }else{
@@ -333,13 +343,21 @@ startBtn.addEventListener('click',()=>{
   status('STARTING GAME…');
 });
 
-renderPlayers();
-updateButtons();
-
-if(session){
-  codeEl.textContent=session.code||'----';
-  reconnectSavedHost();
+if(testMode){
+  players=testPlayers.slice();
+  seatAssignments.clear();
+  renderPlayers();
+  updateButtons();
+  status('TEST MODE — RANDOM SEAT MOVEMENTS');
 }else{
-  status('READY — GENERATE A CODE');
+  renderPlayers();
+  updateButtons();
+
+  if(session){
+    codeEl.textContent=session.code||'----';
+    reconnectSavedHost();
+  }else{
+    status('READY — GENERATE A CODE');
+  }
 }
 })();
