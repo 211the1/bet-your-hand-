@@ -17,7 +17,6 @@ let reconnectTimer=null;
 let reconnecting=false;
 const seatAssignments=new Map();
 const seatTimers=new Map();
-const testMode=new URLSearchParams(location.search).get('test')==='seats';
 
 try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{session=null}
 
@@ -32,15 +31,6 @@ const seatImages={
   'Juby':'/juby-seat.png',
   'Meemaw':'/meemaw-seat.png'
 };
-
-const testPlayers=[
-  {id:'test-1',name:'TEST 1',character:'Bug'},
-  {id:'test-2',name:'TEST 2',character:'Face'},
-  {id:'test-3',name:'TEST 3',character:'Ling Ling'},
-  {id:'test-4',name:'TEST 4',character:'Beanz'},
-  {id:'test-5',name:'TEST 5',character:'Boone'},
-  {id:'test-6',name:'TEST 6',character:'Chicken Joe'}
-];
 
 function status(text,bad=false){
   statusEl.textContent=text;
@@ -145,9 +135,9 @@ function escapeHtml(value){
 }
 
 function updateButtons(){
-  generateBtn.disabled=creating||started||testMode;
-  startBtn.disabled=started || players.length<2 || !session || testMode;
-  if(started||testMode){
+  generateBtn.disabled=creating||started;
+  startBtn.disabled=started || players.length<2 || !session;
+  if(started){
     generateBtn.style.display='none';
     startBtn.style.display='none';
   }else{
@@ -215,11 +205,7 @@ function connectAndCreate(){
 
     if(message.type==='ROOM_CREATED'){
       creating=false;
-      session={
-        code:message.code,
-        hostId:message.hostId,
-        hostToken:message.hostToken
-      };
+      session={code:message.code,hostId:message.hostId,hostToken:message.hostToken};
       localStorage.setItem('pyhHostSession',JSON.stringify(session));
       codeEl.textContent=message.code;
       players=[];
@@ -268,11 +254,11 @@ function connectAndCreate(){
   });
 
   ws.addEventListener('close',()=>{
-    if(!session && !started){
+    if(!session&&!started){
       creating=false;
       updateButtons();
       status('NOT CONNECTED — TAP GENERATE CODE',true);
-    }else if(session && !started){
+    }else if(session&&!started){
       status('HOST DISCONNECTED — RECONNECTING…',true);
       scheduleReconnect();
     }
@@ -288,12 +274,7 @@ function reconnectSavedHost(){
   ws.addEventListener('open',()=>{
     reconnecting=false;
     status('RECONNECTING HOST…');
-    send({
-      type:'RECONNECT',
-      code:session.code,
-      playerId:session.hostId,
-      reconnectToken:session.hostToken
-    });
+    send({type:'RECONNECT',code:session.code,playerId:session.hostId,reconnectToken:session.hostToken});
   });
 
   ws.addEventListener('message',event=>{
@@ -343,21 +324,13 @@ startBtn.addEventListener('click',()=>{
   status('STARTING GAME…');
 });
 
-if(testMode){
-  players=testPlayers.slice();
-  seatAssignments.clear();
-  renderPlayers();
-  updateButtons();
-  status('TEST MODE — RANDOM SEAT MOVEMENTS');
-}else{
-  renderPlayers();
-  updateButtons();
+renderPlayers();
+updateButtons();
 
-  if(session){
-    codeEl.textContent=session.code||'----';
-    reconnectSavedHost();
-  }else{
-    status('READY — GENERATE A CODE');
-  }
+if(session){
+  codeEl.textContent=session.code||'----';
+  reconnectSavedHost();
+}else{
+  status('READY — GENERATE A CODE');
 }
 })();
