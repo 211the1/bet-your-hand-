@@ -305,6 +305,31 @@ function renderPlayers(){
   });
 }
 
+function showHostLastCard(event){
+  if(!event||event.id===lastHostLastCardEvent)return;
+  lastHostLastCardEvent=event.id;
+  const overlay=document.createElement('div');
+  overlay.className='last-card-video-overlay';
+  const video=document.createElement('video');
+  video.className='last-card-video';
+  video.src='/last-card.mp4';
+  video.autoplay=true;
+  video.muted=false;
+  video.playsInline=true;
+  video.preload='auto';
+  overlay.appendChild(video);
+  const sound=document.createElement('button');
+  sound.className='last-card-video-sound';
+  sound.textContent='SOUND — TAP FOR SOUND';
+  sound.onclick=()=>{video.muted=false;video.play().catch(()=>{});sound.remove()};
+  overlay.appendChild(sound);
+  document.body.appendChild(overlay);
+  const finish=()=>{if(overlay.isConnected)overlay.remove()};
+  video.addEventListener('ended',finish,{once:true});
+  video.addEventListener('error',finish,{once:true});
+  video.play().then(()=>sound.remove()).catch(()=>{video.muted=true;video.play().catch(finish)});
+}
+
 function showPlayerEmoji(message){
   const targetId=String(message?.targetPlayerId||'');
   const seatEl=seatsEl.querySelector('.seat[data-player-id="'+CSS.escape(targetId)+'"]');
@@ -425,6 +450,7 @@ function connectAndCreate(){
       players=message.players||players;
       renderTopCard(message.game?.topCard||null,message.game);
       renderPowerWheel(message.game);
+      if(message.game?.lastCardEvent)showHostLastCard(message.game.lastCardEvent);else if(!message.game?.lastCardEvent)lastHostLastCardEvent=null;
       renderPlayers();
       updateButtons();
       status('GAME STARTED');
@@ -437,6 +463,7 @@ function connectAndCreate(){
       updateJoinQr(message.roomCode||session?.code||'');
       renderTopCard(message.game?.topCard||null,message.game);
       renderPowerWheel(message.game);
+      if(message.game?.lastCardEvent)showHostLastCard(message.game.lastCardEvent);else if(!message.game?.lastCardEvent)lastHostLastCardEvent=null;
       if(message.game){
         started=true;
         status('GAME STARTED');
