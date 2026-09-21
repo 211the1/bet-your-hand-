@@ -4,6 +4,7 @@
 const generateBtn=document.getElementById('generate');
 const startBtn=document.getElementById('start');
 const codeEl=document.getElementById('room-code');
+const qrEl=document.getElementById('join-qr');
 const countEl=document.getElementById('player-count');
 const statusEl=document.getElementById('status');
 const seatsEl=document.getElementById('seats');
@@ -104,6 +105,19 @@ function renderTopCard(card,game){
   }else{
     discardEl.innerHTML='<div class="tv-card color-'+escapeHtml(color)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(cardColor(c))+'</small></div>';
   }
+}
+
+function updateJoinQr(code){
+  if(!qrEl)return;
+  const value=String(code||'').trim();
+  if(!value||value==='----'){
+    qrEl.style.display='none';
+    qrEl.removeAttribute('src');
+    return;
+  }
+  const playerUrl=location.origin+'/';
+  qrEl.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data='+encodeURIComponent(playerUrl);
+  qrEl.style.display='block';
 }
 
 function status(text,bad=false){
@@ -303,6 +317,7 @@ function connectAndCreate(){
       session={code:message.code,hostId:message.hostId,hostToken:message.hostToken};
       localStorage.setItem('pyhHostSession',JSON.stringify(session));
       codeEl.textContent=message.code;
+      updateJoinQr(message.code);
       players=[];
       renderPlayers();
       updateButtons();
@@ -331,6 +346,7 @@ function connectAndCreate(){
     if(message.type==='STATE'){
       players=message.players||[];
       codeEl.textContent=message.roomCode||session?.code||'----';
+      updateJoinQr(message.roomCode||session?.code||'');
       renderTopCard(message.game?.topCard||null,message.game);
       if(message.game){
         started=true;
@@ -388,6 +404,7 @@ function reconnectSavedHost(){
 
     if(message.type==='RECONNECTED'){
       codeEl.textContent=session.code;
+      updateJoinQr(session.code);
       status('ROOM RECONNECTED — PLAYERS CAN JOIN');
       return;
     }
@@ -429,6 +446,7 @@ updateButtons();
 
 if(session){
   codeEl.textContent=session.code||'----';
+  updateJoinQr(session.code||'');
   reconnectSavedHost();
 }else{
   status('READY — GENERATE A CODE');
