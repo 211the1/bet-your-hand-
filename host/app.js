@@ -37,6 +37,7 @@ let session=null;
 let creating=false;
 let started=false;
 let players=[];
+const gameScores=new Map();
 let reconnectTimer=null;
 let reconnecting=false;
 const seatAssignments=new Map();
@@ -246,8 +247,7 @@ function assignSeats(seatedPlayers){
   const used=new Set();
   for(const key of activeKeys){
     const seat=seatAssignments.get(key);
-    if(seat && !used.has(seat))used.add(seat);
-    else if(seatAssignments.has(key))seatAssignments.delete(key);
+    if(seat)used.add(seat);
   }
 
   for(const p of seatedPlayers){
@@ -260,6 +260,11 @@ function assignSeats(seatedPlayers){
       }
     }
   }
+}
+
+function updateGameScores(gamePlayers){
+  gameScores.clear();
+  for(const p of gamePlayers||[])gameScores.set(playerKey(p),Number(p.points??500));
 }
 
 function clearSeatTimer(seat){
@@ -290,11 +295,6 @@ function scheduleSeatMovement(seatEl,seat){
   seatTimers.set(seat,timer);
 }
 
-function mergeGameScores(gamePlayers){
-  const scoreMap=new Map((gamePlayers||[]).map(p=>[String(p.id),Number(p.points??500)]));
-  players=(players||[]).map(p=>({...p,points:scoreMap.has(String(p.id))?scoreMap.get(String(p.id)):Number(p.points??500)}));
-}
-
 function renderPlayers(){
   players=players||[];
   const seatedPlayers=players.slice(0,6);
@@ -305,11 +305,10 @@ function renderPlayers(){
   countEl.textContent=seatedPlayers.length+' / 6 PLAYERS';
   seatsEl.innerHTML=seatedPlayers.map(p=>{
     const img=seatImages[p.character]||'';
-    const seat=seatAssignments.get(playerKey(p))||randomOpenSeat(new Set());
-    if(!seatAssignments.has(playerKey(p))&&seat)seatAssignments.set(playerKey(p),seat);
+    const seat=seatAssignments.get(playerKey(p));
     return '<div class="seat s'+seat+'" data-seat="'+seat+'" data-player-id="'+escapeHtml(p.id||'')+'">'+
-      '<div class="seat-score">SCORE: '+escapeHtml(Number(p.points??0))+'</div>'+
-      (img?'<img src="'+img+'" alt="">':'')
+      '<div class="seat-score">SCORE: '+escapeHtml(gameScores.get(playerKey(p))??500)+'</div>'+
+      (img?'<img src="'+img+'" alt="">':'')+
       '<div class="seat-label"><b>'+escapeHtml(p.character||'')+'</b>'+escapeHtml(p.name||'')+'</div>'+
       '</div>';
   }).join('');
@@ -465,7 +464,7 @@ function connectAndCreate(){
     if(message.type==='HOST_GAME_STARTED'){
       started=true;
       players=message.players||players;
-      mergeGameScores(message.game?.players);
+      updateGameScores(message.game?.players);
       renderTopCard(message.game?.topCard||null,message.game);
       updateRound(message.game?.round);
       renderPowerWheel(message.game);
@@ -478,7 +477,7 @@ function connectAndCreate(){
 
     if(message.type==='STATE'){
       players=message.players||[];
-      mergeGameScores(message.game?.players);
+      updateGameScores(message.game?.players);
       codeEl.textContent=message.roomCode||session?.code||'----';
       updateJoinQr(message.roomCode||session?.code||'');
       renderTopCard(message.game?.topCard||null,message.game);
@@ -549,7 +548,7 @@ function reconnectSavedHost(){
 
     if(message.type==='STATE'){
       players=message.players||[];
-      mergeGameScores(message.game?.players);
+      updateGameScores(message.game?.players);
       started=Boolean(message.game);
       codeEl.textContent=message.roomCode||session.code;
       renderTopCard(message.game?.topCard||null,message.game);
