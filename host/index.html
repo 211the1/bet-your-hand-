@@ -16,7 +16,7 @@ body{font-family:system-ui,sans-serif}
 button{flex:1;border:3px solid #fff;border-radius:14px;padding:14px 18px;font:1000 clamp(14px,2vw,20px)/1 system-ui,sans-serif;color:#fff;cursor:pointer;text-shadow:2px 2px 0 #000;box-shadow:0 0 18px #1687ff,0 7px 16px #0009;background:#0869ff}
 button.start{background:#12a84a;box-shadow:0 0 18px #21f17d,0 7px 16px #0009}
 button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
-#seats{position:absolute;inset:0;z-index:4;pointer-events:none}
+#card-display{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);z-index:3;width:clamp(120px,18vw,230px);height:clamp(170px,27vw,330px);display:flex;align-items:center;justify-content:center;pointer-events:none}\n.card-display-card{width:100%;height:100%;border:5px solid #fff;border-radius:18px;background:#111;box-shadow:0 0 28px #00eaff,0 10px 20px #000b;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}.card-display-card img{width:100%;height:100%;object-fit:cover}.card-display-label{font-size:clamp(20px,3vw,38px);font-weight:1000;color:#fff;text-shadow:0 3px 8px #000;text-align:center;padding:12px}.card-display-label small{display:block;font-size:.45em;margin-top:8px;color:#ffd21c}\n#seats{position:absolute;inset:0;z-index:4;pointer-events:none}
 .seat{position:absolute;transform:translate(-50%,-50%);width:clamp(82px,11vw,150px);text-align:center;transform-origin:center bottom}
 .seat img{height:clamp(130px,17vw,210px)!important}
 .s1{left:17%;top:36%}.s2{left:31%;top:34%}.s3{left:43%;top:34%}.s4{left:56%;top:34%}.s5{left:69%;top:34%}.s6{left:84%;top:36%}
@@ -58,7 +58,7 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 <body>
 <div id="game">
   <img id="room-art" src="/host-room.png" alt="PLAY YOUR HAND host room">
-  <div id="room-code">----</div>
+  <div id="room-code">----</div>\n  <div id="card-display"></div>
   <div id="player-count">0 / 6 PLAYERS</div>
   <div id="status">CONNECTING…</div>
   <div id="seats"></div>
