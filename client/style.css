@@ -636,6 +636,8 @@ body.player-page .power-panel b{font-family:Impact,"Arial Black",system-ui,sans-
 body.player-page .power-panel .power-note{font-size:11px!important;color:#fff!important;opacity:1!important;margin:4px auto 6px!important;text-transform:uppercase!important}
 body.player-page .power-panel button#use-power{max-width:300px!important;margin:5px auto 0!important;padding:10px 16px!important;border:2px solid #ffd43b!important;border-radius:999px!important;background:linear-gradient(145deg,#3a2b00,#090700)!important;color:#ffd43b!important;font-family:Impact,"Arial Black",system-ui,sans-serif!important;font-size:17px!important;letter-spacing:1px!important;box-shadow:0 0 16px #ffd43b66!important}
 body.player-page .power-panel button#use-power:active{transform:scale(.97)}
+/* Power Wheel is a shared display; only the active player gets power controls */
+body.player-page .wheel-image-box{position:relative!important;z-index:5!important}
 /* Power badges live directly below the TV and identify their owner */
 .tv-power-owner{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;width:min(360px,92%);margin:7px auto 5px;padding:5px 9px;border:2px solid #ffd43b;border-radius:12px;background:#070d20;box-shadow:0 0 14px #ffd43b55;color:#fff;font-family:system-ui,sans-serif}
 .tv-power-owner b{font-size:13px;color:#ffd43b;text-transform:uppercase}.tv-power-owner>span{font-size:11px;opacity:.9}.tv-power-owner .player-power-badge{margin:0;border:0;box-shadow:none;background:transparent}.tv-power-owner.mine{border-color:#1687ff;box-shadow:0 0 16px #1687ff66}
