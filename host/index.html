@@ -31,8 +31,8 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 .host-pile{width:145px;text-align:center;color:#fff;font-weight:1000}
 .host-pile-title{height:30px;font-size:clamp(10px,1.2vw,16px);color:#ffd21c;text-shadow:0 0 8px #ffd21c;margin-bottom:4px;line-height:1.05}
 
-.deck-stack{position:relative;width:145px;height:195px;margin:12px auto 20px}
-.deck-card-back{position:absolute;left:50%;top:50%;width:165px;height:233px;box-sizing:border-box;transform:translate(-50%,-50%);border:4px solid #1687ff;border-radius:15px;background:linear-gradient(145deg,#082b88,#07132e);box-shadow:0 0 20px #1687ff88;display:flex;align-items:center;justify-content:center;color:#fff;font:900 20px/1 Impact,"Arial Black",system-ui,sans-serif;text-shadow:0 0 8px #1687ff}
+.deck-stack{position:relative;width:165px;height:233px;margin:12px auto 20px}
+.deck-card-back{position:absolute;left:50%;top:50%;width:165px!important;height:233px!important;min-width:165px!important;max-width:165px!important;min-height:233px!important;max-height:233px!important;box-sizing:border-box;transform:translate(-50%,-50%);border:4px solid #1687ff;border-radius:15px;background:linear-gradient(145deg,#082b88,#07132e);box-shadow:0 0 20px #1687ff88;display:flex;align-items:center;justify-content:center;color:#fff;font:900 20px/1 Impact,"Arial Black",system-ui,sans-serif;text-shadow:0 0 8px #1687ff}
 .deck-card-back-2,.deck-card-back-3{transform:translate(-50%,-50%);z-index:-1}
 .deck-card-back-2{opacity:.75}
 .deck-card-back-3{opacity:.5}
@@ -80,8 +80,8 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 @media(max-width:600px){
  #card-display{top:73%;gap:22px}
  .host-pile{width:145px}
- .deck-stack{width:145px;height:195px}
- .deck-card-back{width:85px;height:120px;font-size:20px}
+ .deck-stack{width:85px;height:120px}
+ .deck-card-back{width:85px!important;height:120px!important;min-width:85px!important;max-width:85px!important;min-height:120px!important;max-height:120px!important;font-size:20px}
  .tv-card{width:85px;height:120px;min-height:120px;border-width:2px;border-radius:10px;padding:4px}
  .tv-card img{width:58px;height:58px;border-width:2px;border-radius:8px}
  .tv-card strong{font-size:12px;margin-top:2px}
