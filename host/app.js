@@ -301,7 +301,8 @@ function renderPlayers(){
     const img=seatImages[p.character]||'';
     const seat=seatAssignments.get(playerKey(p));
     return '<div class="seat s'+seat+'" data-seat="'+seat+'" data-player-id="'+escapeHtml(p.id||'')+'">'+
-      (img?'<img src="'+img+'" alt="">':'')+
+      '<div class="seat-score">SCORE: '+escapeHtml(Number(p.points??0))+'</div>'+
+      (img?'<img src="'+img+'" alt="">':'')
       '<div class="seat-label"><b>'+escapeHtml(p.character||'')+'</b>'+escapeHtml(p.name||'')+'</div>'+
       '</div>';
   }).join('');
