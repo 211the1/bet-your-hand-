@@ -613,6 +613,24 @@ startBtn.addEventListener('click',()=>{
   status('STARTING GAME…');
 });
 
+const hostWanderer=document.getElementById('host-wanderer');
+const hostWalkPoints=[[8,18],[92,18],[92,68],[8,68]];
+let hostWalkIndex=0;
+function moveHostCharacter(){
+  if(!hostWanderer)return;
+  const next=hostWalkPoints[hostWalkIndex%hostWalkPoints.length];
+  const currentX=parseFloat(hostWanderer.style.left)||8;
+  hostWanderer.classList.toggle('host-walk-right',next[0]>=currentX);
+  hostWanderer.classList.toggle('host-walk-left',next[0]<currentX);
+  hostWanderer.style.left=next[0]+'%';
+  hostWanderer.style.top=next[1]+'%';
+  hostWalkIndex++;
+}
+setTimeout(()=>{
+  moveHostCharacter();
+  setInterval(moveHostCharacter,6000);
+},1200);
+
 renderPlayers();
 updateButtons();
 updateHostSoundButton();
