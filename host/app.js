@@ -17,6 +17,18 @@ const hostRestartButton=document.getElementById('host-restart');
 const hostGenerateButton=document.getElementById('host-generate');
 const hostStartButton=document.getElementById('host-start');
 let hostSoundEnabled=true;
+let hostWakeLock=null;
+
+async function keepHostScreenAwake(){
+  if(!('wakeLock' in navigator))return;
+  if(document.visibilityState!=='visible')return;
+  if(hostWakeLock&&!hostWakeLock.released)return;
+  try{
+    hostWakeLock=await navigator.wakeLock.request('screen');
+    hostWakeLock.addEventListener('release',()=>{hostWakeLock=null});
+  }catch{}
+}
+
 
 let ws=null;
 let session=null;
@@ -517,11 +529,13 @@ hostSoundButton?.addEventListener('click',()=>{
   if(hostSoundEnabled)playHostTone(880,.16);
 });
 hostGenerateButton?.addEventListener('click',()=>{
+  keepHostScreenAwake();
   closeHostMenu();
   connectAndCreate();
 });
 hostStartButton?.addEventListener('click',()=>{
   if(hostStartButton.disabled)return;
+  keepHostScreenAwake();
   if(!send({type:'START_GAME'})){
     status('NOT CONNECTED — TRY AGAIN',true);
     return;
@@ -530,6 +544,7 @@ hostStartButton?.addEventListener('click',()=>{
   status('STARTING GAME…');
 });
 hostRestartButton?.addEventListener('click',()=>{
+  keepHostScreenAwake();
   if(!session||!send({type:'RESTART_GAME'})){
     status('NOT CONNECTED — GENERATE A NEW CODE',true);
     return;
@@ -537,9 +552,10 @@ hostRestartButton?.addEventListener('click',()=>{
   closeHostMenu();
   status('RESTARTING — CREATING NEW ROOM…');
 });
-generateBtn.addEventListener('click',connectAndCreate);
+generateBtn.addEventListener('click',()=>{keepHostScreenAwake();connectAndCreate()});
 startBtn.addEventListener('click',()=>{
   if(startBtn.disabled)return;
+  keepHostScreenAwake();
   if(!send({type:'START_GAME'})){
     status('NOT CONNECTED — TRY AGAIN',true);
     return;
@@ -551,7 +567,12 @@ renderPlayers();
 updateButtons();
 updateHostSoundButton();
 
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&(session||started))keepHostScreenAwake();
+});
+
 if(session){
+  keepHostScreenAwake();
   codeEl.textContent=session.code||'----';
   updateJoinQr(session.code||'');
   reconnectSavedHost();
