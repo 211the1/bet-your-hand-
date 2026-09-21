@@ -30,14 +30,12 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 #card-display{position:absolute;left:50%;top:76%;transform:translate(-50%,-50%);z-index:3;display:flex;align-items:flex-start;justify-content:center;gap:22px;pointer-events:none}
 .host-pile{width:145px;text-align:center;color:#fff;font-weight:1000}
 .host-pile-title{height:30px;font-size:clamp(10px,1.2vw,16px);color:#ffd21c;text-shadow:0 0 8px #ffd21c;margin-bottom:4px;line-height:1.05}
-
 .deck-stack{position:relative;width:145px;height:195px;margin:12px auto 20px}
- .deck-card-back{position:absolute;left:50%;top:50%;width:123px;height:183px;box-sizing:border-box;transform:translate(-50%,-50%);border:4px solid #1687ff;border-radius:15px;background:linear-gradient(145deg,#082b88,#07132e);box-shadow:0 0 20px #1687ff88;display:flex;align-items:center;justify-content:center;color:#fff;font:900 22px/.95 Impact,"Arial Black",system-ui,sans-serif;letter-spacing:.5px;text-shadow:0 0 6px #fff,0 0 12px #1687ff,0 0 20px #1687ff}
+.deck-card-back{position:absolute;left:50%;top:50%;width:123px;height:183px;box-sizing:border-box;transform:translate(-50%,-50%);border:4px solid #1687ff;border-radius:15px;background:linear-gradient(145deg,#082b88,#07132e);box-shadow:0 0 20px #1687ff88;display:flex;align-items:center;justify-content:center;color:#fff;font:900 22px/.95 Impact,"Arial Black",system-ui,sans-serif;letter-spacing:.5px;text-shadow:0 0 6px #fff,0 0 12px #1687ff,0 0 20px #1687ff}
 .deck-card-back-2,.deck-card-back-3{transform:translate(-50%,-50%);z-index:-1}
 .deck-card-back-2{opacity:.75}
 .deck-card-back-3{opacity:.5}
-
-   .tv-card{width:123px;min-height:183px;border:4px solid #21d46b;border-radius:18px;background:linear-gradient(145deg,#0c7b45,#20d46b);padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 30px #21d46b;position:relative;box-sizing:border-box}
+.tv-card{width:123px;min-height:183px;border:4px solid #21d46b;border-radius:18px;background:linear-gradient(145deg,#0c7b45,#20d46b);padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 30px #21d46b;position:relative;box-sizing:border-box}
 .tv-card img{width:105px;height:105px;border-radius:12px;object-fit:cover;border:3px solid #fff}
 .tv-card strong{font-size:21px;margin-top:4px}
 .tv-card small{font-family:system-ui;font-weight:900}
@@ -47,10 +45,8 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 .tv-card.color-blue{background:linear-gradient(145deg,#10206f,#1d54d8);border-color:#1687ff;box-shadow:0 0 30px #1687ff}
 .tv-card.color-green{background:linear-gradient(145deg,#0c7b45,#20d46b);border-color:#21d46b;box-shadow:0 0 30px #21d46b}
 .tv-card.color-yellow{background:linear-gradient(145deg,#9b6a00,#e0ad16);border-color:#ffd43b;box-shadow:0 0 30px #ffd43b}
-
 .tv-special-art{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;border:0!important;border-radius:10px!important;display:block!important}
 .tv-card:has(.tv-special-art){padding:0!important;overflow:hidden!important}
-
 .modern-special{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;background:#07152d;border:3px solid #fff;border-radius:14px;color:#fff;text-align:center;font-family:system-ui,sans-serif;font-weight:1000;box-shadow:0 0 18px currentColor,inset 0 0 24px #0008}
 .modern-special:before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.09) 0 2px,transparent 2px 12px);pointer-events:none}
 .modern-special-icon{position:relative;width:78px;height:58px;display:block;flex:0 0 auto}
@@ -65,59 +61,36 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 .reverse-icon{width:68px;height:68px;border:10px solid #fff;border-right-color:transparent;border-radius:50%;filter:drop-shadow(3px 3px 0 #000)}
 .reverse-icon::before{content:'';position:absolute;right:-10px;top:-10px;width:0;height:0;border-top:15px solid transparent;border-bottom:15px solid transparent;border-left:27px solid #fff;transform:rotate(18deg);filter:drop-shadow(2px 2px 0 #000)}
 .tv-card.special-modern-host{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;min-height:0!important}
- .tv-card.special-modern-host .modern-special{width:123px;height:183px;margin:auto!important;border-width:3px!important}
-
+.tv-card.special-modern-host .modern-special{width:123px;height:183px;margin:auto!important;border-width:3px!important}
 .host-pile-count{font-size:14px;line-height:1.05}
 .host-pile-note{font-size:10px;opacity:.8;margin-top:3px}
 @media(max-width:900px){
- .tv-card{width:123px;min-height:183px;border-width:2px;border-radius:10px;padding:4px}
- .tv-card img{width:60px;height:60px;border-width:2px}
- .tv-card strong{font-size:12px}
- .tv-card.special-modern-host .modern-special{width:174px;height:246px}
- .tv-card.special-modern-host .modern-special-icon{width:60px;height:46px}
- .tv-card.special-modern-host .modern-special-name{font-size:16px}
+.tv-card{width:123px;min-height:183px;border-width:2px;border-radius:10px;padding:4px}
+.tv-card img{width:60px;height:60px;border-width:2px}
+.tv-card strong{font-size:12px}
+.tv-card.special-modern-host .modern-special{width:174px;height:246px}
+.tv-card.special-modern-host .modern-special-icon{width:60px;height:46px}
+.tv-card.special-modern-host .modern-special-name{font-size:16px}
 }
 @media(max-width:600px){
- #card-display{top:73%;gap:22px}
- .host-pile{width:145px}
- .deck-stack{width:145px;height:195px}
- .deck-card-back{width:123px;height:183px;font-size:20px}
- .tv-card{width:123px;height:183px;min-height:183px;border-width:2px;border-radius:10px;padding:4px}
- .tv-card img{width:48px;height:48px;border-width:2px;border-radius:8px}
- .tv-card strong{font-size:11px;margin-top:2px}
- .tv-card small{font-size:9px}
- .tv-card.special-modern-host .modern-special{width:174px;height:246px;border-width:2px;border-radius:10px}
- .tv-card.special-modern-host .modern-special-icon{width:52px;height:40px}
- .tv-card.special-modern-host .modern-special-name{font-size:13px}
- .host-pile-title{font-size:9px;height:28px}
- .host-pile-count{font-size:10px}
+#card-display{top:73%;gap:22px}
+.host-pile{width:145px}
+.deck-stack{width:145px;height:195px}
+.deck-card-back{width:123px;height:183px;font-size:20px}
+.tv-card{width:123px;height:183px;min-height:183px;border-width:2px;border-radius:10px;padding:4px}
+.tv-card img{width:55px;height:55px;border-width:2px;border-radius:8px}
+.tv-card strong{font-size:11px;margin-top:2px}
+.tv-card small{font-size:9px}
+.tv-card.special-modern-host .modern-special{width:174px;height:246px;border-width:2px;border-radius:10px}
+.tv-card.special-modern-host .modern-special-icon{width:52px;height:40px}
+.tv-card.special-modern-host .modern-special-name{font-size:13px}
+.host-pile-title{font-size:9px;height:28px}
+.host-pile-count{font-size:10px}
 }
 #seats{position:absolute;inset:0;z-index:4;pointer-events:none}
-.host-player-emoji{
-  position:absolute;
-  left:50%;
-  top:-12px;
-  transform:translate(-50%,-100%) scale(.45);
-  z-index:20;
-  font-size:clamp(28px,4.5vw,62px);
-  line-height:1;
-  text-shadow:0 5px 12px #000,0 0 14px #fff;
-  pointer-events:none;
-  animation:hostEmojiPop 1.75s ease-out forwards;
-  white-space:nowrap
-}
-.host-player-emoji img{
-  width:clamp(42px,5vw,68px);
-  height:clamp(42px,5vw,68px);
-  object-fit:contain;
-  display:block
-}
-@keyframes hostEmojiPop{
-  0%{opacity:0;transform:translate(-50%,-65%) scale(.35)}
-  15%{opacity:1;transform:translate(-50%,-100%) scale(1.08)}
-  65%{opacity:1;transform:translate(-50%,-120%) scale(1)}
-  100%{opacity:0;transform:translate(-50%,-155%) scale(.8)}
-}
+.host-player-emoji{position:absolute;left:50%;top:-12px;transform:translate(-50%,-100%) scale(.45);z-index:20;font-size:clamp(28px,4.5vw,62px);line-height:1;text-shadow:0 5px 12px #000,0 0 14px #fff;pointer-events:none;animation:hostEmojiPop 1.75s ease-out forwards;white-space:nowrap}
+.host-player-emoji img{width:clamp(42px,5vw,68px);height:clamp(42px,5vw,68px);object-fit:contain;display:block}
+@keyframes hostEmojiPop{0%{opacity:0;transform:translate(-50%,-65%) scale(.35)}15%{opacity:1;transform:translate(-50%,-100%) scale(1.08)}65%{opacity:1;transform:translate(-50%,-120%) scale(1)}100%{opacity:0;transform:translate(-50%,-155%) scale(.8)}}
 .seat{position:absolute;transform:translate(-50%,-50%);width:clamp(82px,11vw,150px);text-align:center;transform-origin:center bottom}
 .seat img{height:clamp(130px,17vw,210px)!important}
 .s1{left:17%;top:36%}.s2{left:31%;top:34%}.s3{left:43%;top:34%}.s4{left:56%;top:34%}.s5{left:69%;top:34%}.s6{left:84%;top:36%}
@@ -125,26 +98,24 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 .seat img{display:block;width:100%;height:clamp(85px,13vw,190px);object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 10px #0009)}
 .seat-label{margin-top:-3px;padding:3px 6px;border:2px solid #1687ff;border-radius:8px;background:#030713e8;color:#fff;font-size:clamp(7px,1vw,13px);font-weight:1000;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .seat-label b{display:block;color:#ffd21c}
-.seat-rock{animation:seatRock .65s ease-in-out}
-.seat-bounce{animation:seatBounce .7s ease-in-out}
-.seat-wiggle{animation:seatWiggle .6s ease-in-out}
+.seat-rock{animation:seatRock .65s ease-in-out}.seat-bounce{animation:seatBounce .7s ease-in-out}.seat-wiggle{animation:seatWiggle .6s ease-in-out}
 @keyframes seatRock{0%,100%{transform:translate(-50%,-50%) rotate(0)}25%{transform:translate(-50%,-50%) rotate(-4deg)}75%{transform:translate(-50%,-50%) rotate(4deg)}}
 @keyframes seatBounce{0%,100%{transform:translate(-50%,-50%)}35%{transform:translate(-50%,-58%)}70%{transform:translate(-50%,-47%)}}
 @keyframes seatWiggle{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(calc(-50% - 5px),-50%)}50%{transform:translate(calc(-50% + 5px),-50%)}75%{transform:translate(calc(-50% - 3px),-50%)}}
 @media(max-width:600px){
- #controls{bottom:2%;gap:7px;width:96vw}
- #host-menu-button{right:4vw;bottom:5vh;width:68px;height:68px;border-radius:14px}
- #host-menu-panel{left:50%;right:auto;bottom:calc(5vh + 76px);transform:translateX(-50%);width:min(270px,84vw);max-height:68vh}
- .host-menu-box{padding:9px}
- .host-menu-title{font-size:15px;margin-bottom:6px}
- .host-menu-button{margin:4px 0;padding:7px 7px;font-size:13px}
- .host-menu-close{padding:6px;font-size:12px}
- button{padding:11px 7px;border-width:2px;border-radius:10px;font-size:14px}
- #room-code{top:68%;left:11%;padding:4px 8px;border-width:3px;letter-spacing:2px;font-size:clamp(16px,5.2vw,28px)}
- #join-qr{top:78%;left:11%;width:92px;height:92px;padding:4px;border-width:3px;box-shadow:0 0 12px #00eaff,0 0 26px #00eaff,0 0 42px #1687ff}
- #player-count{top:12%}
- #status{top:18%}
- .seat{width:70px}.seat img{height:115px!important}.seat-label{font-size:7px;padding:2px 4px}
+#controls{bottom:2%;gap:7px;width:96vw}
+#host-menu-button{right:4vw;bottom:5vh;width:68px;height:68px;border-radius:14px}
+#host-menu-panel{left:50%;right:auto;bottom:calc(5vh + 76px);transform:translateX(-50%);width:min(270px,84vw);max-height:68vh}
+.host-menu-box{padding:9px}
+.host-menu-title{font-size:15px;margin-bottom:6px}
+.host-menu-button{margin:4px 0;padding:7px 7px;font-size:13px}
+.host-menu-close{padding:6px;font-size:12px}
+button{padding:11px 7px;border-width:2px;border-radius:10px;font-size:14px}
+#room-code{top:68%;left:11%;padding:4px 8px;border-width:3px;letter-spacing:2px;font-size:clamp(16px,5.2vw,28px)}
+#join-qr{top:78%;left:11%;width:92px;height:92px;padding:4px;border-width:3px;box-shadow:0 0 12px #00eaff,0 0 26px #00eaff,0 0 42px #1687ff}
+#player-count{top:12%}
+#status{top:18%}
+.seat{width:70px}.seat img{height:115px!important}.seat-label{font-size:7px;padding:2px 4px}
 }
 </style>
 <style id="host-power-wheel-style">
@@ -160,17 +131,13 @@ button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
 </head>
 <body>
 <div id="game">
-  <img id="room-art" src="/host-room.png" alt="PLAY YOUR HAND host room">
-  <div id="room-code">----</div><img id="join-qr" alt="Scan to open PLAY YOUR HAND player screen"><div id="card-display"><div class="host-pile"><div class="host-pile-title">DRAW DECK</div><div class="deck-stack host-deck-stack"><div class="deck-card-back host-deck-back-3">PLAY<br>YOUR<br>HAND</div><div class="deck-card-back host-deck-back-2"></div><div class="deck-card-back">PLAY<br>YOUR<br>HAND</div></div><div class="host-pile-count" id="host-deck-count">CARDS LEFT: --</div></div><div class="host-pile"><div class="host-pile-title">DISCARD / PLAY PILE</div><div class="deck-stack host-discard-stack"><div id="host-discard-card"></div></div><div class="host-pile-count" id="host-discard-count">CARDS PLAYED: --</div></div></div>
-  <div id="player-count">0 / 6 PLAYERS</div>
-  <div id="status">CONNECTING…</div>
-  <div id="seats"></div>
-  <button id="host-menu-button" type="button" aria-label="Open menu"><span>☰</span>MENU</button>
-  <div id="host-menu-panel"><div class="host-menu-box"><div class="host-menu-title">GAME MENU</div><button id="host-sound" class="host-menu-button sound" type="button">SOUND: ON</button><button id="host-restart" class="host-menu-button restart" type="button">RESTART</button><button id="host-generate" class="host-menu-button" type="button">GENERATE CODE</button><button id="host-start" class="host-menu-button start" type="button" disabled>START GAME</button><button id="host-menu-close" class="host-menu-close" type="button">CLOSE</button></div></div>
-  <div id="controls">
-    <button id="generate" style="display:none">GENERATE CODE</button>
-    <button id="start" class="start" style="display:none" disabled>START GAME</button>
-  </div>
+<img id="room-art" src="/host-room.png" alt="PLAY YOUR HAND host room">
+<div id="room-code">----</div><img id="join-qr" alt="Scan to open PLAY YOUR HAND player screen">
+<div id="card-display"><div class="host-pile"><div class="host-pile-title">DRAW DECK</div><div class="deck-stack host-deck-stack"><div class="deck-card-back host-deck-back-3">PLAY<br>YOUR<br>HAND</div><div class="deck-card-back host-deck-back-2"></div><div class="deck-card-back">PLAY<br>YOUR<br>HAND</div></div><div class="host-pile-count" id="host-deck-count">CARDS LEFT: --</div></div><div class="host-pile"><div class="host-pile-title">DISCARD / PLAY PILE</div><div class="deck-stack host-discard-stack"><div id="host-discard-card"></div></div><div class="host-pile-count" id="host-discard-count">CARDS PLAYED: --</div></div></div>
+<div id="player-count">0 / 6 PLAYERS</div><div id="status">CONNECTING…</div><div id="seats"></div>
+<button id="host-menu-button" type="button" aria-label="Open menu"><span>☰</span>MENU</button>
+<div id="host-menu-panel"><div class="host-menu-box"><div class="host-menu-title">GAME MENU</div><button id="host-sound" class="host-menu-button sound" type="button">SOUND: ON</button><button id="host-restart" class="host-menu-button restart" type="button">RESTART</button><button id="host-generate" class="host-menu-button" type="button">GENERATE CODE</button><button id="host-start" class="host-menu-button start" type="button" disabled>START GAME</button><button id="host-menu-close" class="host-menu-close" type="button">CLOSE</button></div></div>
+<div id="controls"><button id="generate" style="display:none">GENERATE CODE</button><button id="start" class="start" style="display:none" disabled>START GAME</button></div>
 </div>
 <script src="/host/app.js?v=21"></script>
 </body>
