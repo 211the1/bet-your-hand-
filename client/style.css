@@ -630,6 +630,12 @@ body.player-page .power-panel .color-choice{pointer-events:auto!important;positi
 .text-power-badge{padding:4px 5px;color:#ffd43b;text-shadow:0 0 6px #ffd43b}
 @media(max-width:600px){body.player-page .wheel-image-box{width:210px!important}body.player-page .wheel-image-box .wheel{width:198px!important;height:198px!important}body.player-page .player-power-badge{font-size:7px;min-height:20px;margin:3px 1px 2px}.player-power-badge img{width:23px;height:23px;flex-basis:23px}}
 
+/* Premium Power Play popup — appears only while a power action is active */
+body.player-page .power-panel{padding:9px 12px!important;border:2px solid #ffd43b!important;border-radius:16px!important;background:linear-gradient(145deg,#17130a,#050505)!important;box-shadow:0 0 18px #ffd43b66,inset 0 0 18px #ffd43b18!important;color:#fff!important}
+body.player-page .power-panel b{font-family:Impact,"Arial Black",system-ui,sans-serif!important;font-size:20px!important;letter-spacing:1px!important;color:#ffd43b!important;text-shadow:0 0 8px #ffd43b!important}
+body.player-page .power-panel .power-note{font-size:11px!important;color:#fff!important;opacity:1!important;margin:4px auto 6px!important;text-transform:uppercase!important}
+body.player-page .power-panel button#use-power{max-width:300px!important;margin:5px auto 0!important;padding:10px 16px!important;border:2px solid #ffd43b!important;border-radius:999px!important;background:linear-gradient(145deg,#3a2b00,#090700)!important;color:#ffd43b!important;font-family:Impact,"Arial Black",system-ui,sans-serif!important;font-size:17px!important;letter-spacing:1px!important;box-shadow:0 0 16px #ffd43b66!important}
+body.player-page .power-panel button#use-power:active{transform:scale(.97)}
 /* Power badges live directly below the TV and identify their owner */
 .tv-power-owner{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;width:min(360px,92%);margin:7px auto 5px;padding:5px 9px;border:2px solid #ffd43b;border-radius:12px;background:#070d20;box-shadow:0 0 14px #ffd43b55;color:#fff;font-family:system-ui,sans-serif}
 .tv-power-owner b{font-size:13px;color:#ffd43b;text-transform:uppercase}.tv-power-owner>span{font-size:11px;opacity:.9}.tv-power-owner .player-power-badge{margin:0;border:0;box-shadow:none;background:transparent}.tv-power-owner.mine{border-color:#1687ff;box-shadow:0 0 16px #1687ff66}
