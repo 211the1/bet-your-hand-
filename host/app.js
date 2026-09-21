@@ -614,6 +614,16 @@ startBtn.addEventListener('click',()=>{
 });
 
 const hostWanderer=document.getElementById('host-wanderer');
+const hostCharacterSound=new Audio('/host-sound.mp3');
+hostCharacterSound.preload='auto';
+hostCharacterSound.addEventListener('error',()=>{});
+hostWanderer?.addEventListener('click',()=>{
+  if(!hostSoundEnabled)return;
+  try{
+    hostCharacterSound.currentTime=0;
+    hostCharacterSound.play().catch(()=>{});
+  }catch{}
+});
 const hostWalkPoints=[[8,18],[92,18],[92,68],[8,68]];
 let hostWalkIndex=0;
 function moveHostCharacter(){
