@@ -31,6 +31,7 @@ async function keepHostScreenAwake(){
 
 
 let ws=null;
+let lastHostLastCardEvent=null;
 let session=null;
 let creating=false;
 let started=false;
