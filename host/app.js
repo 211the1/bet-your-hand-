@@ -193,7 +193,7 @@ function renderPowerWheel(game){
   }
   const overlay=document.createElement('div');
   overlay.id='host-power-wheel-overlay';overlay.className='host-power-wheel-overlay';
-  overlay.innerHTML='<div class="host-power-wheel"><img class="host-power-wheel-rotator '+cls+'" data-mode="'+mode+'" style="--host-wheel-land:'+rotation+'deg" src="/assets/power_wheel_style2.png?v=1" alt="PLAY YOUR HAND Power Wheel"><div class="host-power-wheel-pointer" aria-hidden="true">▼</div></div>';
+  overlay.innerHTML='<div class="host-power-wheel"><img class="host-power-wheel-rotator '+cls+'" data-mode="'+mode+'" style="--host-wheel-land:'+rotation+'deg" src="/power-wheel.png?v=1" alt="PLAY YOUR HAND Power Wheel"><div class="host-power-wheel-pointer" aria-hidden="true">▼</div></div>';
   document.body.appendChild(overlay);
   if(clickCount)startWheelClickSequence(mode==='spin'?2600:1600,clickCount,...(mode==='spin'?[.15,.8,.2,1]:[.12,.82,.18,1]));
 }
