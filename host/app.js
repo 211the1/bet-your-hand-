@@ -112,24 +112,90 @@ function specialModern(card,where='tv'){
 }
 
 
+let wheelClickTimers=[];
+let wheelAudioContext=null;
+let wheelSoundToken=0;
+
+function stopWheelClickSequence(){
+  wheelSoundToken++;
+  wheelClickTimers.forEach(t=>clearTimeout(t));
+  wheelClickTimers=[];
+}
+
+function playWheelClickSound(){
+  if(!hostSoundEnabled)return;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    if(!wheelAudioContext)wheelAudioContext=new C();
+    if(wheelAudioContext.state==='suspended')wheelAudioContext.resume().catch(()=>{});
+    const ctx=wheelAudioContext,now=ctx.currentTime;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='square';
+    o.frequency.setValueAtTime(1450,now);
+    o.frequency.exponentialRampToValueAtTime(620,now+.045);
+    g.gain.setValueAtTime(.0001,now);
+    g.gain.exponentialRampToValueAtTime(.16,now+.004);
+    g.gain.exponentialRampToValueAtTime(.0001,now+.055);
+    o.connect(g).connect(ctx.destination);
+    o.start(now);o.stop(now+.06);
+  }catch{}
+}
+
+function cubicBezierYForX(x,x1,y1,x2,y2){
+  const bezier=(t,a,b)=>3*(1-t)*(1-t)*t*a+3*(1-t)*t*t*b+t*t*t;
+  let lo=0,hi=1;
+  for(let i=0;i<18;i++){
+    const t=(lo+hi)/2;
+    if(bezier(t,x1,x2)<x)lo=t;else hi=t;
+  }
+  const t=(lo+hi)/2;
+  return bezier(t,y1,y2);
+}
+
+function startWheelClickSequence(duration,count,x1,y1,x2,y2){
+  stopWheelClickSequence();
+  const token=wheelSoundToken;
+  for(let i=1;i<=count;i++){
+    const progress=i/count;
+    const t=cubicBezierYForX(progress,x1,y1,x2,y2);
+    wheelClickTimers.push(setTimeout(()=>{
+      if(token!==wheelSoundToken)return;
+      playWheelClickSound();
+    },Math.max(0,Math.round(t*duration))));
+  }
+}
+
 function renderPowerWheel(game){
   const existing=document.getElementById('host-power-wheel-overlay');
   const pending=game?.pending;
   const active=pending?.type==='SPIN_WHEEL'||pending?.type==='POWER_USED';
-  if(!active){if(existing)existing.remove();return;}
+  if(!active){
+    if(existing)existing.remove();
+    stopWheelClickSequence();
+    return;
+  }
   const result=game?.wheelResult||null;
   const landed=Number(result?.section||0);
   const rotation=landed>0?(1440-(landed-1)*40):0;
-  const cls=pending.type==='SPIN_WHEEL'?'host-power-wheel-spin':(result?'host-power-wheel-land':'');
+  const mode=pending.type==='SPIN_WHEEL'?'spin':(result?'land':'idle');
+  const cls=mode==='spin'?'host-power-wheel-spin':(mode==='land'?'host-power-wheel-land':'');
+  const clickCount=mode==='spin'?36:(mode==='land'?Math.max(1,Math.round(Math.abs(rotation)/40)):0);
   if(existing){
-    const wheel=existing.querySelector('.host-power-wheel');
-    if(wheel){wheel.className='host-power-wheel '+cls;wheel.style.setProperty('--host-wheel-land',rotation+'deg');}
+    const rotator=existing.querySelector('.host-power-wheel-rotator');
+    if(rotator){
+      const previousMode=rotator.dataset.mode||'';
+      rotator.className='host-power-wheel-rotator '+cls;
+      rotator.style.setProperty('--host-wheel-land',rotation+'deg');
+      rotator.dataset.mode=mode;
+      if(previousMode!==mode&&clickCount)startWheelClickSequence(mode==='spin'?2600:1600,clickCount,...(mode==='spin'?[.15,.8,.2,1]:[.12,.82,.18,1]));
+    }
     return;
   }
   const overlay=document.createElement('div');
   overlay.id='host-power-wheel-overlay';overlay.className='host-power-wheel-overlay';
-  overlay.innerHTML='<div class="host-power-wheel '+cls+'" style="--host-wheel-land:'+rotation+'deg"><img src="/assets/power_wheel_style2.png?v=1" alt="PLAY YOUR HAND Power Wheel"><div class="host-power-wheel-pointer">▼</div></div>';
+  overlay.innerHTML='<div class="host-power-wheel"><img class="host-power-wheel-rotator '+cls+'" data-mode="'+mode+'" style="--host-wheel-land:'+rotation+'deg" src="/assets/power_wheel_style2.png?v=1" alt="PLAY YOUR HAND Power Wheel"><div class="host-power-wheel-pointer" aria-hidden="true">▼</div></div>';
   document.body.appendChild(overlay);
+  if(clickCount)startWheelClickSequence(mode==='spin'?2600:1600,clickCount,...(mode==='spin'?[.15,.8,.2,1]:[.12,.82,.18,1]));
 }
 
 function renderTopCard(card,game){
