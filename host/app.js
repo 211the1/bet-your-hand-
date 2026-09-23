@@ -176,7 +176,7 @@ function renderPowerWheel(game){
   }
   const result=game?.wheelResult||null;
   const landed=Number(result?.section||0);
-  const rotation=landed>0?(1440-landed*40):0;
+  const rotation=landed>0?(1440-(landed-1)*40):0;
   const mode=pending.type==='SPIN_WHEEL'?'spin':(result?'land':'idle');
   const cls=mode==='spin'?'host-power-wheel-spin':(mode==='land'?'host-power-wheel-land':'');
   const clickCount=mode==='spin'?36:(mode==='land'?Math.max(1,Math.round(Math.abs(rotation)/40)):0);
