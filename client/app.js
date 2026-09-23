@@ -118,8 +118,8 @@ if(game.phase==='finished'){
  const finish=document.getElementById('player-finish-screen')||document.createElement('div');
  finish.id='player-finish-screen';
  finish.className='finish-screen';
- finish.style.backgroundImage="url('/finish-screen.png?v=3')";
- finish.innerHTML='<div class="finish-score-overlay">'+scores.slice(0,5).map((p,i)=>'<div class="finish-score-box score-box-'+i+'">'+Number(p.points||0)+'</div>').join('')+'</div>';
+ finish.style.backgroundImage="url('/finish-screen.png?v=4')";
+ finish.innerHTML='<div class="finish-player-overlay">'+scores.slice(0,5).map((p,i)=>{const img=({'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'}[p.character]||'');return '<div class="finish-player finish-player-'+i+'">'+(img?'<img class="finish-player-photo" src="'+img+'" alt="">':'')+'<div class="finish-player-name">'+escapeHtml(p.name||'')+'</div><div class="finish-player-score">'+Number(p.points||0)+'</div></div>';}).join('')+'</div>';
  document.body.appendChild(finish);
  gameEl.innerHTML='';
  return;
