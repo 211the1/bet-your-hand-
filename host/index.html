@@ -191,3 +191,9 @@ body.host-finished #host-menu-panel{z-index:100002}
 #host-finish-screen img.finish-player-photo,.finish-screen img.finish-player-photo{position:absolute!important;display:block!important;left:50%!important;top:0!important;transform:translateX(-50%)!important;width:92%!important;height:68%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;object-fit:cover!important;object-position:center top!important;border-radius:12%!important;box-sizing:border-box!important}
 #host-finish-screen .finish-player-name,.finish-screen .finish-player-name{position:absolute!important;left:0!important;right:0!important;top:70%!important;width:100%!important;font-size:clamp(10px,1.5vw,18px)!important;line-height:1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;text-shadow:0 2px 5px #000!important}
 #host-finish-screen .finish-player-score,.finish-screen .finish-player-score{position:absolute!important;left:0!important;right:0!important;top:101%!important;width:100%!important;font-size:clamp(14px,2.2vw,28px)!important;line-height:1!important;text-shadow:0 2px 5px #000!important}
+
+/* HOST FINISH SCREEN — player photos and scores only */
+body.host-finished #host-finish-screen{overflow:hidden!important}
+body.host-finished #host-menu-button{position:fixed!important;top:3vh!important;right:3vw!important;bottom:auto!important;left:auto!important;z-index:100001!important}
+body.host-finished #host-menu-panel{z-index:100002!important}
+body.host-finished #host-finish-screen>div{pointer-events:none!important}
