@@ -17,6 +17,7 @@ const hostSoundButton=document.getElementById('host-sound');
 const hostRestartButton=document.getElementById('host-restart');
 const hostGenerateButton=document.getElementById('host-generate');
 const hostStartButton=document.getElementById('host-start');
+const hostTestFinishButton=document.getElementById('host-test-finish');
 let hostSoundEnabled=true;
 let hostWakeLock=null;
 
@@ -649,6 +650,14 @@ hostGenerateButton?.addEventListener('click',()=>{
   closeHostMenu();
   connectAndCreate();
 });
+hostTestFinishButton?.addEventListener('click',()=>{
+  if(!session)return;
+  hostTestFinishButton.disabled=true;
+  status('TESTING FINISH SCREEN…');
+  send({type:'TEST_FINISH_SCREEN'});
+  closeHostMenu();
+});
+
 hostStartButton?.addEventListener('click',()=>{
   if(hostStartButton.disabled)return;
   keepHostScreenAwake();
