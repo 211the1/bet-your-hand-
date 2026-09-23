@@ -303,9 +303,11 @@ function renderHostFinishScreen(game){
     const img=characterImage(p.character);
     const score=Number(p.points||0);
 
-    return '<div style="position:absolute!important;left:'+columns[i]+'!important;top:'+(i===0?'78.8%':'76.8%')+'!important;width:10%!important;height:22%!important;margin:0!important;padding:0!important;box-sizing:border-box!important;text-align:center!important;overflow:visible!important;pointer-events:none!important;">'+
-      (img?'<div style="position:absolute!important;left:50%!important;top:0!important;transform:translateX(-50%)!important;width:68%!important;height:49%!important;overflow:hidden!important;border-radius:8%!important;box-sizing:border-box!important;"><img src="'+img+'" alt="" style="display:block!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center top!important;"> </div>':'')+
-      '<div style="position:absolute!important;left:42%!important;top:77.5%!important;width:58%!important;height:15%!important;display:flex!important;align-items:center!important;justify-content:center!important;font:1000 clamp(13px,1.8vw,23px)/1 system-ui,sans-serif!important;color:#fff!important;text-shadow:0 2px 5px #000!important;white-space:nowrap!important;">'+score+'</div>'+
+    return '<div class="host-finish-slot" data-slot="'+i+'" style="position:absolute!important;left:'+columns[i]+'!important;top:76.8%!important;width:10%!important;height:22%!important;margin:0!important;padding:0!important;box-sizing:border-box!important;text-align:center!important;overflow:visible!important;pointer-events:none!important;">'+
+      '<div class="host-finish-photo-slot" style="position:absolute!important;left:50%!important;top:0!important;transform:translateX(-50%)!important;width:68%!important;height:49%!important;overflow:hidden!important;border-radius:8%!important;box-sizing:border-box!important;">'+
+        (img?'<img src="'+img+'" alt="" style="display:block!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center top!important;">':'')+
+      '</div>'+
+      '<div class="host-finish-score-slot" style="position:absolute!important;left:42%!important;top:77.5%!important;width:58%!important;height:15%!important;display:flex!important;align-items:center!important;justify-content:center!important;font:1000 clamp(13px,1.8vw,23px)/1 system-ui,sans-serif!important;color:#fff!important;text-shadow:0 2px 5px #000!important;white-space:nowrap!important;">'+score+'</div>'+
     '</div>';
   }).join('');
 
