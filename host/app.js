@@ -279,6 +279,37 @@ function updateHostSoundButton(){
 }
 function closeHostMenu(){if(hostMenuPanel)hostMenuPanel.classList.remove('show')}
 
+function clearHostFinishScreen(){
+  const el=document.getElementById('host-finish-screen');
+  if(el)el.remove();
+  document.body.classList.remove('host-finished');
+}
+
+function renderHostFinishScreen(game){
+  if(!game || game.phase!=='finished') { clearHostFinishScreen(); return; }
+  let overlay=document.getElementById('host-finish-screen');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='host-finish-screen';
+    overlay.className='host-finish-screen';
+    document.body.appendChild(overlay);
+  }
+  const gamePlayers=Array.isArray(game.players)?game.players:[];
+  const winner=gamePlayers.find(p=>String(p.id)===String(game.winner));
+  const scores=[...gamePlayers].sort((a,b)=>Number(b.points||0)-Number(a.points||0));
+  overlay.innerHTML='<div class="host-finish-inner">'+
+    '<div class="host-finish-title">GAME NIGHT COMPLETE</div>'+
+    '<div class="host-finish-subtitle">WINNER</div>'+
+    '<div class="host-finish-winner">'+escapeHtml(winner?.name||'—')+'</div>'+
+    '<div class="host-finish-character">'+escapeHtml(winner?.character||'')+'</div>'+
+    '<div class="host-finish-scores">'+scores.map((p,i)=>
+      '<div class="host-finish-row"><span>'+String(i+1)+'. <b>'+escapeHtml(p.name||'')+'</b></span><span><b>'+Number(p.points||0)+'</b> points</span></div>'
+    ).join('')+'</div>'+
+    '<div class="host-finish-round">ROUND 2 COMPLETE</div>'+
+    '</div>';
+  document.body.classList.add('host-finished');
+}
+
 function updateRound(round){
   if(roundEl)roundEl.textContent=Number(round)>0?'ROUND '+Number(round):'ROUND --';
 }
@@ -444,6 +475,7 @@ function updateButtons(){
 }
 
 function resetToReady(message){
+  clearHostFinishScreen();
   session=null;
   players=[];
   started=false;
@@ -529,6 +561,7 @@ function connectAndCreate(){
     }
 
     if(message.type==='HOST_GAME_STARTED'){
+      clearHostFinishScreen();
       started=true;
       players=message.players||players;
       updateGameScores(message.game?.players);
@@ -544,6 +577,16 @@ function connectAndCreate(){
 
     if(message.type==='STATE'){
       players=message.players||[];
+      if(message.game?.phase==='finished'){
+        started=true;
+        updateGameScores(message.game.players);
+        renderHostFinishScreen(message.game);
+        renderPowerWheel(message.game);
+        updateRound(message.game.round);
+        updateButtons();
+        return;
+      }
+      clearHostFinishScreen();
       updateGameScores(message.game?.players);
       codeEl.textContent=message.roomCode||session?.code||'----';
       updateJoinQr(message.roomCode||session?.code||'');
@@ -616,6 +659,15 @@ function reconnectSavedHost(){
     if(message.type==='STATE'){
       players=message.players||[];
       updateGameScores(message.game?.players);
+      if(message.game?.phase==='finished'){
+        started=true;
+        renderHostFinishScreen(message.game);
+        renderPowerWheel(message.game);
+        updateRound(message.game.round);
+        updateButtons();
+        return;
+      }
+      clearHostFinishScreen();
       started=Boolean(message.game);
       codeEl.textContent=message.roomCode||session.code;
       renderTopCard(message.game?.topCard||null,message.game);
