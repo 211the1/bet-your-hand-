@@ -6,12 +6,12 @@ compact.textContent+='.menu-quit-button{display:block;width:100%;margin:14px 0 2
 const codeInput=document.getElementById('code'),nameInput=document.getElementById('name'),characterSelect=document.getElementById('char'),joinButton=document.getElementById('join'),statusEl=document.getElementById('status'),gameEl=document.getElementById('game');const joinPanel=document.getElementById('join-panel');
 const characters=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];const colors=['Red','Blue','Green','Yellow'];
 const wheelSections=[
- {section:1,character:'Bug',color:'Yellow',power:'TURN_SWITCH'},
- {section:2,character:'Face',color:'Blue',power:'SHIELD'},
- {section:3,character:'Ling Ling',color:'Green',power:'COLOR_CHOICE'},
- {section:4,character:'Beanz',color:'Red',power:'EXTRA_PLAY'},
- {section:5,character:'The One',color:'Yellow',power:'EXTRA_PLAY'},
- {section:6,character:'Boone',color:'Red',power:'TURN_SWITCH'},
+ {section:1,character:'Bug',color:'Yellow',power:'EXTRA_PLAY'},
+ {section:2,character:'Face',color:'Red',power:'TURN_SWITCH'},
+ {section:3,character:'Ling Ling',color:'Blue',power:'SHIELD'},
+ {section:4,character:'Beanz',color:'Green',power:'COLOR_CHOICE'},
+ {section:5,character:'The One',color:'Red',power:'EXTRA_PLAY'},
+ {section:6,character:'Boone',color:'Yellow',power:'TURN_SWITCH'},
  {section:7,character:'Chicken Joe',color:'Blue',power:'SHIELD'},
  {section:8,character:'Juby',color:'Green',power:'COLOR_CHOICE'},
  {section:9,character:'Meemaw',color:'Red',power:'EXTRA_PLAY'}
