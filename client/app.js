@@ -6,15 +6,15 @@ compact.textContent+='.menu-quit-button{display:block;width:100%;margin:14px 0 2
 const codeInput=document.getElementById('code'),nameInput=document.getElementById('name'),characterSelect=document.getElementById('char'),joinButton=document.getElementById('join'),statusEl=document.getElementById('status'),gameEl=document.getElementById('game');const joinPanel=document.getElementById('join-panel');
 const characters=['Bug','Face','Ling Ling','Beanz','The One','Boone','Chicken Joe','Juby','Meemaw'];const colors=['Red','Blue','Green','Yellow'];
 const wheelSections=[
- {section:1,character:'Bug',color:'Blue',power:'EXTRA_PLAY'},
- {section:2,character:'Face',color:'Red',power:'SHIELD'},
+ {section:1,character:'Bug',color:'Yellow',power:'TURN_SWITCH'},
+ {section:2,character:'Face',color:'Blue',power:'SHIELD'},
  {section:3,character:'Ling Ling',color:'Green',power:'COLOR_CHOICE'},
- {section:4,character:'Beanz',color:'Yellow',power:'EXTRA_PLAY'},
- {section:5,character:'The One',color:'Blue',power:'TURN_SWITCH'},
- {section:6,character:'Boone',color:'Green',power:'SHIELD'},
- {section:7,character:'Chicken Joe',color:'Red',power:'COLOR_CHOICE'},
- {section:8,character:'Juby',color:'Yellow',power:'EXTRA_PLAY'},
- {section:9,character:'Meemaw',color:'Blue',power:'TURN_SWITCH'}
+ {section:4,character:'Beanz',color:'Red',power:'EXTRA_PLAY'},
+ {section:5,character:'The One',color:'Yellow',power:'EXTRA_PLAY'},
+ {section:6,character:'Boone',color:'Red',power:'TURN_SWITCH'},
+ {section:7,character:'Chicken Joe',color:'Blue',power:'SHIELD'},
+ {section:8,character:'Juby',color:'Green',power:'COLOR_CHOICE'},
+ {section:9,character:'Meemaw',color:'Red',power:'EXTRA_PLAY'}
 ];
 function buildCharacterChoices(taken=[]){
   const current=characterSelect.value;
@@ -69,7 +69,7 @@ function cardColor(card){if(!card)return '';if(card.type==='CHARACTER'){const c=
 function specialImage(card){if(!card)return '';const base='https://raw.githubusercontent.com/211the1/bet-your-hand-/522dda3f4d19b5024001a74e78d9229b5e0c98b3';if(card.type==='WILD')return base+'/WILD.png';if(card.type==='PLAY_YOUR_HAND')return base+'/PLAY_YOUR_HAND.png';if(card.type==='SKIP'||card.type==='REVERSE')return '';return ''}
 function specialModern(card,where='hand'){const c=card||{},type=c.type;if(type!=='SKIP'&&type!=='REVERSE')return '';const col=cardColor(c);const iconClass=type==='SKIP'?'skip-icon':'reverse-icon';return `<div class="modern-special ${type.toLowerCase()} modern-${String(col).toLowerCase()} ${where}"><div class="modern-special-icon ${iconClass}" aria-hidden="true"></div><div class="modern-special-name">${type}</div></div>`}
 function cardHtml(card){const c=card||{},name=c.character||({SKIP:'SKIP',REVERSE:'REVERSE',WILD:'WILD',PLAY_YOUR_HAND:'PLAY YOUR HAND'}[c.type]||'CARD'),img=characterImage(c.character),authoritativeColor=cardColor(c),color=authoritativeColor.toLowerCase();return `<div class="card table-card player-current color-${escapeHtml(color)}">${img?`<img class="card-face" src="${img}" alt="${escapeHtml(name)}">`:''}<div class="card-name">${escapeHtml(name)}</div>${authoritativeColor?`<div class="card-color">${escapeHtml(authoritativeColor)}</div>`:`<div class="card-type">${escapeHtml((c.type||'CARD').replaceAll('_',' '))}</div>`}</div>`}
-function wheelHtml(result,spinning){const landed=Number(result?.section||0);const landRotation=landed>0?(1440-landed*40):0;const wheelClass=spinning?'wheel-spin':(result?'wheel-land':'');const wheelStyle=`--wheel-land-rotation:${landRotation}deg`;const wheelSrc='/power-wheel.png?v=1';return `<div class="wheel-box wheel-image-box"><div class="wheel ${wheelClass}" style="${wheelStyle}"><img class="power-wheel-art" src="${wheelSrc}" alt="PLAY YOUR HAND Power Wheel"></div><div class="wheel-pointer">▼</div></div>`}
+function wheelHtml(result,spinning){const landed=Number(result?.section||0);const landRotation=landed>0?(1440-(landed-1)*40):0;const wheelClass=spinning?'wheel-spin':(result?'wheel-land':'');const wheelStyle=`--wheel-land-rotation:${landRotation}deg`;const wheelSrc='/power-wheel.png?v=1';return `<div class="wheel-box wheel-image-box"><div class="wheel ${wheelClass}" style="${wheelStyle}"><img class="power-wheel-art" src="${wheelSrc}" alt="PLAY YOUR HAND Power Wheel"></div><div class="wheel-pointer">▼</div></div>`}
 function colorButtons(id){return `<div class="color-buttons">${colors.map(c=>`<button type="button" class="color-choice color-choice-${c.toLowerCase()}" data-color="${c}" data-color-group="${id}">${c}</button>`).join('')}</div>`}
 function powerControls(game){const p=game.pending?.power;if(!p)return '';if(p==='COLOR_CHOICE')return `<div class="power-panel"><b>POWER PLAY READY</b><small class="power-note">COLOR CHOICE • CURRENT: ${escapeHtml(game.wheelResult?.color||game.currentColor||'—')}</small>${colorButtons('power-color')}</div>`;return `<div class="power-panel"><b>POWER PLAY READY</b><small class="power-note">POWER: ${escapeHtml(p.replaceAll('_',' '))}</small><button id="use-power" type="button">USE POWER PLAY</button></div>`}
 function wildColorControls(){return `<div class="power-panel wild-color-panel"><b>WILD CARD — CHOOSE A COLOR</b>${colorButtons('wild-color')}</div>`}
