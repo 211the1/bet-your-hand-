@@ -28,6 +28,7 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
     return;
   }
   if(t==='RESTART_GAME'){if(!host)throw Error('Host only');const fresh=await rooms.restartGame(r.code);s={...fresh};sessions.set(ws,s);await rooms.attach(fresh.code,fresh.hostId,ws);send(ws,{type:'ROOM_CREATED',...fresh});return rooms.sendState(fresh.code)}
+  if(t==='TEST_FINISH_SCREEN'){if(!host)throw Error('Host only');if(!r.game)throw Error('Game has not started');if(!r.game.players.length)throw Error('No players in game');r.game.phase='finished';r.game.round=2;r.game.pending=null;r.game.wheelResult=null;r.game.lastCardEvent=null;r.game.winner=r.game.players[0].id;await rooms.saveRoom(r.code);return rooms.sendState(r.code)}
   if(t==='SEND_EMOJI'){if(!r.game)throw Error('Game has not started');const allowed=['😂','😈','🤣','😎','🤔','😱','😭','🤦','👀','🔥','💥','👑','🫡','❤️','👍','CUSTOM'];const emoji=String(m.emoji||'');const targetPlayerId=String(m.targetPlayerId||'');if(!allowed.includes(emoji))throw Error('Invalid emoji');if(!targetPlayerId||![...r.players.values()].some(p=>String(p.id)===targetPlayerId))throw Error('Player not found');for(const q of r.sockets.values())send(q,{type:'PLAYER_EMOJI',targetPlayerId,fromPlayerId:s.playerId,emoji});return}
 if(t==='CALL_PLAYER'){if(!r.game)throw Error('Game has not started');for(const q of r.sockets.values())send(q,{type:'CALL_PLAYER',playerId:s.playerId});return}
   if(t==='EASTER_EGG'){if(!r.game)throw Error('Game has not started');for(const q of r.sockets.values())send(q,{type:'EASTER_EGG'});return}
