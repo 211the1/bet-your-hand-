@@ -294,19 +294,8 @@ function renderHostFinishScreen(game){
     overlay.className='host-finish-screen';
     document.body.appendChild(overlay);
   }
-  const gamePlayers=Array.isArray(game.players)?game.players:[];
-  const winner=gamePlayers.find(p=>String(p.id)===String(game.winner));
-  const scores=[...gamePlayers].sort((a,b)=>Number(b.points||0)-Number(a.points||0));
-  overlay.innerHTML='<div class="host-finish-inner">'+
-    '<div class="host-finish-title">GAME NIGHT COMPLETE</div>'+
-    '<div class="host-finish-subtitle">WINNER</div>'+
-    '<div class="host-finish-winner">'+escapeHtml(winner?.name||'—')+'</div>'+
-    '<div class="host-finish-character">'+escapeHtml(winner?.character||'')+'</div>'+
-    '<div class="host-finish-scores">'+scores.map((p,i)=>
-      '<div class="host-finish-row"><span>'+String(i+1)+'. <b>'+escapeHtml(p.name||'')+'</b></span><span><b>'+Number(p.points||0)+'</b> points</span></div>'
-    ).join('')+'</div>'+
-    '<div class="host-finish-round">ROUND 2 COMPLETE</div>'+
-    '</div>';
+  const scores=[...(Array.isArray(game.players)?game.players:[])].sort((a,b)=>Number(b.points||0)-Number(a.points||0));
+  overlay.innerHTML='<div class="finish-score-overlay">'+scores.slice(0,5).map((p,i)=>'<div class="finish-score-box score-box-'+i+'">'+Number(p.points||0)+'</div>').join('')+'</div>';
   document.body.classList.add('host-finished');
 }
 
