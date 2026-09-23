@@ -114,15 +114,12 @@ if(m.type==='JOINED'||m.type==='RECONNECTED'){
   save(session);joinButton.disabled=true;hideJoinScreen();setStatus(`JOINED ROOM ${m.code}`);return
 }if(m.type==='ROOM_RESTARTED'){try{ws?.close()}catch{}resetToFreshJoinScreen('');return}if(m.type==='CALL_PLAYER'){playCallSound();const flash=document.createElement('div');flash.className='call-flash';flash.innerHTML='<div class="wake-up-arcade">WAKE UP!</div>';document.body.appendChild(flash);setTimeout(()=>flash.remove(),2200);setStatus('📞 CALL — PAY ATTENTION');setTimeout(()=>setStatus(joined?'JOINED ROOM '+(session?.code||''):''),1800);return}if(m.type==='PLAYER_EMOJI'){showIncomingEmoji(m);return}if(m.type==='EASTER_EGG'){playEasterLaugh();const flash=document.createElement('div');flash.className='easter-egg-flash';flash.innerHTML='<div class="easter-egg-text">YOU’RE STUPID!</div>';document.body.appendChild(flash);setTimeout(()=>flash.remove(),3200);return}if(m.type!=='STATE')return;const game=m.game;if(!game){autoSpinSent=false;const playerCount=(m.players||[]).length;const heading=playerCount<2?'WAITING FOR MORE PLAYERS…':'WAITING FOR HOST…';gameEl.innerHTML='<div class="waiting-room-recovery"><h2>'+heading+'</h2>'+m.players.map(p=>`<div>${escapeHtml(p.name)} — ${escapeHtml(p.character)} ${p.connected?'🟢':'⚪'}</div>`).join('')+'<button id="leave-old-room" type="button" style="margin-top:18px;padding:12px 18px;border:2px solid #fff;border-radius:12px;background:#7d1010;color:#fff;font-weight:1000;font-size:14px;box-shadow:0 0 14px #ff3b3b">LEAVE ROOM / JOIN NEW GAME</button></div>';const leaveOld=gameEl.querySelector('#leave-old-room');if(leaveOld)leaveOld.addEventListener('click',()=>{leaveOld.disabled=true;setStatus('LEAVING ROOM…');if(!send({type:'LEAVE_ROOM'}))resetToFreshJoinScreen('');});return}if(game.lastCardEvent){lastCardWasActive=true;showLastCard(game.lastCardEvent)}else if(lastCardWasActive){lastCardWasActive=false;autoSpinSent=false}
 if(game.phase==='finished'){
- const oldFinish=document.getElementById('player-finish-screen');
- if(oldFinish)oldFinish.remove();
- const winner=game.players.find(p=>String(p.id)===String(game.winner));
  const scores=[...game.players].sort((a,b)=>Number(b.points)-Number(a.points));
- const finish=document.createElement('div');
+ const finish=document.getElementById('player-finish-screen')||document.createElement('div');
  finish.id='player-finish-screen';
  finish.className='finish-screen';
- finish.style.backgroundImage="url('/finish-screen.png?v=2')";
- finish.innerHTML=`<div class="finish-screen-content"><div class="finish-screen-title">GAME NIGHT COMPLETE</div><div class="finish-screen-subtitle">WINNER</div><div class="finish-screen-winner">${escapeHtml(winner?.name||'—')}</div><div class="finish-screen-character">${escapeHtml(winner?.character||'')}</div><div class="finish-screen-scores">${scores.map((p,i)=>`<div class="finish-screen-row"><span>${i+1}. <b>${escapeHtml(p.name)}</b></span><span><b>${Number(p.points)}</b> points</span></div>`).join('')}</div><div class="finish-screen-round">ROUND 2 COMPLETE</div></div>`;
+ finish.style.backgroundImage="url('/finish-screen.png?v=3')";
+ finish.innerHTML='<div class="finish-score-overlay">'+scores.slice(0,5).map((p,i)=>'<div class="finish-score-box score-box-'+i+'">'+Number(p.points||0)+'</div>').join('')+'</div>';
  document.body.appendChild(finish);
  gameEl.innerHTML='';
  return;
