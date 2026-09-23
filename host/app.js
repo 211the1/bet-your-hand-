@@ -476,6 +476,7 @@ function updateButtons(){
 
 function resetToReady(message){
   clearHostFinishScreen();
+  if(hostTestFinishButton)hostTestFinishButton.disabled=false;
   session=null;
   players=[];
   started=false;
@@ -539,6 +540,7 @@ function connectAndCreate(){
     }
 
     if(message.type==='ROOM_CREATED'){
+      if(hostTestFinishButton)hostTestFinishButton.disabled=false;
       creating=false;
       session={code:message.code,hostId:message.hostId,hostToken:message.hostToken};
       localStorage.setItem('pyhHostSession',JSON.stringify(session));
