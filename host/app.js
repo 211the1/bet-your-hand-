@@ -301,17 +301,15 @@ function renderHostFinishScreen(game){
 
   overlay.innerHTML=scores.slice(0,5).map((p,i)=>{
     const img=characterImage(p.character);
-    const name=escapeHtml(p.name||'');
     const score=Number(p.points||0);
 
     return '<div style="position:absolute!important;left:'+columns[i]+'!important;top:76.5%!important;width:10%!important;height:22%!important;margin:0!important;padding:0!important;box-sizing:border-box!important;text-align:center!important;overflow:visible!important;pointer-events:none!important;">'+
       (img?'<img src="'+img+'" alt="" style="position:absolute!important;left:50%!important;top:0!important;transform:translateX(-50%)!important;width:76%!important;height:52%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;object-fit:cover!important;object-position:center top!important;border-radius:8%!important;display:block!important;box-sizing:border-box!important;">':'')+
-      '<div style="position:absolute!important;left:0!important;right:0!important;top:53%!important;width:100%!important;font:900 clamp(9px,1.25vw,16px)/1 system-ui,sans-serif!important;color:#fff!important;text-shadow:0 2px 5px #000!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;">'+name+'</div>'+
-      '<div style="position:absolute!important;left:0!important;right:0!important;top:77%!important;width:100%!important;height:15%!important;display:flex!important;align-items:center!important;justify-content:center!important;font:1000 clamp(14px,2vw,25px)/1 system-ui,sans-serif!important;color:#fff!important;text-shadow:0 2px 6px #000!important;">'+score+'</div>'+
+      '<div style="position:absolute!important;left:0!important;right:0!important;top:77%!important;width:100%!important;height:16%!important;display:flex!important;align-items:center!important;justify-content:center!important;font:1000 clamp(14px,2vw,25px)/1 system-ui,sans-serif!important;color:#fff!important;text-shadow:0 2px 6px #000!important;">'+score+'</div>'+
     '</div>';
   }).join('');
 
-  overlay.style.backgroundImage="url('/finish-screen.png?v=6')";
+  overlay.style.backgroundImage="url('/finish-screen.png?v=7')";
   document.body.classList.add('host-finished');
 }
 function updateRound(round){
