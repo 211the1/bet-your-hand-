@@ -4,15 +4,15 @@ const CHARACTERS = Object.freeze(['Bug','Face','Ling Ling','Beanz','The One','Bo
 const MIN_PLAYERS=2, MAX_PLAYERS=6, STARTING_HAND=8, STARTING_POINTS=500;
 const SPECIAL_POINTS=Object.freeze({SKIP:100,REVERSE:100,WILD:200,PLAY_YOUR_HAND:300});
 const WHEEL_SECTIONS=Object.freeze([
-  {section:1,character:'Bug',color:'Blue',power:'EXTRA_PLAY'},
-  {section:2,character:'Face',color:'Red',power:'SHIELD'},
+  {section:1,character:'Bug',color:'Yellow',power:'TURN_SWITCH'},
+  {section:2,character:'Face',color:'Blue',power:'SHIELD'},
   {section:3,character:'Ling Ling',color:'Green',power:'COLOR_CHOICE'},
-  {section:4,character:'Beanz',color:'Yellow',power:'EXTRA_PLAY'},
-  {section:5,character:'The One',color:'Blue',power:'TURN_SWITCH'},
-  {section:6,character:'Boone',color:'Green',power:'SHIELD'},
-  {section:7,character:'Chicken Joe',color:'Red',power:'COLOR_CHOICE'},
-  {section:8,character:'Juby',color:'Yellow',power:'EXTRA_PLAY'},
-  {section:9,character:'Meemaw',color:'Blue',power:'TURN_SWITCH'}
+  {section:4,character:'Beanz',color:'Red',power:'EXTRA_PLAY'},
+  {section:5,character:'The One',color:'Yellow',power:'EXTRA_PLAY'},
+  {section:6,character:'Boone',color:'Red',power:'TURN_SWITCH'},
+  {section:7,character:'Chicken Joe',color:'Blue',power:'SHIELD'},
+  {section:8,character:'Juby',color:'Green',power:'COLOR_CHOICE'},
+  {section:9,character:'Meemaw',color:'Red',power:'EXTRA_PLAY'}
 ]);
 function buildDeck(){const deck=[];for(const character of CHARACTERS) for(const color of COLORS) for(let copy=0;copy<2;copy++) deck.push({id:`${color}-${character}-${copy}`,type:'CHARACTER',color,character});for(let i=0;i<8;i++) deck.push({id:`SKIP-${i}`,type:'SKIP',color:COLORS[i%4]});for(let i=0;i<8;i++) deck.push({id:`REVERSE-${i}`,type:'REVERSE',color:COLORS[i%4]});for(let i=0;i<8;i++) deck.push({id:`WILD-${i}`,type:'WILD',color:null});for(let i=0;i<12;i++) deck.push({id:`PLAY-${i}`,type:'PLAY_YOUR_HAND',color:null});if(deck.length!==108)throw new Error('Deck must contain exactly 108 cards');return deck}
 function shuffle(a,rng=Math.random){const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x}
