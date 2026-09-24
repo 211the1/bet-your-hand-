@@ -636,7 +636,6 @@ function reconnectSavedHost(){
       codeEl.textContent=session.code;
       updateJoinQr(session.code);
       status('ROOM RECONNECTED — PLAYERS CAN JOIN');
-      startRoomSync();
       return;
     }
 
