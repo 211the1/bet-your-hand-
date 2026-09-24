@@ -283,6 +283,19 @@ function clearHostFinishScreen(){
   const el=document.getElementById('host-finish-screen');
   if(el)el.remove();
   document.body.classList.remove('host-finished');
+  if(hostMenuButton){
+    hostMenuButton.style.top='';
+    hostMenuButton.style.right='';
+    hostMenuButton.style.bottom='';
+    hostMenuButton.style.left='';
+  }
+  if(hostMenuPanel){
+    hostMenuPanel.style.top='';
+    hostMenuPanel.style.right='';
+    hostMenuPanel.style.bottom='';
+    hostMenuPanel.style.left='';
+    hostMenuPanel.style.transform='';
+  }
 }
 
 function renderHostFinishScreen(game){
@@ -315,6 +328,24 @@ function renderHostFinishScreen(game){
     '</div></div>';
 
   document.body.classList.add('host-finished');
+  // Finish screen menu is explicitly positioned here so media-query/base CSS cannot override it.
+  if(hostMenuButton){
+    hostMenuButton.style.setProperty('position','fixed','important');
+    hostMenuButton.style.setProperty('top','1.5vh','important');
+    hostMenuButton.style.setProperty('right','2vw','important');
+    hostMenuButton.style.setProperty('bottom','auto','important');
+    hostMenuButton.style.setProperty('left','auto','important');
+    hostMenuButton.style.setProperty('z-index','100001','important');
+  }
+  if(hostMenuPanel){
+    hostMenuPanel.style.setProperty('position','fixed','important');
+    hostMenuPanel.style.setProperty('top','calc(1.5vh + 76px)','important');
+    hostMenuPanel.style.setProperty('right','2vw','important');
+    hostMenuPanel.style.setProperty('left','auto','important');
+    hostMenuPanel.style.setProperty('bottom','auto','important');
+    hostMenuPanel.style.setProperty('transform','none','important');
+    hostMenuPanel.style.setProperty('z-index','100002','important');
+  }
 }
 function updateRound(round){
   if(roundEl)roundEl.textContent=Number(round)>0?'ROUND '+Number(round):'ROUND --';
