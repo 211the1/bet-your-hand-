@@ -738,6 +738,12 @@ setTimeout(()=>{
   setInterval(moveHostCharacter,6000);
 },1200);
 
+// Remove any stale full-screen overlays left by an earlier render before reconnecting.
+document.getElementById('host-finish-screen')?.remove();
+document.getElementById('host-power-wheel-overlay')?.remove();
+document.body.classList.remove('host-finished');
+if(hostMenuPanel)hostMenuPanel.classList.remove('show');
+
 renderPlayers();
 updateButtons();
 updateHostSoundButton();
