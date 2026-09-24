@@ -310,7 +310,7 @@ function renderHostFinishScreen(game){
   }
 
   const scores=[...(Array.isArray(game.players)?game.players:[])].sort((a,b)=>Number(b.points||0)-Number(a.points||0));
-  const columns=['4.3%','19.8%','35.4%','50.9%','66.4%'];
+  const columns=['6.0%','21.5%','37.1%','52.6%','68.1%'];
 
   overlay.innerHTML='<div class="host-finish-art-lock" style="position:relative!important;width:100%!important;height:100%!important;inset:0!important;overflow:hidden!important;">'+
     '<img src="/finish-screen.png?v=11" alt="" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;pointer-events:none!important;">'+
@@ -318,7 +318,7 @@ function renderHostFinishScreen(game){
     scores.slice(0,5).map((p,i)=>{
       const img=characterImage(p.character);
       const score=Number(p.points||0);
-      return '<div class="host-finish-slot" data-slot="'+i+'" style="position:absolute!important;left:'+columns[i]+'!important;top:77%!important;width:12.3%!important;height:14%!important;margin:0!important;padding:0!important;box-sizing:border-box!important;text-align:center!important;overflow:visible!important;pointer-events:none!important;">'+
+      return '<div class="host-finish-slot" data-slot="'+i+'" style="position:absolute!important;left:'+columns[i]+'!important;top:73%!important;width:12.3%!important;height:14%!important;margin:0!important;padding:0!important;box-sizing:border-box!important;text-align:center!important;overflow:visible!important;pointer-events:none!important;">'+
         '<div class="host-finish-photo-slot" style="position:absolute!important;left:50%!important;top:0!important;transform:translateX(-50%)!important;width:100%!important;height:58%!important;overflow:hidden!important;border-radius:5%!important;box-sizing:border-box!important;">'+
           (img?'<img src="'+img+'" alt="" style="display:block!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center top!important;">':'')+
         '</div>'+
