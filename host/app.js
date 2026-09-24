@@ -194,6 +194,51 @@ function renderPowerWheel(game){
   }
   const overlay=document.createElement('div');
   overlay.id='host-power-wheel-overlay';overlay.className='host-power-wheel-overlay';
+  overlay.innerHTML='<div class="host-power-wheel"><img class="host-power-wheel-rotator '+cls+'" data-mode="'+mode+'" style="--host-wheel-land:'+rotation+'deg" src="/power-wheel.png?v=1" alt="PLAY YOUR HAND Power Wheel"><div class="host-power-wheel-pointer" aria-hidden="true">▼</div></div>';
+  document.body.appendChild(overlay);
+  if(clickCount)startWheelClickSequence(mode==='spin'?2600:1600,clickCount,...(mode==='spin'?[.15,.8,.2,1]:[.12,.82,.18,1]));
+}
+
+function clearHostFinishScreen(){
+  const el=document.getElementById('host-finish-screen');
+  if(el)el.remove();
+  document.body.classList.remove('host-finished');
+  if(hostMenuButton){
+    hostMenuButton.style.position='';
+    hostMenuButton.style.top='';
+    hostMenuButton.style.right='';
+    hostMenuButton.style.bottom='';
+    hostMenuButton.style.left='';
+    hostMenuButton.style.zIndex='';
+  }
+  if(hostMenuPanel){
+    hostMenuPanel.style.position='';
+    hostMenuPanel.style.top='';
+    hostMenuPanel.style.right='';
+    hostMenuPanel.style.bottom='';
+    hostMenuPanel.style.left='';
+    hostMenuPanel.style.transform='';
+    hostMenuPanel.style.zIndex='';
+  }
+}
+
+function renderHostFinishScreen(game){
+  if(!game || game.phase!=='finished'){
+    clearHostFinishScreen();
+    return;
+  }
+
+  let overlay=document.getElementById('host-finish-screen');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='host-finish-screen';
+    overlay.className='host-finish-screen';
+    document.body.appendChild(overlay);
+  }
+
+  const scores=[...(Array.isArray(game.players)?game.players:[])].sort((a,b)=>Number(b.points||0)-Number(a.points||0));
+  const columns=['9.0%','24.6%','40.1%','55.7%','71.6%'];
+
   overlay.innerHTML='<div class="host-finish-art-lock" style="position:relative!important;width:100%!important;height:100%!important;inset:0!important;overflow:hidden!important;">'+
     '<img src="/finish-screen.png?v=12" alt="" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;pointer-events:none!important;">'+
     '<div id="host-finish-wanderer" class="host-finish-wanderer host-walk-right"><img src="/host-winner.png?v=2" alt=""></div>'+
@@ -205,7 +250,7 @@ function renderPowerWheel(game){
     '</div></div>';
 
   document.body.classList.add('host-finished');
-  // Finish screen menu is explicitly positioned here so media-query/base CSS cannot override it.
+
   if(hostMenuButton){
     hostMenuButton.style.setProperty('position','fixed','important');
     hostMenuButton.style.setProperty('top','1.5vh','important');
@@ -223,7 +268,13 @@ function renderPowerWheel(game){
     hostMenuPanel.style.setProperty('transform','none','important');
     hostMenuPanel.style.setProperty('z-index','100002','important');
   }
+
+  const finishHost=document.getElementById('host-finish-wanderer');
+  if(finishHost){
+    finishHost.onclick=playHostCharacterSound;
+  }
 }
+
 function updateRound(round){
   if(roundEl)roundEl.textContent=Number(round)>0?'ROUND '+Number(round):'ROUND --';
 }
@@ -657,24 +708,18 @@ startBtn.addEventListener('click',()=>{
 });
 
 const hostWanderer=document.getElementById('host-wanderer');
-const hostCharacterSound=new Audio('/host-sound.mp3?v=2');
-hostCharacterSound.load();
+const hostCharacterSound=new Audio('/host-sound.mp3?v=3');
 hostCharacterSound.preload='auto';
-hostCharacterSound.addEventListener('error',()=>{});
 function playHostCharacterSound(){
   if(!hostSoundEnabled)return;
   try{
+    hostCharacterSound.pause();
     hostCharacterSound.currentTime=0;
-    const playPromise=hostCharacterSound.play();
-    if(playPromise&&typeof playPromise.catch==='function')playPromise.catch(()=>{hostCharacterSound.load();});
+    const p=hostCharacterSound.play();
+    if(p&&typeof p.catch==='function')p.catch(()=>{});
   }catch{}
 }
 hostWanderer?.addEventListener('click',playHostCharacterSound);
-const finishHostSoundObserver=new MutationObserver(()=>{
-  const finishHost=document.getElementById('host-finish-wanderer');
-  if(finishHost){finishHost.addEventListener('click',playHostCharacterSound,{once:true});finishHostSoundObserver.disconnect();}
-});
-finishHostSoundObserver.observe(document.body,{childList:true,subtree:true});
 const hostWalkPoints=[[8,18],[92,18],[92,68],[8,68]];
 let hostWalkIndex=0;
 function moveHostCharacter(){
