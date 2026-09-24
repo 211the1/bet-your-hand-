@@ -199,6 +199,23 @@ function renderPowerWheel(game){
   if(clickCount)startWheelClickSequence(mode==='spin'?2600:1600,clickCount,...(mode==='spin'?[.15,.8,.2,1]:[.12,.82,.18,1]));
 }
 
+function playHostTone(freq=660,duration=.12){
+  if(!hostSoundEnabled)return;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=new C(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.0001,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.18,ctx.currentTime+.02);
+    g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+duration);
+    o.connect(g).connect(ctx.destination);o.start();o.stop(ctx.currentTime+duration);
+    setTimeout(()=>ctx.close(),300);
+  }catch{}
+}
+function updateHostSoundButton(){
+  if(hostSoundButton)hostSoundButton.textContent=hostSoundEnabled?'SOUND: ON':'SOUND: OFF';
+}
+function closeHostMenu(){if(hostMenuPanel)hostMenuPanel.classList.remove('show')}
+
 function clearHostFinishScreen(){
   const el=document.getElementById('host-finish-screen');
   if(el)el.remove();
