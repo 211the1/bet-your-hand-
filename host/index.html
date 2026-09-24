@@ -147,6 +147,11 @@ body.host-finished #host-menu-panel{z-index:100002}
   50%{transform:translateY(0) rotate(0deg) scaleY(1)}
   75%{transform:translateY(-7px) rotate(2deg) scaleY(.99)}
 }
+.host-finish-wanderer{position:absolute!important;left:8%;top:18%;z-index:99997!important;width:clamp(144px,20vw,290px);height:auto;pointer-events:auto;cursor:pointer;will-change:left,top,transform;transition:left 5.5s ease-in-out,top 5.5s ease-in-out;filter:drop-shadow(0 8px 8px #0008)}
+.host-finish-wanderer img{display:block;width:100%;height:auto;object-fit:contain;transform-origin:center bottom;animation:hostWalkCycle .62s ease-in-out infinite}
+.host-finish-wanderer.host-walk-right{transform:scaleX(1)}
+.host-finish-wanderer.host-walk-left{transform:scaleX(-1)}
+body.host-finished #host-finish-wanderer{z-index:99997!important}
 @media(max-width:600px){
   #host-wanderer{width:152px;transition:left 4.5s ease-in-out,top 4.5s ease-in-out}
   #host-wanderer img{animation-duration:.55s}
