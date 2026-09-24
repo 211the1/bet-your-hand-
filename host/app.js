@@ -657,14 +657,16 @@ startBtn.addEventListener('click',()=>{
 });
 
 const hostWanderer=document.getElementById('host-wanderer');
-const hostCharacterSound=new Audio('/host-sound.mp3');
+const hostCharacterSound=new Audio('/host-sound.mp3?v=2');
+hostCharacterSound.load();
 hostCharacterSound.preload='auto';
 hostCharacterSound.addEventListener('error',()=>{});
 function playHostCharacterSound(){
   if(!hostSoundEnabled)return;
   try{
     hostCharacterSound.currentTime=0;
-    hostCharacterSound.play().catch(()=>{});
+    const playPromise=hostCharacterSound.play();
+    if(playPromise&&typeof playPromise.catch==='function')playPromise.catch(()=>{hostCharacterSound.load();});
   }catch{}
 }
 hostWanderer?.addEventListener('click',playHostCharacterSound);
@@ -686,6 +688,10 @@ function moveHostCharacter(){
   hostWanderer.onclick=playHostCharacterSound;
   hostWalkIndex++;
 }
+setTimeout(()=>{
+  moveHostCharacter();
+  setInterval(moveHostCharacter,6000);
+},1200);
 
 renderPlayers();
 updateButtons();
