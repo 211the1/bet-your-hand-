@@ -45,8 +45,18 @@ function buildCharacterChoices(taken=[]){
 buildCharacterChoices([]);
 let ws=null,me=null,joined=false,connecting=false,retryTimer=null,pingTimer=null,session=null,autoSpinSent=false,lastSeenEvent=null,lastCardWasActive=false,selectedCardId=null,sortMode=false,soundEnabled=true,intentionalDisconnect=false;
 const topMenuSound=document.getElementById('menu-sound');if(topMenuSound)topMenuSound.addEventListener('click',()=>{soundEnabled=!soundEnabled;topMenuSound.textContent=soundEnabled?'SOUND: ON':'SOUND: OFF';if(soundEnabled)playUiTone(880,.16)});
-try{session=JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{}
-if(session){codeInput.value=session.code||'';nameInput.value=session.name||'';characterSelect.value=session.character||'';joined=Boolean(session.playerId)}
+let finishedSession=false;
+try{finishedSession=localStorage.getItem('byhPlayerFinished')==='1'}catch{}
+if(finishedSession){
+ localStorage.removeItem('byhPlayerFinished');
+ localStorage.removeItem('byhPlayerSession');
+ session=null;
+ joined=false;
+ me=null;
+}else{
+ try{session=JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{session=null}
+ if(session){codeInput.value=session.code||'';nameInput.value=session.name||'';characterSelect.value=session.character||'';joined=Boolean(session.playerId)}
+}
 joinButton.disabled=false;
 const setStatus=(m,bad=false)=>{statusEl.textContent=m||'';statusEl.style.color=bad?'#ff6b6b':'#21f17d'};
 const showJoinScreen=(prejoin=true)=>{if(joinPanel){joinPanel.classList.add('show');joinPanel.classList.toggle('prejoin',prejoin);joinPanel.setAttribute('aria-hidden','false')}joinButton.disabled=false};
@@ -114,6 +124,7 @@ if(m.type==='JOINED'||m.type==='RECONNECTED'){
   save(session);joinButton.disabled=true;hideJoinScreen();setStatus(`JOINED ROOM ${m.code}`);return
 }if(m.type==='ROOM_RESTARTED'){try{ws?.close()}catch{}resetToFreshJoinScreen('');return}if(m.type==='CALL_PLAYER'){playCallSound();const flash=document.createElement('div');flash.className='call-flash';flash.innerHTML='<div class="wake-up-arcade">WAKE UP!</div>';document.body.appendChild(flash);setTimeout(()=>flash.remove(),2200);setStatus('📞 CALL — PAY ATTENTION');setTimeout(()=>setStatus(joined?'JOINED ROOM '+(session?.code||''):''),1800);return}if(m.type==='PLAYER_EMOJI'){showIncomingEmoji(m);return}if(m.type==='EASTER_EGG'){playEasterLaugh();const flash=document.createElement('div');flash.className='easter-egg-flash';flash.innerHTML='<div class="easter-egg-text">YOU’RE STUPID!</div>';document.body.appendChild(flash);setTimeout(()=>flash.remove(),3200);return}if(m.type!=='STATE')return;const game=m.game;if(!game){autoSpinSent=false;const playerCount=(m.players||[]).length;const heading=playerCount<2?'WAITING FOR MORE PLAYERS…':'WAITING FOR HOST…';gameEl.innerHTML='<div class="waiting-room-recovery"><h2>'+heading+'</h2>'+m.players.map(p=>`<div>${escapeHtml(p.name)} — ${escapeHtml(p.character)} ${p.connected?'🟢':'⚪'}</div>`).join('')+'<button id="leave-old-room" type="button" style="margin-top:18px;padding:12px 18px;border:2px solid #fff;border-radius:12px;background:#7d1010;color:#fff;font-weight:1000;font-size:14px;box-shadow:0 0 14px #ff3b3b">LEAVE ROOM / JOIN NEW GAME</button></div>';const leaveOld=gameEl.querySelector('#leave-old-room');if(leaveOld)leaveOld.addEventListener('click',()=>{leaveOld.disabled=true;setStatus('LEAVING ROOM…');if(!send({type:'LEAVE_ROOM'}))resetToFreshJoinScreen('');});return}if(game.lastCardEvent){lastCardWasActive=true;showLastCard(game.lastCardEvent)}else if(lastCardWasActive){lastCardWasActive=false;autoSpinSent=false}
 if(game.phase==='finished'){
+ try{localStorage.setItem('byhPlayerFinished','1')}catch{}
  const scores=[...game.players].sort((a,b)=>Number(b.points)-Number(a.points));
  const finish=document.getElementById('player-finish-screen')||document.createElement('div');
  finish.id='player-finish-screen';
