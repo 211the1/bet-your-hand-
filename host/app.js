@@ -795,17 +795,14 @@ hostWanderer?.addEventListener('click',playHostCharacterSound);
 const hostWalkPoints=[[8,18],[92,18],[92,68],[8,68]];
 let hostWalkIndex=0;
 function moveHostCharacter(){
-  const walkers=[hostWanderer,document.getElementById('host-finish-wanderer')].filter(Boolean);
-  if(!walkers.length)return;
+  if(!hostWanderer)return;
   const next=hostWalkPoints[hostWalkIndex%hostWalkPoints.length];
-  walkers.forEach((walker,i)=>{
-    const currentX=parseFloat(walker.style.left)||(i?8:8);
-    walker.classList.toggle('host-walk-right',next[0]>=currentX);
-    walker.classList.toggle('host-walk-left',next[0]<currentX);
-    walker.style.left=next[0]+'%';
-    walker.style.top=next[1]+'%';
-    walker.onclick=playHostCharacterSound;
-  });
+  const currentX=parseFloat(hostWanderer.style.left)||8;
+  hostWanderer.classList.toggle('host-walk-right',next[0]>=currentX);
+  hostWanderer.classList.toggle('host-walk-left',next[0]<currentX);
+  hostWanderer.style.left=next[0]+'%';
+  hostWanderer.style.top=next[1]+'%';
+  hostWanderer.onclick=playHostCharacterSound;
   hostWalkIndex++;
 }
 
