@@ -20,7 +20,6 @@ const hostStartButton=document.getElementById('host-start');
 const hostTestFinishButton=document.getElementById('host-test-finish');
 let hostSoundEnabled=true;
 let hostWakeLock=null;
-let hostFinishVisualTest=false;
 
 async function keepHostScreenAwake(){
   if(!('wakeLock' in navigator))return;
@@ -281,7 +280,6 @@ function updateHostSoundButton(){
 function closeHostMenu(){if(hostMenuPanel)hostMenuPanel.classList.remove('show')}
 
 function clearHostFinishScreen(){
-  hostFinishVisualTest=false;
   const el=document.getElementById('host-finish-screen');
   if(el)el.remove();
   document.body.classList.remove('host-finished');
@@ -312,24 +310,19 @@ function renderHostFinishScreen(game){
   }
 
   const scores=[...(Array.isArray(game.players)?game.players:[])].sort((a,b)=>Number(b.points||0)-Number(a.points||0));
-  const testCharacters=['Bug','Face','Ling Ling','Beanz','The One'];
-  const displayPlayers=scores.slice(0,5);
-  if(hostFinishVisualTest){
-    for(let i=displayPlayers.length;i<5;i++)displayPlayers.push({character:testCharacters[i],points:0,__visualTest:true});
-  }
   const columns=['8.9%','23.1%','37.1%','51.4%','66.0%'];
 
   overlay.innerHTML='<div class="host-finish-art-lock" style="position:relative!important;width:100%!important;height:100%!important;inset:0!important;overflow:hidden!important;">'+
     '<img src="/finish-screen.png?v=11" alt="" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;pointer-events:none!important;">'+
     '<div class="host-finish-slot-layer" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;">'+
-    displayPlayers.map((p,i)=>{
+    scores.slice(0,5).map((p,i)=>{
       const img=characterImage(p.character);
-      const score=Number(p.points||0);\n      const isVisualTest=Boolean(p.__visualTest);
+      const score=Number(p.points||0);
       return '<div class="host-finish-slot" data-slot="'+i+'" style="position:absolute!important;left:'+columns[i]+'!important;top:71.4%!important;width:8.8%!important;height:14%!important;margin:0!important;padding:0!important;box-sizing:border-box!important;text-align:center!important;overflow:visible!important;pointer-events:none!important;">'+
         '<div class="host-finish-photo-slot" style="position:absolute!important;left:50%!important;top:0!important;transform:translateX(-50%)!important;width:100%!important;height:49%!important;overflow:hidden!important;border-radius:5%!important;box-sizing:border-box!important;">'+
           (img?'<img src="'+img+'" alt="" style="display:block!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center top!important;">':'')+
         '</div>'+
-        '<div class="host-finish-score-slot" style="position:absolute!important;left:50%!important;top:60%!important;transform:translateX(-50%)!important;width:100%!important;height:24%!important;display:flex!important;align-items:center!important;justify-content:center!important;font:1000 clamp(13px,1.8vw,23px)/1 system-ui,sans-serif!important;color:#fff!important;text-shadow:0 2px 5px #000!important;white-space:nowrap!important;">'+(isVisualTest?'':score)+'</div>'+
+        '<div class="host-finish-score-slot" style="position:absolute!important;left:50%!important;top:60%!important;transform:translateX(-50%)!important;width:100%!important;height:24%!important;display:flex!important;align-items:center!important;justify-content:center!important;font:1000 clamp(13px,1.8vw,23px)/1 system-ui,sans-serif!important;color:#fff!important;text-shadow:0 2px 5px #000!important;white-space:nowrap!important;">'+score+'</div>'+
       '</div>';
     }).join('')+
     '</div></div>';
@@ -751,7 +744,6 @@ hostGenerateButton?.addEventListener('click',()=>{
 hostTestFinishButton?.addEventListener('click',()=>{
   if(!session)return;
   hostTestFinishButton.disabled=true;
-  hostFinishVisualTest=true;
   status('TESTING FINISH SCREEN…');
   send({type:'TEST_FINISH_SCREEN'});
   closeHostMenu();
