@@ -310,7 +310,7 @@ function renderHostFinishScreen(game){
   }
 
   const scores=[...(Array.isArray(game.players)?game.players:[])].sort((a,b)=>Number(b.points||0)-Number(a.points||0));
-  const columns=['5.5%','21.1%','36.6%','52.2%','68.1%'];
+  const columns=['9.0%','24.6%','40.1%','55.7%','71.6%'];
 
   overlay.innerHTML='<div class="host-finish-art-lock" style="position:relative!important;width:100%!important;height:100%!important;inset:0!important;overflow:hidden!important;">'+
     '<img src="/finish-screen.png?v=11" alt="" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;pointer-events:none!important;">'+
