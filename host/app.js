@@ -313,8 +313,8 @@ function renderHostFinishScreen(game){
   const columns=['9.0%','24.6%','40.1%','55.7%','71.6%'];
 
   overlay.innerHTML='<div class="host-finish-art-lock" style="position:relative!important;width:100%!important;height:100%!important;inset:0!important;overflow:hidden!important;">'+
-    '<img src="/finish-screen.png?v=11" alt="" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;pointer-events:none!important;">'+
-
+    '<img src="/finish-screen.png?v=12" alt="" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;pointer-events:none!important;">'+
+    '<div id="host-finish-wanderer" class="host-finish-wanderer host-walk-right"><img src="/host-winner.png?v=2" alt=""></div>'+\
     '<div class="host-finish-slot-layer" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;">'+
     scores.slice(0,5).map((p,i)=>{
       const img=characterImage(p.character);
