@@ -5,7 +5,7 @@ const {RoomServer}=require('./server/room-server');
 const e=require('./game/engine');
 const root=__dirname,rooms=new RoomServer();
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.jpg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.wav':'audio/wav','.mp3':'audio/mpeg','.mp4':'video/mp4','.webmanifest':'application/manifest+json'};
-function serve(req,res){let u;try{u=decodeURIComponent(new URL(req.url,'http://x').pathname)}catch{return res.end('Bad request')}if(u==='/health'){res.writeHead(200,{'content-type':'text/plain; charset=utf-8','cache-control':'no-store'});return res.end('ok')}if(u==='/')u='/client/index.html';if(u==='/host')u='/host/index.html';const file=path.normalize(path.join(root,u));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end('Not found')}res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'});fs.createReadStream(file).pipe(res)}
+function serve(req,res){let u;try{u=decodeURIComponent(new URL(req.url,'http://x').pathname)}catch{return res.end('Bad request')}if(u==='/health'){res.writeHead(200,{'content-type':'text/plain; charset=utf-8','cache-control':'no-store'});return res.end('ok')}if(u==='/')u='/client/index.html';if(u==='/host')u='/host/index.html';const file=path.normalize(path.join(root,u));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end('Not found')}if(u==='/client/index.html'){let html=fs.readFileSync(file,'utf8');const walkScript=`<style>.host-walk-overlay{display:none!important}.pyh-host-walk-v2{position:fixed;inset:0;z-index:99991;pointer-events:none;overflow:hidden}.pyh-host-walk-v2 img{position:absolute;bottom:8%;width:clamp(110px,34vw,190px);height:auto;max-height:70vh;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))}.pyh-host-walk-v2.left-to-right{animation:pyhHostWalkLTR 4s linear forwards}@keyframes pyhHostWalkLTR{from{left:-35vw}to{left:115vw}}</style><script>(function(){const proto=location.protocol==='https:'?'wss:':'ws:';let sock;function s(){try{return JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{return null}}function show(d){document.querySelectorAll('.pyh-host-walk-v2').forEach(x=>x.remove());const e=document.createElement('div');e.className='pyh-host-walk-v2 left-to-right';const i=document.createElement('img');i.src='/host-character.png?v=2';e.appendChild(i);document.body.appendChild(e);setTimeout(()=>e.remove(),d+200)}function listen(){sock=new WebSocket(proto+'//'+location.host);sock.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type!=='HOST_WALK_CYCLE')return;const x=s();if(!x?.playerId||x.code!==m.code)return;const n=(m.playerIds||[]).findIndex(id=>String(id)===String(x.playerId));if(n<0)return;setTimeout(()=>show(m.segmentMs),(n+1)*m.segmentMs)}catch{}};sock.onclose=()=>setTimeout(listen,2000)}listen()})();</script>`;html=html.replace('</body>',walkScript+'</body>');res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});return res.end(html)}res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'});fs.createReadStream(file).pipe(res)}
 function send(ws,m){if(ws.readyState===1)ws.send(JSON.stringify(m))}
 function createServer(){const httpServer=http.createServer(serve);const wss=new WebSocketServer({server:httpServer});const sessions=new Map();
  wss.on('connection',ws=>{ws.isAlive=true;ws.on('pong',()=>{ws.isAlive=true});ws.on('message',async raw=>{try{await rooms.ready;const m=JSON.parse(raw),t=String(m.type||'').toUpperCase();if(t==='PING')return send(ws,{type:'PONG'});let s=sessions.get(ws),r;
@@ -15,22 +15,12 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
   if(t==='RECONNECT'){s=await rooms.reconnect(m.code,m.playerId||m.hostId,m.reconnectToken||m.hostToken);sessions.set(ws,s);await rooms.attach(s.code,s.playerId,ws);send(ws,{type:'RECONNECTED',...s});return send(ws,await rooms.snapshot(s.code,s.playerId))}
   if(!s)throw Error('Not connected');r=await rooms.getRoom(s.code);const host=s.host===true&&s.hostToken===r.hostToken;
   if(t==='START_GAME'){if(!host)throw Error('Host only');await rooms.startGame(r.code);const hostState=await rooms.snapshot(r.code,s.playerId);send(ws,{type:'HOST_GAME_STARTED',...hostState});return rooms.sendState(r.code)}
-  if(t==='LEAVE_ROOM'){
-    if(s.host===true)throw Error('Host cannot leave from the player screen');
-    const code=s.code;
-    await rooms.leavePlayer(code,s.playerId,ws);
-    sessions.delete(ws);
-    // Tell every remaining player immediately. With exactly 2 players,
-    // leavePlayer ends the active game and leaves the room open for a new join.
-    await rooms.sendState(code);
-    send(ws,{type:'LEFT_ROOM'});
-    try{ws.close(1000,'Player left room')}catch{}
-    return;
-  }
+  if(t==='HOST_WALK_CYCLE'){if(!host)throw Error('Host only');if(!r.game)throw Error('Game has not started');const playerIds=[...r.game.players].map(p=>p.id);const segmentMs=4000;const msg={type:'HOST_WALK_CYCLE',code:r.code,playerIds,segmentMs,cycleId:Date.now()};for(const client of wss.clients)send(client,msg);return}
+  if(t==='LEAVE_ROOM'){if(s.host===true)throw Error('Host cannot leave from the player screen');const code=s.code;await rooms.leavePlayer(code,s.playerId,ws);sessions.delete(ws);await rooms.sendState(code);send(ws,{type:'LEFT_ROOM'});try{ws.close(1000,'Player left room')}catch{}return;}
   if(t==='TEST_FINISH_SCREEN'){if(!host)throw Error('Host only');if(!r.game)throw Error('Game has not started');if(!r.game.players.length)throw Error('No players in game');r.game.phase='finished';r.game.round=2;r.game.pending=null;r.game.wheelResult=null;r.game.lastCardEvent=null;r.game.winner=r.game.players[0].id;await rooms.saveRoom(r.code);return rooms.sendState(r.code)}
   if(t==='RESTART_GAME'){if(!host)throw Error('Host only');const fresh=await rooms.restartGame(r.code);s={...fresh};sessions.set(ws,s);await rooms.attach(fresh.code,fresh.hostId,ws);send(ws,{type:'ROOM_CREATED',...fresh});return rooms.sendState(fresh.code)}
   if(t==='SEND_EMOJI'){if(!r.game)throw Error('Game has not started');const allowed=['😂','😈','🤣','😎','🤔','😱','😭','🤦','👀','🔥','💥','👑','🫡','❤️','👍','CUSTOM'];const emoji=String(m.emoji||'');const targetPlayerId=String(m.targetPlayerId||'');if(!allowed.includes(emoji))throw Error('Invalid emoji');if(!targetPlayerId||![...r.players.values()].some(p=>String(p.id)===targetPlayerId))throw Error('Player not found');for(const q of r.sockets.values())send(q,{type:'PLAYER_EMOJI',targetPlayerId,fromPlayerId:s.playerId,emoji});return}
-if(t==='CALL_PLAYER'){if(!r.game)throw Error('Game has not started');for(const q of r.sockets.values())send(q,{type:'CALL_PLAYER',playerId:s.playerId});return}
+  if(t==='CALL_PLAYER'){if(!r.game)throw Error('Game has not started');for(const q of r.sockets.values())send(q,{type:'CALL_PLAYER',playerId:s.playerId});return}
   if(t==='EASTER_EGG'){if(!r.game)throw Error('Game has not started');for(const q of r.sockets.values())send(q,{type:'EASTER_EGG'});return}
   if(t==='CALL_LAST_CARD'){throw Error('LAST CARD is automatic when a player reaches one card')}
   if(t==='LAST_CARD_DONE'){const g=r.game;if(!g)throw Error('Game has not started');if(!g.lastCardEvent||g.lastCardEvent.id!==m.eventId||g.lastCardEvent.playerId!==s.playerId)throw Error('Invalid LAST CARD event');g.lastCardEvent=null;await rooms.saveRoom(r.code);return rooms.sendState(r.code)}
@@ -40,26 +30,7 @@ if(t==='CALL_PLAYER'){if(!r.game)throw Error('Game has not started');for(const q
  }catch(err){send(ws,{type:'ERROR',error:err.message||'Server error'})}});
  ws.on('close',()=>{const s=sessions.get(ws);if(s)rooms.detach(s.code,s.playerId,ws).then(changed=>{if(changed)return rooms.sendState(s.code)}).catch(()=>{});sessions.delete(ws)})});
  const heartbeat=setInterval(()=>{wss.clients.forEach(ws=>{if(ws.isAlive===false)return ws.terminate();ws.isAlive=false;try{ws.ping()}catch{}})},20000);
- const close=async()=>{
-  clearInterval(heartbeat);
-  for(const ws of wss.clients)try{ws.close(1001,'Server shutting down')}catch{}
-  await new Promise(resolve=>wss.close(()=>resolve()));
-  await new Promise(resolve=>httpServer.close(()=>resolve()));
-  await rooms.store.close();
- };
+ const close=async()=>{clearInterval(heartbeat);for(const ws of wss.clients)try{ws.close(1001,'Server shutting down')}catch{}await new Promise(resolve=>wss.close(()=>resolve()));await new Promise(resolve=>httpServer.close(()=>resolve()));await rooms.store.close();};
  return{httpServer,wss,close}}
-if(require.main===module){
- const port=Number(process.env.PORT)||10000;
- const app=createServer();
- app.httpServer.listen(port,'0.0.0.0',()=>console.log('PLAY YOUR HAND server ready on 0.0.0.0:'+port));
- let shuttingDown=false;
- const shutdown=async(signal)=>{
-  if(shuttingDown)return;
-  shuttingDown=true;
-  console.log('PLAY YOUR HAND server shutting down: '+signal);
-  try{await app.close()}finally{process.exit(0)}
- };
- process.once('SIGTERM',()=>shutdown('SIGTERM'));
- process.once('SIGINT',()=>shutdown('SIGINT'));
-}
+if(require.main===module){const port=Number(process.env.PORT)||10000;const app=createServer();app.httpServer.listen(port,'0.0.0.0',()=>console.log('PLAY YOUR HAND server ready on 0.0.0.0:'+port));let shuttingDown=false;const shutdown=async(signal)=>{if(shuttingDown)return;shuttingDown=true;console.log('PLAY YOUR HAND server shutting down: '+signal);try{await app.close()}finally{process.exit(0)}};process.once('SIGTERM',()=>shutdown('SIGTERM'));process.once('SIGINT',()=>shutdown('SIGINT'))}
 module.exports={createServer};
