@@ -41,7 +41,6 @@ let players=[];
 const gameScores=new Map();
 let reconnectTimer=null;
 let reconnecting=false;
-let roomSyncTimer=null;
 const seatAssignments=new Map();
 const seatTimers=new Map();
 
@@ -472,17 +471,6 @@ function resetToReady(message){
   status(message||'READY — GENERATE A CODE');
 }
 
-function startRoomSync(){
-  clearInterval(roomSyncTimer);
-  roomSyncTimer=setInterval(()=>{
-    if(session&&!started)send({type:'SYNC_ROOM'});
-  },2000);
-}
-
-function stopRoomSync(){
-  clearInterval(roomSyncTimer);
-  roomSyncTimer=null;
-}
 
 function scheduleReconnect(){
   if(reconnectTimer||creating||!session)return;
@@ -544,7 +532,6 @@ function connectAndCreate(){
       renderPlayers();
       updateButtons();
       status('ROOM READY — PLAYERS CAN JOIN');
-      startRoomSync();
       return;
     }
 
@@ -553,14 +540,12 @@ function connectAndCreate(){
       codeEl.textContent=session?.code||'----';
       updateButtons();
       status('ROOM RECONNECTED — PLAYERS CAN JOIN');
-      startRoomSync();
       return;
     }
 
     if(message.type==='HOST_GAME_STARTED'){
       clearHostFinishScreen();
       started=true;
-      stopRoomSync();
       players=message.players||players;
       updateGameScores(message.game?.players);
       renderTopCard(message.game?.topCard||null,message.game);
@@ -577,7 +562,6 @@ function connectAndCreate(){
       players=message.players||[];
       if(message.game?.phase==='finished'){
         started=true;
-        stopRoomSync();
         updateGameScores(message.game.players);
         renderHostFinishScreen(message.game);
         renderPowerWheel(message.game);
@@ -594,12 +578,10 @@ function connectAndCreate(){
       if(message.game?.lastCardEvent)showHostLastCard(message.game.lastCardEvent);else if(!message.game?.lastCardEvent)lastHostLastCardEvent=null;
       if(message.game){
         started=true;
-        stopRoomSync();
-        status('GAME STARTED');
+          status('GAME STARTED');
       }else{
         started=false;
-        startRoomSync();
-        status('ROOM READY — WAITING FOR PLAYERS');
+          status('ROOM READY — WAITING FOR PLAYERS');
       }
       renderPlayers();
       updateButtons();
