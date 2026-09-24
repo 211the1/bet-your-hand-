@@ -31,7 +31,9 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
   if(t==='SYNC_ROOM'){
     if(!host)throw Error('Host only');
     await rooms.syncRoom(r.code);
-    return rooms.sendState(r.code);
+    // Return the freshly synced snapshot directly to the Host socket.
+    // Do not depend on the room's socket map/broadcast path for Host polling.
+    return send(ws,await rooms.snapshot(r.code,s.playerId));
   }
   if(t==='RESTART_GAME'){if(!host)throw Error('Host only');const fresh=await rooms.restartGame(r.code);s={...fresh};sessions.set(ws,s);await rooms.attach(fresh.code,fresh.hostId,ws);send(ws,{type:'ROOM_CREATED',...fresh});return rooms.sendState(fresh.code)}
   if(t==='SEND_EMOJI'){if(!r.game)throw Error('Game has not started');const allowed=['😂','😈','🤣','😎','🤔','😱','😭','🤦','👀','🔥','💥','👑','🫡','❤️','👍','CUSTOM'];const emoji=String(m.emoji||'');const targetPlayerId=String(m.targetPlayerId||'');if(!allowed.includes(emoji))throw Error('Invalid emoji');if(!targetPlayerId||![...r.players.values()].some(p=>String(p.id)===targetPlayerId))throw Error('Player not found');for(const q of r.sockets.values())send(q,{type:'PLAYER_EMOJI',targetPlayerId,fromPlayerId:s.playerId,emoji});return}
