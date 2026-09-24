@@ -15,6 +15,7 @@ const hostMenuPanel=document.getElementById('host-menu-panel');
 const hostMenuClose=document.getElementById('host-menu-close');
 const hostSoundButton=document.getElementById('host-sound');
 const hostRestartButton=document.getElementById('host-restart');
+const hostTestFinishButton=document.getElementById('host-test-finish');
 const hostGenerateButton=document.getElementById('host-generate');
 const hostStartButton=document.getElementById('host-start');
 let hostSoundEnabled=true;
@@ -692,6 +693,14 @@ hostStartButton?.addEventListener('click',()=>{
   }
   closeHostMenu();
   status('STARTING GAME…');
+});
+hostTestFinishButton?.addEventListener('click',()=>{
+  if(!session||!send({type:'TEST_FINISH_SCREEN'})){
+    status('NOT CONNECTED — GENERATE A NEW CODE',true);
+    return;
+  }
+  closeHostMenu();
+  status('TESTING FINISH SCREEN…');
 });
 hostRestartButton?.addEventListener('click',()=>{
   keepHostScreenAwake();
