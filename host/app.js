@@ -17,7 +17,6 @@ const hostSoundButton=document.getElementById('host-sound');
 const hostRestartButton=document.getElementById('host-restart');
 const hostGenerateButton=document.getElementById('host-generate');
 const hostStartButton=document.getElementById('host-start');
-const hostTestFinishButton=document.getElementById('host-test-finish');
 let hostSoundEnabled=true;
 let hostWakeLock=null;
 
@@ -458,7 +457,6 @@ function updateButtons(){
 
 function resetToReady(message){
   clearHostFinishScreen();
-  if(hostTestFinishButton)hostTestFinishButton.disabled=false;
   session=null;
   players=[];
   started=false;
@@ -522,7 +520,6 @@ function connectAndCreate(){
     }
 
     if(message.type==='ROOM_CREATED'){
-      if(hostTestFinishButton)hostTestFinishButton.disabled=false;
       creating=false;
       session={code:message.code,hostId:message.hostId,hostToken:message.hostToken};
       localStorage.setItem('pyhHostSession',JSON.stringify(session));
@@ -684,29 +681,8 @@ hostSoundButton?.addEventListener('click',()=>{
 hostGenerateButton?.addEventListener('click',()=>{
   keepHostScreenAwake();
   closeHostMenu();
-  // If a room already exists, GENERATE CODE acts as a clean reset so
-  // connected player screens are released instead of being left in the old game.
-  if(session&&ws?.readyState===WebSocket.OPEN){
-    if(!send({type:'RESTART_GAME'}))status('NOT CONNECTED — GENERATE CODE AGAIN',true);
-    else status('RESETTING ROOM — CREATING NEW CODE…');
-    return;
-  }
   connectAndCreate();
 });
-hostTestFinishButton?.addEventListener('click',()=>{
-  if(!session||!ws||ws.readyState!==WebSocket.OPEN){
-    status('GENERATE A CODE FIRST',true);
-    return;
-  }
-  hostTestFinishButton.disabled=true;
-  status('TESTING FINISH SCREEN…');
-  if(!send({type:'TEST_FINISH_SCREEN'})){
-    hostTestFinishButton.disabled=false;
-    status('NOT CONNECTED — TRY AGAIN',true);
-  }
-  closeHostMenu();
-});
-
 hostStartButton?.addEventListener('click',()=>{
   if(hostStartButton.disabled)return;
   keepHostScreenAwake();
