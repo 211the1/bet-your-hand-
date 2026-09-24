@@ -314,6 +314,7 @@ function renderHostFinishScreen(game){
 
   overlay.innerHTML='<div class="host-finish-art-lock" style="position:relative!important;width:100%!important;height:100%!important;inset:0!important;overflow:hidden!important;">'+
     '<img src="/finish-screen.png?v=11" alt="" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;pointer-events:none!important;">'+
+    '<div id="host-finish-wanderer" class="host-finish-wanderer host-walk-right"><img src="/host-winner.png?v=1" alt=""></div>'+\
     '<div class="host-finish-slot-layer" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;">'+
     scores.slice(0,5).map((p,i)=>{
       const img=characterImage(p.character);
@@ -783,29 +784,30 @@ const hostWanderer=document.getElementById('host-wanderer');
 const hostCharacterSound=new Audio('/host-sound.mp3');
 hostCharacterSound.preload='auto';
 hostCharacterSound.addEventListener('error',()=>{});
-hostWanderer?.addEventListener('click',()=>{
+function playHostCharacterSound(){
   if(!hostSoundEnabled)return;
   try{
     hostCharacterSound.currentTime=0;
     hostCharacterSound.play().catch(()=>{});
   }catch{}
-});
+}
+hostWanderer?.addEventListener('click',playHostCharacterSound);
 const hostWalkPoints=[[8,18],[92,18],[92,68],[8,68]];
 let hostWalkIndex=0;
 function moveHostCharacter(){
-  if(!hostWanderer)return;
+  const walkers=[hostWanderer,document.getElementById('host-finish-wanderer')].filter(Boolean);
+  if(!walkers.length)return;
   const next=hostWalkPoints[hostWalkIndex%hostWalkPoints.length];
-  const currentX=parseFloat(hostWanderer.style.left)||8;
-  hostWanderer.classList.toggle('host-walk-right',next[0]>=currentX);
-  hostWanderer.classList.toggle('host-walk-left',next[0]<currentX);
-  hostWanderer.style.left=next[0]+'%';
-  hostWanderer.style.top=next[1]+'%';
+  walkers.forEach((walker,i)=>{
+    const currentX=parseFloat(walker.style.left)||(i?8:8);
+    walker.classList.toggle('host-walk-right',next[0]>=currentX);
+    walker.classList.toggle('host-walk-left',next[0]<currentX);
+    walker.style.left=next[0]+'%';
+    walker.style.top=next[1]+'%';
+    walker.onclick=playHostCharacterSound;
+  });
   hostWalkIndex++;
 }
-setTimeout(()=>{
-  moveHostCharacter();
-  setInterval(moveHostCharacter,6000);
-},1200);
 
 renderPlayers();
 updateButtons();
