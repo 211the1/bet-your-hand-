@@ -1,4 +1,4 @@
-self.addEventListener('install', event => self.skipWaiting());
+self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', event => {
   if(event.request.method !== 'GET') return;
@@ -9,8 +9,9 @@ self.addEventListener('fetch', event => {
     const type=response.headers.get('content-type')||'';
     if(!type.includes('text/html')) return response;
     let html=await response.text();
-    const tag='<script src="/host-walk-relay.js?v=1"></script>';
+    const tag='<script src="/host-walk-relay.js?v=2"></script>';
     if(!html.includes('/host-walk-relay.js')) html=html.replace(/<\/body>/i,tag+'</body>');
+    else html=html.replace(/\/host-walk-relay\.js\?v=\d+/g,'/host-walk-relay.js?v=2');
     return new Response(html,{status:response.status,statusText:response.statusText,headers:response.headers});
   })());
 });
