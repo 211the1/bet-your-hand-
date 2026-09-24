@@ -1,59 +1,182 @@
 (()=>{
-  const isPlayer=document.body?.classList.contains('player-page');
-  const isHost=!isPlayer && !!document.getElementById('host-wanderer');
-  if(!isPlayer&&!isHost)return;
-  const sessionKey=isPlayer?'byhPlayerSession':'pyhHostSession';
-  const readSession=()=>{try{return JSON.parse(localStorage.getItem(sessionKey)||'null')}catch{return null}};
-  let players=[];
-  let preview=null;
-  function connectPreview(){
-    const s=readSession(); if(!s?.code)return;
-    try{preview?.close()}catch{}
-    const proto=location.protocol==='https:'?'wss:':'ws:';
-    preview=new WebSocket(proto+'//'+location.host);
-    preview.onopen=()=>preview.send(JSON.stringify({type:'PREVIEW_ROOM',code:String(s.code).toUpperCase()}));
-    preview.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='ROOM_PREVIEW'&&m.code===String(s.code).toUpperCase())players=m.players||[]}catch{}};
+'use strict';
+
+// One visual actor travels through the Host screen and the active player screens.
+// This file owns ONLY the walking animation; it does not touch game state.
+const isPlayer=document.body?.classList.contains('player-page');
+const isHost=!isPlayer && !!document.getElementById('host-wanderer');
+if(!isPlayer&&!isHost)return;
+
+const sessionKey=isPlayer?'byhPlayerSession':'pyhHostSession';
+const readSession=()=>{try{return JSON.parse(localStorage.getItem(sessionKey)||'null')}catch{return null}};
+let players=[];
+let preview=null;
+let actor=null;
+let activeMarker='';
+
+const STEP=6200;       // time assigned to each screen
+const GAP=250;         // tiny handoff gap so the actor fully clears the edge
+const TOTAL_PER_SCREEN=STEP+GAP;
+
+function ensureStyle(){
+  if(document.getElementById('pyh-walk-relay-style'))return;
+  const st=document.createElement('style');
+  st.id='pyh-walk-relay-style';
+  st.textContent=`
+    /* Disable the older independent player walk so there is only one relay. */
+    .host-walk-overlay{display:none!important}
+    #host-wanderer.pyh-old-walk-hidden{display:none!important}
+
+    .pyh-relay-actor{
+      position:fixed!important;
+      left:0!important;
+      top:auto!important;
+      bottom:7%!important;
+      width:clamp(130px,20vw,270px)!important;
+      height:auto!important;
+      z-index:99990!important;
+      margin:0!important;
+      padding:0!important;
+      pointer-events:none!important;
+      filter:drop-shadow(0 8px 10px rgba(0,0,0,.55));
+      will-change:transform;
+      display:block;
+    }
+    .pyh-relay-actor.clickable{pointer-events:auto!important;cursor:pointer!important;z-index:99999!important}
+    .pyh-relay-actor img{
+      display:block!important;
+      width:100%!important;
+      height:auto!important;
+      object-fit:contain!important;
+      transform-origin:center bottom!important;
+      animation:pyhRealWalk .48s ease-in-out infinite!important;
+      will-change:transform;
+    }
+    @keyframes pyhRealWalk{
+      0%,100%{transform:translateY(0) rotate(0deg) scaleY(1)}
+      25%{transform:translateY(-7px) rotate(-2deg) scaleY(.985)}
+      50%{transform:translateY(0) rotate(0deg) scaleY(1)}
+      75%{transform:translateY(-7px) rotate(2deg) scaleY(.985)}
+    }
+    .pyh-relay-actor.pyh-left img{transform:scaleX(-1)}
+    @media(max-width:600px){
+      .pyh-relay-actor{width:clamp(110px,34vw,200px)!important;bottom:9%!important}
+    }
+  `;
+  document.head.appendChild(st);
+}
+
+function connectPreview(){
+  const s=readSession();
+  if(!s?.code)return;
+  try{preview?.close()}catch{}
+  const proto=location.protocol==='https:'?'wss:':'ws:';
+  preview=new WebSocket(proto+'//'+location.host);
+  preview.onopen=()=>preview.send(JSON.stringify({type:'PREVIEW_ROOM',code:String(s.code).toUpperCase()}));
+  preview.onmessage=e=>{
+    try{
+      const m=JSON.parse(e.data);
+      if(m.type==='ROOM_PREVIEW'&&m.code===String(s.code).toUpperCase())players=m.players||[];
+    }catch{}
+  };
+  preview.onerror=()=>{};
+  preview.onclose=()=>{preview=null};
+}
+
+function screenIndex(){
+  if(isHost)return 0;
+  const s=readSession();
+  if(!s?.playerId)return -1;
+  const idx=players.findIndex(p=>String(p.id)===String(s.playerId));
+  return idx<0?-1:idx+1;
+}
+
+function createActor(){
+  const wrap=document.createElement('div');
+  wrap.className='pyh-relay-actor'+(isHost?' clickable':'');
+  const img=document.createElement('img');
+  img.src='/host-character.png?v=3';
+  img.alt='';
+  img.draggable=false;
+  wrap.appendChild(img);
+
+  if(isHost){
+    wrap.addEventListener('click',()=>{
+      try{const a=new Audio('/host-sound.mp3');a.currentTime=0;a.play().catch(()=>{})}catch{}
+    });
   }
-  function ensureStyle(){
-    if(document.getElementById('pyh-wander-style'))return;
-    const st=document.createElement('style');st.id='pyh-wander-style';st.textContent=`
-      #host-wanderer.pyh-hidden-old{display:none!important}
-      .pyh-wander-host{position:fixed;z-index:9998;pointer-events:auto;width:clamp(120px,18vw,230px);height:auto;bottom:6%;left:-28vw;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55));}
-      .pyh-wander-player{position:fixed;z-index:99990;pointer-events:none;width:clamp(110px,34vw,200px);height:auto;bottom:9%;left:-35vw;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55));}
-      @keyframes pyhWanderLTR{0%{left:-35vw;transform:translateY(0) rotate(-1deg)}25%{left:20vw;transform:translateY(-2vh) rotate(1deg)}50%{left:55vw;transform:translateY(1vh) rotate(-1deg)}75%{left:90vw;transform:translateY(-1vh) rotate(1deg)}100%{left:115vw;transform:translateY(0) rotate(0)}}
-      @keyframes pyhWanderRTL{0%{left:115vw;transform:scaleX(-1) translateY(0) rotate(1deg)}25%{left:80vw;transform:scaleX(-1) translateY(-2vh) rotate(-1deg)}50%{left:45vw;transform:scaleX(-1) translateY(1vh) rotate(1deg)}75%{left:10vw;transform:scaleX(-1) translateY(-1vh) rotate(-1deg)}100%{left:-35vw;transform:scaleX(-1) translateY(0) rotate(0)}}
-      .pyh-wander-run-ltr{animation:pyhWanderLTR 5.2s ease-in-out forwards}
-      .pyh-wander-run-rtl{animation:pyhWanderRTL 5.2s ease-in-out forwards}
-    `;document.head.appendChild(st);
+  document.body.appendChild(wrap);
+  return wrap;
+}
+
+function hide(){
+  if(actor)actor.style.display='none';
+}
+
+function animateScreen(reverse,marker){
+  if(!actor)return;
+  actor.style.display='block';
+  actor.classList.toggle('pyh-left',reverse);
+  actor.style.animation='none';
+  void actor.offsetWidth;
+  actor.style.animation=reverse
+    ?`pyhRelayRightToLeft ${STEP}ms linear forwards`
+    :`pyhRelayLeftToRight ${STEP}ms linear forwards`;
+  actor.dataset.marker=marker;
+}
+
+function installMotionKeyframes(){
+  if(document.getElementById('pyh-relay-motion-style'))return;
+  const st=document.createElement('style');
+  st.id='pyh-relay-motion-style';
+  st.textContent=`
+    @keyframes pyhRelayLeftToRight{
+      0%{transform:translateX(-45vw)}
+      100%{transform:translateX(145vw)}
+    }
+    @keyframes pyhRelayRightToLeft{
+      0%{transform:translateX(145vw)}
+      100%{transform:translateX(-45vw)}
+    }
+  `;
+  document.head.appendChild(st);
+}
+
+function tick(){
+  const count=players.length;
+  if(isPlayer&&count===0){hide();return;}
+  const idx=screenIndex();
+  if(idx<0){hide();return;}
+
+  const screens=count+1;
+  const cycleLength=screens*TOTAL_PER_SCREEN;
+  const now=Date.now();
+  const cycle=Math.floor(now/cycleLength);
+  const phase=now%cycleLength;
+  const slot=Math.floor(phase/TOTAL_PER_SCREEN);
+  const slotTime=phase%TOTAL_PER_SCREEN;
+
+  if(slot!==idx||slotTime>=STEP){hide();activeMarker='';return;}
+
+  // Deterministic variation: direction changes between cycles instead of random
+  // per device, so every screen agrees on which way the actor is walking.
+  const reverse=((cycle+slot*3)%4===2||((cycle+slot)%7===0));
+  const marker=cycle+':'+slot+':'+(reverse?'R':'L');
+  if(marker!==activeMarker){
+    activeMarker=marker;
+    animateScreen(reverse,marker);
   }
-  function makeImg(host){
-    const img=document.createElement('img');img.src='/host-character.png?v=2';img.alt='';img.draggable=false;img.className=host?'pyh-wander-host':'pyh-wander-player';
-    if(host){img.id='pyh-wander-host';img.addEventListener('click',()=>{const a=new Audio('/host-sound.mp3');a.play().catch(()=>{})});document.body.appendChild(img)}else document.body.appendChild(img);
-    return img;
-  }
-  ensureStyle();
-  let actor=null;
-  if(isHost){const old=document.getElementById('host-wanderer');if(old)old.classList.add('pyh-hidden-old');actor=makeImg(true)}
-  else actor=makeImg(false);
-  const WALK=5200,GAP=800;
-  function index(){
-    if(isHost)return 0;
-    const s=readSession(); if(!s?.playerId)return -1;
-    const i=players.findIndex(p=>String(p.id)===String(s.playerId));
-    return i<0?-1:i+1;
-  }
-  function tick(){
-    const n=Math.max(0,players.length)+1;
-    const idx=index(); if(idx<0||(!isHost&&players.length===0)){actor.style.display='none';return}
-    actor.style.display='block';
-    const slot=Date.now()%(n*(WALK+GAP));
-    const start=idx*(WALK+GAP);
-    const inSlot=slot>=start&&slot<start+WALK;
-    if(!inSlot){actor.style.animation='none';return}
-    const cycle=Math.floor(Date.now()/(n*(WALK+GAP)));
-    const reverse=((cycle+idx)%3===2);
-    const cls=reverse?'pyh-wander-run-rtl':'pyh-wander-run-ltr';
-    if(actor.dataset.cycle!==cycle+':'+idx+':'+(reverse?1:0)){actor.dataset.cycle=cycle+':'+idx+':'+(reverse?1:0);actor.className=(isHost?'pyh-wander-host':'pyh-wander-player')+' '+cls;}
-  }
-  connectPreview();setInterval(connectPreview,5000);setInterval(tick,150);tick();
+}
+
+ensureStyle();
+installMotionKeyframes();
+if(isHost){
+  const old=document.getElementById('host-wanderer');
+  if(old)old.classList.add('pyh-old-walk-hidden');
+}
+actor=createActor();
+connectPreview();
+setInterval(connectPreview,5000);
+setInterval(tick,100);
+tick();
 })();
