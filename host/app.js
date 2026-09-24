@@ -15,7 +15,6 @@ const hostMenuPanel=document.getElementById('host-menu-panel');
 const hostMenuClose=document.getElementById('host-menu-close');
 const hostSoundButton=document.getElementById('host-sound');
 const hostRestartButton=document.getElementById('host-restart');
-const hostTestFinishButton=document.getElementById('host-test-finish');
 const hostGenerateButton=document.getElementById('host-generate');
 const hostStartButton=document.getElementById('host-start');
 let hostSoundEnabled=true;
@@ -199,6 +198,69 @@ function renderPowerWheel(game){
   if(clickCount)startWheelClickSequence(mode==='spin'?2600:1600,clickCount,...(mode==='spin'?[.15,.8,.2,1]:[.12,.82,.18,1]));
 }
 
+function renderTopCard(card,game){
+  const discardEl=document.getElementById('host-discard-card');
+  const deckCountEl=document.getElementById('host-deck-count');
+  const discardCountEl=document.getElementById('host-discard-count');
+  if(deckCountEl)deckCountEl.textContent='CARDS LEFT: '+Number(game?.deckCount??game?.cardsLeft??0);
+  if(discardCountEl)discardCountEl.textContent='CARDS PLAYED: '+Number(game?.discardCount??0);
+  if(!discardEl)return;
+  if(!card){discardEl.innerHTML='';return;}
+
+  const c=card||{},
+    name=c.character||({SKIP:'SKIP',REVERSE:'REVERSE',WILD:'WILD',PLAY_YOUR_HAND:'PLAY YOUR HAND'}[c.type]||'CARD'),
+    img=characterImage(c.character),
+    color=cardColor(c).toLowerCase(),
+    specialUrl=specialImage(c);
+
+  const visual=specialUrl
+    ?'<img class="tv-special-art" src="'+specialUrl+'" alt="'+escapeHtml(name)+'">'
+    :(c.type==='SKIP'||c.type==='REVERSE')
+      ?specialModern(c,'tv')
+      :img
+        ?'<img src="'+img+'" alt="'+escapeHtml(name)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(cardColor(c)||'')+'</small>'
+        :'<div class="special-card-symbol">'+escapeHtml((c.type||'CARD').replaceAll('_',' '))+'</div>';
+
+  discardEl.innerHTML='<div class="tv-card '+(c.type==='SKIP'||c.type==='REVERSE'?'special-modern-host ':'')+'color-'+escapeHtml(color)+' '+(c.type==='WILD'?'wild ':'')+(c.type==='PLAY_YOUR_HAND'?'play-special':'')+'">'+visual+'</div>';
+}
+function updateJoinQr(code){
+  if(!qrEl)return;
+  const value=String(code||'').trim();
+  if(!value||value==='----'){
+    qrEl.style.display='none';
+    qrEl.removeAttribute('src');
+    return;
+  }
+  const playerUrl=location.origin+'/';
+  qrEl.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data='+encodeURIComponent(playerUrl);
+  qrEl.style.display='block';
+}
+
+function playHostCallSound(){
+  if(!hostSoundEnabled)return;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=new C(),now=ctx.currentTime;
+    [0,0.28,0.56].forEach((t,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sine';o.frequency.value=i===1?880:660;
+      g.gain.setValueAtTime(.0001,now+t);
+      g.gain.exponentialRampToValueAtTime(.45,now+t+.03);
+      g.gain.exponentialRampToValueAtTime(.0001,now+t+.2);
+      o.connect(g).connect(ctx.destination);o.start(now+t);o.stop(now+t+.22);
+    });
+    setTimeout(()=>ctx.close(),1000);
+  }catch{}
+}
+function showHostActionEffect(type){
+  document.querySelectorAll('.host-action-effect').forEach(x=>x.remove());
+  const el=document.createElement('div');
+  el.className='host-action-effect '+(type==='CALL_PLAYER'?'wake':'play-hand');
+  el.innerHTML='<div class="host-action-flash"></div><div class="host-action-text">'+(type==='CALL_PLAYER'?'WAKE UP!':'PLAY YOUR HAND!')+'</div>';
+  document.body.appendChild(el);
+  if(type==='CALL_PLAYER')playHostCallSound();else playHostTone(880,.22);
+  setTimeout(()=>{if(el.isConnected)el.remove()},3200);
+}
 function playHostTone(freq=660,duration=.12){
   if(!hostSoundEnabled)return;
   try{
@@ -215,82 +277,6 @@ function updateHostSoundButton(){
   if(hostSoundButton)hostSoundButton.textContent=hostSoundEnabled?'SOUND: ON':'SOUND: OFF';
 }
 function closeHostMenu(){if(hostMenuPanel)hostMenuPanel.classList.remove('show')}
-
-function clearHostFinishScreen(){
-  const el=document.getElementById('host-finish-screen');
-  if(el)el.remove();
-  document.body.classList.remove('host-finished');
-  if(hostMenuButton){
-    hostMenuButton.style.position='';
-    hostMenuButton.style.top='';
-    hostMenuButton.style.right='';
-    hostMenuButton.style.bottom='';
-    hostMenuButton.style.left='';
-    hostMenuButton.style.zIndex='';
-  }
-  if(hostMenuPanel){
-    hostMenuPanel.style.position='';
-    hostMenuPanel.style.top='';
-    hostMenuPanel.style.right='';
-    hostMenuPanel.style.bottom='';
-    hostMenuPanel.style.left='';
-    hostMenuPanel.style.transform='';
-    hostMenuPanel.style.zIndex='';
-  }
-}
-
-function renderHostFinishScreen(game){
-  if(!game || game.phase!=='finished'){
-    clearHostFinishScreen();
-    return;
-  }
-
-  let overlay=document.getElementById('host-finish-screen');
-  if(!overlay){
-    overlay=document.createElement('div');
-    overlay.id='host-finish-screen';
-    overlay.className='host-finish-screen';
-    document.body.appendChild(overlay);
-  }
-
-  const scores=[...(Array.isArray(game.players)?game.players:[])].sort((a,b)=>Number(b.points||0)-Number(a.points||0));
-  const columns=['9.0%','24.6%','40.1%','55.7%','71.6%'];
-
-  overlay.innerHTML='<div class="host-finish-art-lock" style="position:relative!important;width:100%!important;height:100%!important;inset:0!important;overflow:hidden!important;">'+
-    '<img src="/finish-screen.png?v=12" alt="" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;pointer-events:none!important;">'+
-    '<div id="host-finish-wanderer" class="host-finish-wanderer host-walk-right"><img src="/host-winner.png?v=2" alt=""></div>'+
-    '<div class="host-finish-score-layer" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important;">'+
-    scores.slice(0,5).map((p,i)=>{
-      const score=Number(p.points||0);
-      return '<div class="host-finish-score-only" data-slot="'+i+'" style="position:absolute!important;left:'+columns[i]+'!important;top:82%!important;width:9.3%!important;height:8%!important;margin:0!important;padding:0!important;box-sizing:border-box!important;text-align:center!important;font:1000 clamp(13px,1.8vw,23px)/1 system-ui,sans-serif!important;color:#fff!important;text-shadow:0 2px 5px #000!important;white-space:nowrap!important;">'+score+'</div>';
-    }).join('')+
-    '</div></div>';
-
-  document.body.classList.add('host-finished');
-
-  if(hostMenuButton){
-    hostMenuButton.style.setProperty('position','fixed','important');
-    hostMenuButton.style.setProperty('top','1.5vh','important');
-    hostMenuButton.style.setProperty('right','2vw','important');
-    hostMenuButton.style.setProperty('bottom','auto','important');
-    hostMenuButton.style.setProperty('left','auto','important');
-    hostMenuButton.style.setProperty('z-index','100001','important');
-  }
-  if(hostMenuPanel){
-    hostMenuPanel.style.setProperty('position','fixed','important');
-    hostMenuPanel.style.setProperty('top','calc(1.5vh + 76px)','important');
-    hostMenuPanel.style.setProperty('right','2vw','important');
-    hostMenuPanel.style.setProperty('left','auto','important');
-    hostMenuPanel.style.setProperty('bottom','auto','important');
-    hostMenuPanel.style.setProperty('transform','none','important');
-    hostMenuPanel.style.setProperty('z-index','100002','important');
-  }
-
-  const finishHost=document.getElementById('host-finish-wanderer');
-  if(finishHost){
-    finishHost.onclick=playHostCharacterSound;
-  }
-}
 
 function updateRound(round){
   if(roundEl)roundEl.textContent=Number(round)>0?'ROUND '+Number(round):'ROUND --';
@@ -457,7 +443,6 @@ function updateButtons(){
 }
 
 function resetToReady(message){
-  clearHostFinishScreen();
   session=null;
   players=[];
   started=false;
@@ -470,7 +455,6 @@ function resetToReady(message){
   updateButtons();
   status(message||'READY — GENERATE A CODE');
 }
-
 
 function scheduleReconnect(){
   if(reconnectTimer||creating||!session)return;
@@ -544,7 +528,6 @@ function connectAndCreate(){
     }
 
     if(message.type==='HOST_GAME_STARTED'){
-      clearHostFinishScreen();
       started=true;
       players=message.players||players;
       updateGameScores(message.game?.players);
@@ -560,16 +543,6 @@ function connectAndCreate(){
 
     if(message.type==='STATE'){
       players=message.players||[];
-      if(message.game?.phase==='finished'){
-        started=true;
-        updateGameScores(message.game.players);
-        renderHostFinishScreen(message.game);
-        renderPowerWheel(message.game);
-        updateRound(message.game.round);
-        updateButtons();
-        return;
-      }
-      clearHostFinishScreen();
       updateGameScores(message.game?.players);
       codeEl.textContent=message.roomCode||session?.code||'----';
       updateJoinQr(message.roomCode||session?.code||'');
@@ -578,10 +551,10 @@ function connectAndCreate(){
       if(message.game?.lastCardEvent)showHostLastCard(message.game.lastCardEvent);else if(!message.game?.lastCardEvent)lastHostLastCardEvent=null;
       if(message.game){
         started=true;
-          status('GAME STARTED');
+        status('GAME STARTED');
       }else{
         started=false;
-          status('ROOM READY — WAITING FOR PLAYERS');
+        status('ROOM READY — WAITING FOR PLAYERS');
       }
       renderPlayers();
       updateButtons();
@@ -642,15 +615,6 @@ function reconnectSavedHost(){
     if(message.type==='STATE'){
       players=message.players||[];
       updateGameScores(message.game?.players);
-      if(message.game?.phase==='finished'){
-        started=true;
-        renderHostFinishScreen(message.game);
-        renderPowerWheel(message.game);
-        updateRound(message.game.round);
-        updateButtons();
-        return;
-      }
-      clearHostFinishScreen();
       started=Boolean(message.game);
       codeEl.textContent=message.roomCode||session.code;
       renderTopCard(message.game?.topCard||null,message.game);
@@ -695,14 +659,6 @@ hostStartButton?.addEventListener('click',()=>{
   closeHostMenu();
   status('STARTING GAME…');
 });
-hostTestFinishButton?.addEventListener('click',()=>{
-  if(!session||!send({type:'TEST_FINISH_SCREEN'})){
-    status('NOT CONNECTED — GENERATE A NEW CODE',true);
-    return;
-  }
-  closeHostMenu();
-  status('TESTING FINISH SCREEN…');
-});
 hostRestartButton?.addEventListener('click',()=>{
   keepHostScreenAwake();
   if(!session||!send({type:'RESTART_GAME'})){
@@ -724,18 +680,16 @@ startBtn.addEventListener('click',()=>{
 });
 
 const hostWanderer=document.getElementById('host-wanderer');
-const hostCharacterSound=new Audio('/host-sound.mp3?v=3');
+const hostCharacterSound=new Audio('/host-sound.mp3');
 hostCharacterSound.preload='auto';
-function playHostCharacterSound(){
+hostCharacterSound.addEventListener('error',()=>{});
+hostWanderer?.addEventListener('click',()=>{
   if(!hostSoundEnabled)return;
   try{
-    hostCharacterSound.pause();
     hostCharacterSound.currentTime=0;
-    const p=hostCharacterSound.play();
-    if(p&&typeof p.catch==='function')p.catch(()=>{});
+    hostCharacterSound.play().catch(()=>{});
   }catch{}
-}
-hostWanderer?.addEventListener('click',playHostCharacterSound);
+});
 const hostWalkPoints=[[8,18],[92,18],[92,68],[8,68]];
 let hostWalkIndex=0;
 function moveHostCharacter(){
@@ -746,19 +700,12 @@ function moveHostCharacter(){
   hostWanderer.classList.toggle('host-walk-left',next[0]<currentX);
   hostWanderer.style.left=next[0]+'%';
   hostWanderer.style.top=next[1]+'%';
-  hostWanderer.onclick=playHostCharacterSound;
   hostWalkIndex++;
 }
 setTimeout(()=>{
   moveHostCharacter();
   setInterval(moveHostCharacter,6000);
 },1200);
-
-// Remove any stale full-screen overlays left by an earlier render before reconnecting.
-document.getElementById('host-finish-screen')?.remove();
-document.getElementById('host-power-wheel-overlay')?.remove();
-document.body.classList.remove('host-finished');
-if(hostMenuPanel)hostMenuPanel.classList.remove('show');
 
 renderPlayers();
 updateButtons();
