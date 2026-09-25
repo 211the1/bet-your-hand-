@@ -32,13 +32,18 @@ img.draggable=false;
 wrap.appendChild(img);
 wrap.addEventListener('click',()=>{try{const a=new Audio('/host-sound.mp3');a.currentTime=0;a.play().catch(()=>{})}catch{}});
 document.body.appendChild(wrap);
-function callSound(){if(typeof window.playCallSound==='function'){try{window.playCallSound();return}catch{}}}
-function easterSound(){if(typeof window.playEasterLaugh==='function'){try{window.playEasterLaugh();return}catch{}}}
+function playRelaySound(type){
+  try{
+    if(type==='CALL_PLAYER'&&typeof window.playCallSound==='function'){window.playCallSound();return}
+    if(type==='EASTER_EGG'&&typeof window.playEasterLaugh==='function'){window.playEasterLaugh();return}
+  }catch{}
+  try{const a=new Audio('/host-sound.mp3');a.currentTime=0;a.play().catch(()=>{})}catch{}
+}
 function showAlert(text,easter=false){document.querySelectorAll('.pyh-host-alert').forEach(x=>x.remove());const el=document.createElement('div');el.className='pyh-host-alert'+(easter?' easter':'');const t=document.createElement('div');t.className='pyh-host-alert-text';t.textContent=text;el.appendChild(t);document.body.appendChild(el);setTimeout(()=>el.remove(),easter?3200:2200)}
 let socket=null;
 let hostSession=null;
 try{hostSession=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{}
-function connect(){if(!hostSession?.code||!hostSession?.hostId||!hostSession?.hostToken)return;try{socket?.close()}catch{}const proto=location.protocol==='https:'?'wss:':'ws:';socket=new WebSocket(proto+'//'+location.host);socket.onopen=()=>{};socket.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='CALL_PLAYER'){callSound();showAlert('WAKE UP!');}else if(m.type==='EASTER_EGG'){easterSound();showAlert('YOU’RE STUPID!',true)}}catch{}};socket.onclose=()=>setTimeout(connect,2000);socket.onerror=()=>{try{socket?.close()}catch{}}}
+function connect(){if(!hostSession?.code||!hostSession?.hostId||!hostSession?.hostToken)return;try{socket?.close()}catch{}const proto=location.protocol==='https:'?'wss:':'ws:';socket=new WebSocket(proto+'//'+location.host);socket.onopen=()=>{try{socket.send(JSON.stringify({type:'RECONNECT',code:hostSession.code,hostId:hostSession.hostId,reconnectToken:hostSession.hostToken}))}catch{}};socket.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='CALL_PLAYER'){playRelaySound('CALL_PLAYER');showAlert('WAKE UP!');}else if(m.type==='EASTER_EGG'){playRelaySound('EASTER_EGG');showAlert('YOU’RE STUPID!',true)}}catch{}};socket.onclose=()=>setTimeout(connect,2000);socket.onerror=()=>{try{socket?.close()}catch{}}}
 connect();
 setInterval(()=>{try{const s=JSON.parse(localStorage.getItem('pyhHostSession')||'null');if(JSON.stringify(s)!==JSON.stringify(hostSession)){hostSession=s;connect()}}catch{}},3000);
 })();
