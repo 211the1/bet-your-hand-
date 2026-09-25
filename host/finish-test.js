@@ -8,11 +8,25 @@ function installFinishStyles(){
   style.textContent=`
 #host-finish-test-overlay{position:fixed;inset:0;z-index:100000;background:#05020d;color:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif}
 .host-finish-test-bg{position:absolute;inset:0;background:url('/finish-screen.png?v=1') center/100% 100% no-repeat}
-/* Winner slot: test Bug seated deeper into the center chair, moved down 2.5% from the previous position. */
+/* Winner slot: locked position for the seated winner. */
 #host-test-winner-slot{position:absolute;left:47.5%;top:51.5%;transform:translate(-50%,-50%);width:clamp(130px,20vw,250px);height:clamp(190px,32vw,360px);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;pointer-events:none}
 /* Keep the score attached to the winner slot so it moves with the seated character. */
 #host-test-winner-score{position:absolute;left:50%;top:-6vh;transform:translateX(-50%);font-size:clamp(28px,5vw,58px);font-weight:1000;color:#fff;text-shadow:0 0 8px #000,0 0 18px #1687ff;margin:0;line-height:1;white-space:nowrap;z-index:3}
 #host-test-winner-character{width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 8px #000)}
+/* The real host-winner.png is the host's trophy-in-hand walking character. */
+#host-finish-host-walker{position:absolute;left:-18%;bottom:11vh;width:clamp(100px,15vw,190px);height:auto;z-index:2;pointer-events:none;animation:hostFinishWalk 18s linear infinite;will-change:left,transform}
+#host-finish-host-walker img{display:block;width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 8px 8px #000);animation:hostFinishWalkBob 1.05s ease-in-out infinite}
+@keyframes hostFinishWalk{
+  0%{left:-18%;transform:scaleX(1)}
+  49%{left:103%;transform:scaleX(1)}
+  50%{left:103%;transform:scaleX(-1)}
+  99%{left:-18%;transform:scaleX(-1)}
+  100%{left:-18%;transform:scaleX(1)}
+}
+@keyframes hostFinishWalkBob{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+}
 #host-finish-back{position:absolute;z-index:3;left:50%;bottom:5vh;transform:translateX(-50%);width:min(360px,86vw);padding:13px 20px;border:3px solid #fff;border-radius:14px;background:#0869ff;color:#fff;font:1000 clamp(17px,2.8vw,25px)/1 system-ui,sans-serif;box-shadow:0 0 18px #1687ff,0 7px 16px #0009;text-shadow:2px 2px 0 #000;cursor:pointer;display:block}
 #host-finish-back:active{transform:translateX(-50%) scale(.98)}
 `;
@@ -28,6 +42,9 @@ function showFinish(){
   overlay.id='host-finish-test-overlay';
   overlay.innerHTML=`
     <div class="host-finish-test-bg"></div>
+    <div id="host-finish-host-walker" aria-hidden="true">
+      <img src="/host-winner.png?v=1" alt="Host walking with trophy">
+    </div>
     <div id="host-test-winner-slot" aria-label="Test winner seat">
       <div id="host-test-winner-score">500</div>
       <img id="host-test-winner-character" src="/bug-seat.png?v=1" alt="Test winner Bug seated">
