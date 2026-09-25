@@ -14,7 +14,8 @@ function installFinishStyles(){
 #host-test-winner-score{position:absolute;left:50%;top:-6vh;transform:translateX(-50%);font-size:clamp(28px,5vw,58px);font-weight:1000;color:#fff;text-shadow:0 0 8px #000,0 0 18px #1687ff;margin:0;line-height:1;white-space:nowrap;z-index:3}
 #host-test-winner-character{width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 8px #000)}
 /* The real host-winner.png is the host's trophy-in-hand walking character. */
-#host-finish-host-walker{position:absolute;left:-18%;bottom:11vh;width:clamp(100px,15vw,190px);height:auto;z-index:2;pointer-events:none;animation:hostFinishWalk 18s linear infinite;will-change:left,transform}
+/* Host walker is now exactly 2x its previous size; walking path and position are unchanged. */
+#host-finish-host-walker{position:absolute;left:-18%;bottom:11vh;width:clamp(200px,30vw,380px);height:auto;z-index:2;pointer-events:none;animation:hostFinishWalk 18s linear infinite;will-change:left,transform}
 #host-finish-host-walker img{display:block;width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 8px 8px #000);animation:hostFinishWalkBob 1.05s ease-in-out infinite}
 @keyframes hostFinishWalk{
   0%{left:-18%;transform:scaleX(1)}
