@@ -28,7 +28,7 @@ function showFinish(){
     <div class="host-finish-test-bg"></div>
     <div id="host-test-winner-slot" aria-label="Test winner seat">
       <div id="host-test-winner-score">TEST WINNER · 500</div>
-      <img id="host-test-winner-character" src="/Bug.jpg" alt="Test winner Bug">
+      <img id="host-test-winner-character" src="/bug-seat.png?v=1" alt="Test winner Bug seated">
     </div>
     <button id="host-finish-back" type="button">BACK TO HOST</button>`;
 
