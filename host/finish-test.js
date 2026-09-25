@@ -35,7 +35,7 @@ function showFinish(){
       <div id="host-test-winner-score">500</div>
       <img id="host-test-winner-character" src="/bug-seat.png?v=1" alt="Test winner Bug seated">
     </div>
-    <button id="host-finish-back" type="button">BACK TO HOST</button>`;
+    <button id="host-finish-back" type="button">PLAY AGAIN</button>`;
   document.body.appendChild(overlay);
   document.body.classList.add('host-finished');
   const menuButton=document.getElementById('host-menu-button');
