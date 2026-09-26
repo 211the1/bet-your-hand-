@@ -51,7 +51,18 @@ function show(data){
  o.innerHTML=`<div class="player-test-finish-bg"></div><audio id="player-test-finish-music" src="/assets/finish-screen.mp3" preload="auto"></audio><div id="player-test-host-walker"><img src="/host-winner.png?v=1" alt="Host walking with trophy"></div><div id="player-test-winner-slot" aria-label="Test winner seat"><div id="player-test-winner-score">${esc(score)}</div><img id="player-test-winner-character" src="${SEAT_IMAGES[character]}" alt="${esc(character)} seated winner"></div><button id="player-test-finish-button" type="button">PLAY AGAIN</button>`;
  document.body.appendChild(o);
  const music=document.getElementById('player-test-finish-music');
- if(music){music.currentTime=0;const startAt=Number(data.startAt||0)||((Number(data.updatedAt)||Date.now())+10000);const wait=Math.max(0,startAt-Date.now());setTimeout(()=>{if(!document.body.contains(music))return;music.currentTime=0;music.play().catch(()=>{});},wait);}
+ if(music){
+   music.currentTime=0;
+   music.load();
+   music.addEventListener('canplaythrough',()=>{try{music.load()}catch{}},{once:true});
+ }
+ const startAt=Number(data.startAt||0)||((Number(data.updatedAt)||0)+10000);
+ const wait=Math.max(0,startAt-Date.now());
+ setTimeout(()=>{
+   if(!document.body.contains(music))return;
+   music.currentTime=0;
+   music.play().catch(()=>{});
+ },wait);
  document.getElementById('player-test-finish-button')?.addEventListener('click',()=>{
    if(music){music.pause();music.currentTime=0;}
    try{localStorage.removeItem('byhPlayerSession');localStorage.setItem('byhPlayerFinished','1')}catch{}
@@ -59,19 +70,13 @@ function show(data){
  });
 }
 async function poll(){
- if(shown){return;}
+ if(shown)return;
  try{
    const r=await fetch('/__test_finish?code='+encodeURIComponent(sessionCode()),{cache:'no-store'});
    if(r.ok){const data=await r.json();if(data?.active){show(data);return;}}
  }catch{}
- try{
-   if(localStorage.getItem('byhPlayerFinished')==='1'){
-     const data=winnerFromExistingState();
-     try{const r=await fetch('/__test_finish?code='+encodeURIComponent(sessionCode()),{cache:'no-store'});if(r.ok){const x=await r.json();if(x?.active)Object.assign(data,x);}}catch{}
-     show(data);
-     return;
-   }
- }catch{}
+ /* Do not start the music from the local finish marker alone. The shared
+    room test timestamp is required so every device uses the same start time. */
  pollTimer=setTimeout(poll,300);
 }
 poll();
