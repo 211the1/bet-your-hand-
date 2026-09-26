@@ -11,7 +11,7 @@ const SEAT_IMAGES={
   'Bug':'/bug-seat.png?v=1','Face':'/face-seat.png?v=1','Ling Ling':'/ling-ling-seat.png?v=1','Beanz':'/beanz-seat.png?v=1','The One':'/the-one-seat.png?v=1','Boone':'/boone-seat.png?v=1','Chicken Joe':'/chicken-joe-seat.png?v=1','Juby':'/juby-seat.png?v=1','Meemaw':'/meemaw-seat.png?v=1'
 };
 let shown=false,pollTimer=null;
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
 function styles(){
  if(document.getElementById('player-test-finish-styles'))return;
  const s=document.createElement('style');s.id='player-test-finish-styles';
@@ -51,7 +51,7 @@ function show(data){
  o.innerHTML=`<div class="player-test-finish-bg"></div><audio id="player-test-finish-music" src="/assets/finish-screen.mp3" preload="auto"></audio><div id="player-test-host-walker"><img src="/host-winner.png?v=1" alt="Host walking with trophy"></div><div id="player-test-winner-slot" aria-label="Test winner seat"><div id="player-test-winner-score">${esc(score)}</div><img id="player-test-winner-character" src="${SEAT_IMAGES[character]}" alt="${esc(character)} seated winner"></div><button id="player-test-finish-button" type="button">PLAY AGAIN</button>`;
  document.body.appendChild(o);
  const music=document.getElementById('player-test-finish-music');
- if(music){music.currentTime=0;music.play().catch(()=>{});}
+ if(music){music.currentTime=0;const startAt=Number(data.startAt||0)||((Number(data.updatedAt)||Date.now())+10000);const wait=Math.max(0,startAt-Date.now());setTimeout(()=>{if(!document.body.contains(music))return;music.currentTime=0;music.play().catch(()=>{});},wait);}
  document.getElementById('player-test-finish-button')?.addEventListener('click',()=>{
    if(music){music.pause();music.currentTime=0;}
    try{localStorage.removeItem('byhPlayerSession');localStorage.setItem('byhPlayerFinished','1')}catch{}
@@ -64,12 +64,11 @@ async function poll(){
    const r=await fetch('/__test_finish?code='+encodeURIComponent(sessionCode()),{cache:'no-store'});
    if(r.ok){const data=await r.json();if(data?.active){show(data);return;}}
  }catch{}
- // The real player STATE handler already marks a finished game with this
- // existing flag. Use that same signal as the direct test connection so the
- // new finish screen does not depend on a second room/session mechanism.
  try{
    if(localStorage.getItem('byhPlayerFinished')==='1'){
-     show(winnerFromExistingState());
+     const data=winnerFromExistingState();
+     try{const r=await fetch('/__test_finish?code='+encodeURIComponent(sessionCode()),{cache:'no-store'});if(r.ok){const x=await r.json();if(x?.active)Object.assign(data,x);}}catch{}
+     show(data);
      return;
    }
  }catch{}
