@@ -5,7 +5,7 @@ const {RoomServer}=require('./server/room-server');
 const e=require('./game/engine');
 const root=__dirname,rooms=new RoomServer(),testFinishRooms=new Map();
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.jpg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.wav':'audio/wav','.mp3':'audio/mpeg','.mp4':'video/mp4','.webmanifest':'application/manifest+json'};
-function serve(req,res){let u;try{u=new URL(req.url,'http://x')}catch{return res.end('Bad request')}if(u.pathname==='/health'){res.writeHead(200,{'content-type':'text/plain; charset=utf-8','cache-control':'no-store'});return res.end('ok')}if(u.pathname==='/__test_finish'){const code=String(u.searchParams.get('code')||'').toUpperCase();const data=testFinishRooms.get(code);res.writeHead(200,{'content-type':'application/json; charset=utf-8','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'});return res.end(JSON.stringify(data||{active:false}))}let p=u.pathname;if(p==='/')p='/client/index.html';if(p==='/host')p='/host/index.html';const file=path.normalize(path.join(root,p));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end('Not found')}res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'});fs.createReadStream(file).pipe(res)}
+function serve(req,res){let u;try{u=new URL(req.url,'http://x')}catch{return res.end('Bad request')}if(u.pathname==='/health'){res.writeHead(200,{'content-type':'text/plain; charset=utf-8','cache-control':'no-store'});return res.end('ok')}if(u.pathname==='/__test_finish'){const code=String(u.searchParams.get('code')||'').toUpperCase();const data=testFinishRooms.get(code);res.writeHead(200,{'content-type':'application/json; charset=utf-8','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'});return res.end(JSON.stringify({...data,serverNow:Date.now()}||{active:false}))}let p=u.pathname;if(p==='/')p='/client/index.html';if(p==='/host')p='/host/index.html';const file=path.normalize(path.join(root,p));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end('Not found')}res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'});fs.createReadStream(file).pipe(res)}
 function send(ws,m){if(ws.readyState===1)ws.send(JSON.stringify(m))}
 function createServer(){const httpServer=http.createServer(serve);const wss=new WebSocketServer({server:httpServer});const sessions=new Map();
  wss.on('connection',ws=>{ws.isAlive=true;ws.on('pong',()=>{ws.isAlive=true});ws.on('message',async raw=>{try{await rooms.ready;const m=JSON.parse(raw),t=String(m.type||'').toUpperCase();if(t==='PING')return send(ws,{type:'PONG'});let s=sessions.get(ws),r;
@@ -22,13 +22,13 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
     if(!testPlayers.length)throw Error('No players in room');
     const winner=testPlayers[0];
     const now=Date.now();
-    const startAt=now+10000;
+    const startAt=now+5000;
     testFinishRooms.set(r.code,{active:true,winnerId:winner.id,winnerName:winner.name,winnerCharacter:winner.character,winnerScore:500,updatedAt:now,startAt});
     const testGame={phase:'finished',round:2,viewerId:null,isYourTurn:false,turnPlayerId:null,turnPlayerName:null,direction:1,currentColor:'',topCard:null,discardCount:0,deckCount:0,cardsLeft:0,players:testPlayers.map((p,i)=>({id:p.id,name:p.name,character:p.character,handCount:0,points:i===0?500:0,shield:false,extraPlay:false,colorChoice:false,turnSwitch:false})),viewerHand:undefined,pending:null,wheelResult:null,lastCardEvent:null,winner:winner.id};
     const previousGame=r.game;
     r.game=testGame;
     try{
-      for(const q of r.sockets.values())send(q,{type:'TEST_FINISH_SCHEDULED',startAt,winnerId:winner.id,winnerName:winner.name,winnerCharacter:winner.character,winnerScore:500});
+      for(const q of r.sockets.values())send(q,{type:'TEST_FINISH_SCHEDULED',startAt,serverNow:now,winnerId:winner.id,winnerName:winner.name,winnerCharacter:winner.character,winnerScore:500});
       await rooms.sendState(r.code);
     }finally{r.game=previousGame}
     return;
