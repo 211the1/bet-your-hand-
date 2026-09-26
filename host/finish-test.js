@@ -44,9 +44,18 @@ function signalPlayersForTestFinish(){
   setTimeout(()=>{try{testWs.close()}catch{}},5000);
 }
 
+function stopAllFinishAudio(){
+  document.querySelectorAll('audio').forEach(a=>{
+    try{
+      if(String(a.currentSrc||a.src||'').includes('finish-screen.mp3')){a.pause();a.currentTime=0;}
+    }catch{}
+  });
+}
+
 function showFinish(){
   const old=document.getElementById('host-finish-test-overlay');
   if(old)old.remove();
+  stopAllFinishAudio();
   installFinishStyles();
   const overlay=document.createElement('div');
   overlay.id='host-finish-test-overlay';
@@ -64,7 +73,16 @@ function showFinish(){
   const menuButton=document.getElementById('host-menu-button');
   if(menuButton)menuButton.style.display='none';
   const music=document.getElementById('host-finish-music');
-  if(music){music.currentTime=0;music.play().catch(()=>{});}
+  if(music){
+    music.currentTime=0;
+    music.load();
+    setTimeout(()=>{
+      if(document.body.contains(music)){
+        music.currentTime=0;
+        music.play().catch(()=>{});
+      }
+    },10000);
+  }
   document.getElementById('host-finish-back')?.addEventListener('click',hideFinish);
 }
 
