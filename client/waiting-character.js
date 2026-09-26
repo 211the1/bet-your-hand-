@@ -3,12 +3,17 @@
 const characterImages={'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'};
 function getSession(){try{return JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{return null}}
 function drawCharacter(){
+  const recovery=document.querySelector('.waiting-room-recovery');
+  const old=document.getElementById('waiting-character-fixed');
+  // The character frame belongs ONLY on the waiting-room screen.
+  // Never cover the JOIN GAME screen or an active game screen.
+  if(!recovery){old?.remove();return}
   const session=getSession()||{};
   const character=session.character||'';
   const playerName=session.name||'';
   const src=characterImages[character];
-  let overlay=document.getElementById('waiting-character-fixed');
-  if(!src){overlay?.remove();return}
+  if(!src){old?.remove();return}
+  let overlay=old;
   if(!overlay){
     overlay=document.createElement('div');
     overlay.id='waiting-character-fixed';
@@ -27,13 +32,15 @@ function drawWaitingPlayers(){
   const names=rows.map(row=>String(row.textContent||'').replace(/[🟢⚪]/g,'').split(' — ')[0].trim()).filter(Boolean);
   if(!names.length){old?.remove();return}
   rows.forEach(row=>{row.style.display='none'});
+  const html='<div class="waiting-players-title">PLAYERS IN ROOM</div>'+names.map(name=>'<div class="waiting-player-name">'+name.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+'</div>').join('');
   let box=old;
   if(!box){
     box=document.createElement('div');
     box.id='waiting-players-fixed';
     document.body.appendChild(box);
   }
-  box.innerHTML='<div class="waiting-players-title">PLAYERS IN ROOM</div>'+names.map(name=>'<div class="waiting-player-name">'+name.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+'</div>').join('');
+  // Avoid unnecessary DOM writes (and mutation-observer loops).
+  if(box.innerHTML!==html)box.innerHTML=html;
 }
 const style=document.createElement('style');
 style.textContent=`
@@ -51,9 +58,12 @@ style.textContent=`
 }
 `;
 document.head.appendChild(style);
-const observer=new MutationObserver(()=>drawWaitingPlayers());
-observer.observe(document.body,{childList:true,subtree:true});
+const game=document.getElementById('game');
+if(game){
+  const observer=new MutationObserver(()=>{drawCharacter();drawWaitingPlayers()});
+  observer.observe(game,{childList:true,subtree:true});
+}
 window.addEventListener('pageshow',()=>{drawCharacter();drawWaitingPlayers()});
-setInterval(drawCharacter,700);
+setInterval(()=>{drawCharacter();drawWaitingPlayers()},700);
 drawCharacter();drawWaitingPlayers();
 })();
