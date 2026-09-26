@@ -21,38 +21,38 @@ function drawCharacter(){
 }
 function drawWaitingPlayers(){
   const recovery=document.querySelector('.waiting-room-recovery');
-  if(!recovery)return;
-  if(recovery.dataset.playerListBuilt==='1')return;
-  const leave=recovery.querySelector('#leave-old-room');
-  const rawRows=[...recovery.children].filter(el=>el.tagName==='DIV'&&!el.classList.contains('waiting-players-box'));
-  const names=rawRows.map(row=>String(row.textContent||'').replace(/[🟢⚪]/g,'').split(' — ')[0].trim()).filter(Boolean);
-  if(!names.length)return;
-  recovery.dataset.playerListBuilt='1';
-  const heading=recovery.querySelector('h2')?.textContent||'';
-  recovery.innerHTML='';
-  const h=document.createElement('h2');h.textContent=heading;recovery.appendChild(h);
-  const box=document.createElement('div');box.className='waiting-players-box';
-  const title=document.createElement('div');title.className='waiting-players-title';title.textContent='PLAYERS IN ROOM';box.appendChild(title);
-  names.forEach(name=>{const row=document.createElement('div');row.className='waiting-player-name';row.textContent=name;box.appendChild(row)});
-  recovery.appendChild(box);
-  if(leave){leave.style.display='';recovery.appendChild(leave)}
+  const old=document.getElementById('waiting-players-fixed');
+  if(!recovery){old?.remove();return}
+  const rows=[...recovery.children].filter(el=>el.tagName==='DIV'&&!el.classList.contains('waiting-players-box')&&!el.classList.contains('waiting-players-title')&&!el.classList.contains('waiting-player-name'));
+  const names=rows.map(row=>String(row.textContent||'').replace(/[🟢⚪]/g,'').split(' — ')[0].trim()).filter(Boolean);
+  if(!names.length){old?.remove();return}
+  rows.forEach(row=>{row.style.display='none'});
+  let box=old;
+  if(!box){
+    box=document.createElement('div');
+    box.id='waiting-players-fixed';
+    document.body.appendChild(box);
+  }
+  box.innerHTML='<div class="waiting-players-title">PLAYERS IN ROOM</div>'+names.map(name=>'<div class="waiting-player-name">'+name.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+'</div>').join('');
 }
 const style=document.createElement('style');
 style.textContent=`
 #waiting-character-fixed{position:fixed!important;left:50%!important;top:37%!important;transform:translateX(-50%)!important;width:30vw!important;height:30vh!important;max-width:250px!important;max-height:340px!important;z-index:999999!important;pointer-events:none!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;overflow:hidden!important;background:#050b22!important;border:4px solid #ffd400!important;border-radius:18px!important;box-shadow:0 0 18px #ffd400,0 0 38px #ffd40099!important;box-sizing:border-box!important}
 #waiting-character-fixed img{display:block!important;width:100%!important;height:calc(100% - 48px)!important;object-fit:cover!important;object-position:center center!important;border:0!important;border-radius:12px 12px 0 0!important;box-shadow:none!important;flex:1 1 auto!important;min-height:0!important}
 #waiting-character-fixed .waiting-selected-player-name{width:100%!important;height:48px!important;flex:0 0 48px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;background:linear-gradient(180deg,#07122f,#000)!important;color:#fff!important;font-weight:1000!important;font-size:clamp(16px,3.8vw,25px)!important;letter-spacing:.5px!important;text-align:center!important;text-shadow:0 0 8px #1687ff,0 2px 3px #000!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;padding:0 8px!important}
-.waiting-room-recovery{width:min(92vw,430px)!important;margin:0 auto!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;color:#fff!important;text-align:center!important;box-sizing:border-box!important}
-.waiting-room-recovery h2{margin:0 0 10px!important;font-size:16px!important;color:#fff!important}
-.waiting-players-box{width:100%!important;box-sizing:border-box!important;padding:10px 12px!important;border:2px solid #1687ff!important;border-radius:14px!important;background:linear-gradient(180deg,#07183f,#02091f)!important;box-shadow:0 0 16px #1687ff88!important;color:#fff!important}
-.waiting-players-title{font-size:18px!important;font-weight:1000!important;letter-spacing:1px!important;color:#fff!important;text-shadow:0 0 8px #1687ff!important;margin:0 0 8px!important}
-.waiting-player-name{padding:6px 8px!important;margin:5px 0!important;border:1px solid #1687ff!important;border-radius:8px!important;background:#0a1435!important;color:#fff!important;font-size:15px!important;font-weight:900!important;line-height:1.15!important;box-sizing:border-box!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-#leave-old-room{margin-top:12px!important;width:100%!important;box-sizing:border-box!important}
-@media(max-width:600px){#waiting-character-fixed{top:36%!important;width:42vw!important;height:30vh!important;max-width:220px!important;max-height:310px!important}.waiting-room-recovery{width:min(92vw,390px)!important}.waiting-players-box{padding:8px 10px!important}.waiting-players-title{font-size:16px!important}.waiting-player-name{font-size:14px!important;padding:5px 7px!important}}
+#waiting-players-fixed{position:fixed!important;left:50%!important;top:68%!important;transform:translateX(-50%)!important;width:min(78vw,330px)!important;max-height:19vh!important;overflow-y:auto!important;z-index:999998!important;box-sizing:border-box!important;padding:8px 10px!important;border:2px solid #1687ff!important;border-radius:12px!important;background:linear-gradient(180deg,#07183f,#02091f)!important;box-shadow:0 0 14px #1687ff88!important;color:#fff!important;text-align:center!important}
+#waiting-players-fixed .waiting-players-title{font-size:15px!important;font-weight:1000!important;letter-spacing:1px!important;color:#fff!important;text-shadow:0 0 7px #1687ff!important;margin:0 0 5px!important}
+#waiting-players-fixed .waiting-player-name{padding:4px 7px!important;margin:3px 0!important;border:1px solid #1687ff!important;border-radius:7px!important;background:#0a1435!important;color:#fff!important;font-size:14px!important;font-weight:900!important;line-height:1.1!important;box-sizing:border-box!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+@media(max-width:600px){
+#waiting-character-fixed{top:36%!important;width:42vw!important;height:30vh!important;max-width:220px!important;max-height:310px!important}
+#waiting-players-fixed{top:67%!important;width:min(78vw,320px)!important;max-height:20vh!important;padding:7px 9px!important}
+#waiting-players-fixed .waiting-players-title{font-size:14px!important}
+#waiting-players-fixed .waiting-player-name{font-size:13px!important;padding:4px 6px!important}
+}
 `;
 document.head.appendChild(style);
-const game=document.getElementById('game');
-if(game){const observer=new MutationObserver(()=>drawWaitingPlayers());observer.observe(game,{childList:true,subtree:true});}
+const observer=new MutationObserver(()=>drawWaitingPlayers());
+observer.observe(document.body,{childList:true,subtree:true});
 window.addEventListener('pageshow',()=>{drawCharacter();drawWaitingPlayers()});
 setInterval(drawCharacter,700);
 drawCharacter();drawWaitingPlayers();
