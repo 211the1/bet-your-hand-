@@ -43,3 +43,7 @@
   from{opacity:.45}
   to{opacity:.9}
 }
+
+/* The Host character belongs only on Host/finish screens, never on player screens. */
+#player-host-wanderer{display:none!important}
+body.player-host-walking #player-host-wanderer{display:none!important}
