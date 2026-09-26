@@ -30,10 +30,10 @@
     body.player-page .waiting-selected-character{
       position:absolute!important;
       left:50%!important;
-      top:36.1%!important;
+      top:34.2%!important;
       transform:translateX(-50%)!important;
-      width:28.5%!important;
-      height:25.5%!important;
+      width:33%!important;
+      height:29.5%!important;
       object-fit:cover!important;
       object-position:center center!important;
       border:0!important;
