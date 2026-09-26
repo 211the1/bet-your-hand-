@@ -16,6 +16,11 @@ function installStateTap(){
     return socket;
   }
   WrappedWebSocket.prototype=Native.prototype;
+  // Preserve the native WebSocket constants used by the existing host game code.
+  WrappedWebSocket.CONNECTING=Native.CONNECTING;
+  WrappedWebSocket.OPEN=Native.OPEN;
+  WrappedWebSocket.CLOSING=Native.CLOSING;
+  WrappedWebSocket.CLOSED=Native.CLOSED;
   try{Object.setPrototypeOf(WrappedWebSocket,Native)}catch{}
   try{Object.defineProperty(WrappedWebSocket,'__pyhHostFinishSocketTap',{value:true})}catch{}
   window.WebSocket=WrappedWebSocket;
