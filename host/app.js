@@ -1,6 +1,10 @@
 (() => {
 'use strict';
 
+const display=document.createElement('script');
+display.src='/host/live-card-display.js?v=1';
+document.head.appendChild(display);
+
 const core=document.createElement('script');
 core.src='/host/app-core.js?v=1';
 core.onload=()=>{
