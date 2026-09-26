@@ -25,15 +25,23 @@ function hostCode(){
   try{return String(JSON.parse(localStorage.getItem('pyhHostSession')||'null')?.code||'').toUpperCase()}catch{return ''}
 }
 
+function stopAllFinishAudio(){
+  document.querySelectorAll('audio').forEach(a=>{
+    try{
+      if(String(a.currentSrc||a.src||'').includes('finish-screen.mp3')){a.pause();a.currentTime=0;}
+    }catch{}
+  });
+}
+
 function signalPlayersForTestFinish(){
   return new Promise(resolve=>{
     let hostSession=null;
     try{hostSession=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{hostSession=null}
-    if(!hostSession?.code||!hostSession?.hostId||!hostSession?.hostToken){resolve();return;}
+    if(!hostSession?.code||!hostSession?.hostId||!hostSession?.hostToken){resolve(0);return;}
     const proto=location.protocol==='https:'?'wss:':'ws:';
     const testWs=new WebSocket(proto+'//'+location.host);
     let reconnected=false,done=false;
-    const finish=()=>{if(done)return;done=true;try{testWs.close()}catch{}resolve()};
+    const finish=(startAt=0)=>{if(done)return;done=true;try{testWs.close()}catch{}resolve(Number(startAt)||0)};
     testWs.onopen=()=>testWs.send(JSON.stringify({type:'RECONNECT',code:hostSession.code,hostId:hostSession.hostId,reconnectToken:hostSession.hostToken}));
     testWs.onmessage=event=>{
       try{
@@ -43,11 +51,12 @@ function signalPlayersForTestFinish(){
           testWs.send(JSON.stringify({type:'TEST_FINISH_SCREEN'}));
           return;
         }
-        if(m.type==='ERROR'||(m.type==='STATE'&&reconnected))finish();
+        if(m.type==='TEST_FINISH_SCHEDULED'&&reconnected){finish(m.startAt);return;}
+        if(m.type==='ERROR')finish(0);
       }catch{}
     };
-    testWs.onerror=finish;
-    setTimeout(finish,5000);
+    testWs.onerror=()=>finish(0);
+    setTimeout(()=>finish(0),5000);
   });
 }
 
@@ -60,7 +69,7 @@ async function getSharedStartAt(afterMs=0){
       const r=await fetch('/__test_finish?code='+encodeURIComponent(code),{cache:'no-store'});
       if(r.ok){
         const data=await r.json();
-        if(data?.active&&Number(data.updatedAt)>afterMs)return Number(data.updatedAt)+10000;
+        if(data?.active&&Number(data.updatedAt)>afterMs)return Number(data.startAt)||Number(data.updatedAt)+10000;
       }
     }catch{}
     await new Promise(resolve=>setTimeout(resolve,100));
@@ -68,9 +77,10 @@ async function getSharedStartAt(afterMs=0){
   return Date.now()+10000;
 }
 
-async function showFinish(afterMs=0){
+async function showFinish(sharedStartAt=0){
   const old=document.getElementById('host-finish-test-overlay');
   if(old)old.remove();
+  stopAllFinishAudio();
   installFinishStyles();
   const overlay=document.createElement('div');
   overlay.id='host-finish-test-overlay';
@@ -89,9 +99,9 @@ async function showFinish(afterMs=0){
   if(menuButton)menuButton.style.display='none';
   const music=document.getElementById('host-finish-music');
   if(music){music.pause();music.currentTime=0;music.load();}
-  const sharedStartAt=await getSharedStartAt(afterMs);
+  const startAt=Number(sharedStartAt)||await getSharedStartAt(0);
   if(music){
-    const wait=Math.max(0,sharedStartAt-Date.now());
+    const wait=Math.max(0,startAt-Date.now());
     setTimeout(()=>{
       if(!document.body.contains(music))return;
       music.currentTime=0;
@@ -102,8 +112,7 @@ async function showFinish(afterMs=0){
 }
 
 function hideFinish(){
-  const music=document.getElementById('host-finish-music');
-  if(music){music.pause();music.currentTime=0;}
+  stopAllFinishAudio();
   document.getElementById('host-finish-test-overlay')?.remove();
   document.body.classList.remove('host-finished');
   const menuButton=document.getElementById('host-menu-button');
@@ -117,9 +126,8 @@ function attach(){
   button.dataset.finishBound='1';
   button.addEventListener('click',async()=>{
     document.getElementById('host-menu-panel')?.classList.remove('show');
-    const requestStartedAt=Date.now();
-    await signalPlayersForTestFinish();
-    await showFinish(requestStartedAt);
+    const sharedStartAt=await signalPlayersForTestFinish();
+    await showFinish(sharedStartAt);
   });
 }
 
