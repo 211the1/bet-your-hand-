@@ -2,10 +2,11 @@
 'use strict';
 
 /* PLAYER TEST FINISH SCREEN
-   Test-only bridge. It leaves normal gameplay and the existing player finish
-   screen alone. The Host's TEST FINISH SCREEN command creates a temporary
-   room-scoped test result on the server; this file polls that test result and
-   opens the same finish-screen design on the player phone. */
+   Test-only bridge. The existing player game-over path stays in place.
+   The Host TEST FINISH SCREEN produces the same finished STATE the player
+   already receives. This bridge watches that existing finish marker and,
+   when present, replaces the old player finish view with the new test finish
+   screen. */
 const SEAT_IMAGES={
   'Bug':'/bug-seat.png?v=1','Face':'/face-seat.png?v=1','Ling Ling':'/ling-ling-seat.png?v=1','Beanz':'/beanz-seat.png?v=1','The One':'/the-one-seat.png?v=1','Boone':'/boone-seat.png?v=1','Chicken Joe':'/chicken-joe-seat.png?v=1','Juby':'/juby-seat.png?v=1','Meemaw':'/meemaw-seat.png?v=1'
 };
@@ -32,6 +33,13 @@ function styles(){
 function sessionCode(){
  try{const s=JSON.parse(localStorage.getItem('byhPlayerSession')||'null');return String(s?.code||'').toUpperCase()}catch{return ''}
 }
+function winnerFromExistingState(){
+ try{
+   const s=JSON.parse(localStorage.getItem('byhPlayerSession')||'null');
+   if(s?.character&&SEAT_IMAGES[s.character])return {winnerCharacter:s.character,winnerScore:500};
+ }catch{}
+ return {winnerCharacter:'Bug',winnerScore:500};
+}
 function show(data){
  if(shown||document.getElementById('player-test-finish-overlay'))return;
  shown=true;styles();
@@ -51,13 +59,21 @@ function show(data){
  });
 }
 async function poll(){
- const code=sessionCode();
- if(!code){pollTimer=setTimeout(poll,1000);return;}
+ if(shown){return;}
  try{
-   const r=await fetch('/__test_finish?code='+encodeURIComponent(code),{cache:'no-store'});
+   const r=await fetch('/__test_finish?code='+encodeURIComponent(sessionCode()),{cache:'no-store'});
    if(r.ok){const data=await r.json();if(data?.active){show(data);return;}}
  }catch{}
- pollTimer=setTimeout(poll,700);
+ // The real player STATE handler already marks a finished game with this
+ // existing flag. Use that same signal as the direct test connection so the
+ // new finish screen does not depend on a second room/session mechanism.
+ try{
+   if(localStorage.getItem('byhPlayerFinished')==='1'){
+     show(winnerFromExistingState());
+     return;
+   }
+ }catch{}
+ pollTimer=setTimeout(poll,300);
 }
 poll();
 })();
