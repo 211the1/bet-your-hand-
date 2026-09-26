@@ -64,7 +64,7 @@ function showFinish(){
   const menuButton=document.getElementById('host-menu-button');
   if(menuButton)menuButton.style.display='none';
   const music=document.getElementById('host-finish-music');
-  if(music){music.currentTime=0;music.play().catch(()=>{});}
+  if(music){music.currentTime=0;setTimeout(()=>{if(!document.body.contains(music))return;music.currentTime=0;music.play().catch(()=>{});},10000);}
   document.getElementById('host-finish-back')?.addEventListener('click',hideFinish);
 }
 
