@@ -1,11 +1,23 @@
 (() => {
 'use strict';
 
-/* ISOLATED PLAYER FINISH TEST
-   The existing player game-over screen remains intact. This helper only watches
-   for the existing player finish marker and displays the new finish-screen test
-   on top of it. It does not change game state, cards, turns, sessions, or the host. */
+/* PLAYER FINISH SCREEN
+   This is intentionally isolated from player gameplay. It mirrors the existing
+   Host finish-screen design exactly. The existing player game-over screen stays
+   underneath and is not rewritten. */
 let shown=false;
+
+const SEAT_IMAGES={
+  'Bug':'/bug-seat.png?v=1',
+  'Face':'/face-seat.png?v=1',
+  'Ling Ling':'/ling-ling-seat.png?v=1',
+  'Beanz':'/beanz-seat.png?v=1',
+  'The One':'/the-one-seat.png?v=1',
+  'Boone':'/boone-seat.png?v=1',
+  'Chicken Joe':'/chicken-joe-seat.png?v=1',
+  'Juby':'/juby-seat.png?v=1',
+  'Meemaw':'/meemaw-seat.png?v=1'
+};
 
 function installStyles(){
   if(document.getElementById('player-test-finish-styles'))return;
@@ -13,7 +25,7 @@ function installStyles(){
   style.id='player-test-finish-styles';
   style.textContent=`
 #player-test-finish-overlay{position:fixed;inset:0;z-index:100000;background:#05020d;color:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif}
-.player-test-finish-bg{position:absolute;inset:0;background:url('/finish-screen.png?v=4') center/100% 100% no-repeat}
+.player-test-finish-bg{position:absolute;inset:0;background:url('/finish-screen.png?v=1') center/100% 100% no-repeat}
 #player-test-winner-slot{position:absolute;left:47.5%;top:51.5%;transform:translate(-50%,-50%);width:clamp(130px,20vw,250px);height:clamp(190px,32vw,360px);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;pointer-events:none}
 #player-test-winner-score{position:absolute;left:50%;top:-6vh;transform:translateX(-50%);font-size:clamp(28px,5vw,58px);font-weight:1000;color:#fff;text-shadow:0 0 8px #000,0 0 18px #1687ff;margin:0;line-height:1;white-space:nowrap;z-index:3}
 #player-test-winner-character{width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 8px #000)}
@@ -27,29 +39,53 @@ function installStyles(){
   document.head.appendChild(style);
 }
 
+function getWinner(){
+  const first=document.querySelector('#player-finish-screen .finish-player-0');
+  const score=first?.querySelector('.finish-player-score')?.textContent?.trim()||'0';
+  const photo=first?.querySelector('.finish-player-photo');
+  let character='Bug';
+  if(photo?.getAttribute('src')){
+    const file=photo.getAttribute('src').split('/').pop().split('?')[0].replace(/\.jpg$/i,'');
+    character=file.replace(/_/g,' ');
+    if(character==='Ling Ling')character='Ling Ling';
+    if(character==='The One')character='The One';
+    if(character==='Chicken Joe')character='Chicken Joe';
+  }
+  return {character:SEAT_IMAGES[character]?character:'Bug',score};
+}
+
 function showTestFinish(){
   if(shown)return;
   shown=true;
   installStyles();
+  const winner=getWinner();
   const overlay=document.createElement('div');
   overlay.id='player-test-finish-overlay';
   overlay.innerHTML=`
     <div class="player-test-finish-bg"></div>
     <audio id="player-test-finish-music" src="/assets/finish-screen.mp3" preload="auto"></audio>
     <div id="player-test-host-walker" aria-hidden="true"><img src="/host-winner.png?v=1" alt="Host walking with trophy"></div>
-    <div id="player-test-winner-slot" aria-label="Test winner seat">
-      <div id="player-test-winner-score">500</div>
-      <img id="player-test-winner-character" src="/bug-seat.png?v=1" alt="Test winner Bug seated">
+    <div id="player-test-winner-slot" aria-label="Winner seat">
+      <div id="player-test-winner-score">${escapeHtml(winner.score)}</div>
+      <img id="player-test-winner-character" src="${SEAT_IMAGES[winner.character]}" alt="${escapeHtml(winner.character)} seated winner">
     </div>
     <button id="player-test-finish-button" type="button">PLAY AGAIN</button>`;
   document.body.appendChild(overlay);
   const music=document.getElementById('player-test-finish-music');
   if(music){music.currentTime=0;music.play().catch(()=>{});}
+  document.getElementById('player-test-finish-button')?.addEventListener('click',()=>{
+    if(music){music.pause();music.currentTime=0;}
+    try{localStorage.removeItem('byhPlayerSession');localStorage.setItem('byhPlayerFinished','1')}catch{}
+    overlay.remove();
+    window.location.reload();
+  });
 }
 
 function check(){
+  /* The real/test player game-over renderer creates this existing element.
+     Watching the DOM keeps this helper independent of the game's WebSocket code. */
   if(document.getElementById('player-test-finish-overlay'))return;
-  if(localStorage.getItem('byhPlayerFinished')==='1')showTestFinish();
+  if(document.getElementById('player-finish-screen'))showTestFinish();
 }
 
 new MutationObserver(check).observe(document.documentElement,{childList:true,subtree:true});
