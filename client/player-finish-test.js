@@ -3,8 +3,8 @@
 
 /* ISOLATED PLAYER FINISH TEST
    The existing player game-over screen remains intact. This helper only watches
-   for that existing GAME OVER state and displays the new finish-screen test on
-   top of it. It does not change game state, cards, turns, sessions, or the host. */
+   for the existing player finish marker and displays the new finish-screen test
+   on top of it. It does not change game state, cards, turns, sessions, or the host. */
 let shown=false;
 
 function installStyles(){
@@ -49,8 +49,7 @@ function showTestFinish(){
 
 function check(){
   if(document.getElementById('player-test-finish-overlay'))return;
-  const game=document.getElementById('game');
-  if(game&&/GAME OVER/.test(game.textContent||''))showTestFinish();
+  if(localStorage.getItem('byhPlayerFinished')==='1')showTestFinish();
 }
 
 new MutationObserver(check).observe(document.documentElement,{childList:true,subtree:true});
