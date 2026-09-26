@@ -17,35 +17,25 @@ function drawCharacter(){
   }
   const img=overlay.querySelector('img');
   const nameEl=overlay.querySelector('.waiting-selected-player-name');
-  img.src=src;
-  img.alt=character;
-  nameEl.textContent=playerName;
+  img.src=src;img.alt=character;nameEl.textContent=playerName;
 }
 function drawWaitingPlayers(){
   const recovery=document.querySelector('.waiting-room-recovery');
   if(!recovery)return;
-  let box=recovery.querySelector('.waiting-players-box');
-  const rows=[...recovery.children].filter(el=>el.tagName==='DIV'&&!el.classList.contains('waiting-players-box'));
-  if(!rows.length)return;
-  if(!box){
-    box=document.createElement('div');
-    box.className='waiting-players-box';
-    const leave=recovery.querySelector('#leave-old-room');
-    recovery.insertBefore(box,leave||null);
-  }
-  const names=rows.map(row=>String(row.textContent||'').replace(/[🟢⚪]/g,'').split(' — ')[0].trim()).filter(Boolean);
-  box.innerHTML='';
-  const title=document.createElement('div');
-  title.className='waiting-players-title';
-  title.textContent='PLAYERS IN ROOM';
-  box.appendChild(title);
-  names.forEach(name=>{
-    const row=document.createElement('div');
-    row.className='waiting-player-name';
-    row.textContent=name;
-    box.appendChild(row);
-  });
-  rows.forEach(row=>row.style.display='none');
+  if(recovery.dataset.playerListBuilt==='1')return;
+  const leave=recovery.querySelector('#leave-old-room');
+  const rawRows=[...recovery.children].filter(el=>el.tagName==='DIV'&&!el.classList.contains('waiting-players-box'));
+  const names=rawRows.map(row=>String(row.textContent||'').replace(/[🟢⚪]/g,'').split(' — ')[0].trim()).filter(Boolean);
+  if(!names.length)return;
+  recovery.dataset.playerListBuilt='1';
+  const heading=recovery.querySelector('h2')?.textContent||'';
+  recovery.innerHTML='';
+  const h=document.createElement('h2');h.textContent=heading;recovery.appendChild(h);
+  const box=document.createElement('div');box.className='waiting-players-box';
+  const title=document.createElement('div');title.className='waiting-players-title';title.textContent='PLAYERS IN ROOM';box.appendChild(title);
+  names.forEach(name=>{const row=document.createElement('div');row.className='waiting-player-name';row.textContent=name;box.appendChild(row)});
+  recovery.appendChild(box);
+  if(leave){leave.style.display='';recovery.appendChild(leave)}
 }
 const style=document.createElement('style');
 style.textContent=`
@@ -61,9 +51,9 @@ style.textContent=`
 @media(max-width:600px){#waiting-character-fixed{top:36%!important;width:42vw!important;height:30vh!important;max-width:220px!important;max-height:310px!important}.waiting-room-recovery{width:min(92vw,390px)!important}.waiting-players-box{padding:8px 10px!important}.waiting-players-title{font-size:16px!important}.waiting-player-name{font-size:14px!important;padding:5px 7px!important}}
 `;
 document.head.appendChild(style);
-window.addEventListener('storage',drawCharacter);
+const game=document.getElementById('game');
+if(game){const observer=new MutationObserver(()=>drawWaitingPlayers());observer.observe(game,{childList:true,subtree:true});}
 window.addEventListener('pageshow',()=>{drawCharacter();drawWaitingPlayers()});
-setInterval(()=>{drawCharacter();drawWaitingPlayers()},700);
-drawCharacter();
-drawWaitingPlayers();
+setInterval(drawCharacter,700);
+drawCharacter();drawWaitingPlayers();
 })();
