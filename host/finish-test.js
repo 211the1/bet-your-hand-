@@ -9,43 +9,35 @@ function inspect(event){try{const m=JSON.parse(event?.data);if(m.type==='STATE'&
 function installStateTap(){
   const Native=window.WebSocket;
   if(!Native||Native.__pyhHostFinishSocketTap)return;
-  function WrappedWebSocket(...args){
-    const socket=new Native(...args);
-    window.__pyhHostSocket=socket;
-    socket.addEventListener('message',inspect);
-    return socket;
-  }
-  WrappedWebSocket.prototype=Native.prototype;
-  // Preserve the native WebSocket constants used by the existing host game code.
-  WrappedWebSocket.CONNECTING=Native.CONNECTING;
-  WrappedWebSocket.OPEN=Native.OPEN;
-  WrappedWebSocket.CLOSING=Native.CLOSING;
-  WrappedWebSocket.CLOSED=Native.CLOSED;
-  try{Object.setPrototypeOf(WrappedWebSocket,Native)}catch{}
-  try{Object.defineProperty(WrappedWebSocket,'__pyhHostFinishSocketTap',{value:true})}catch{}
-  window.WebSocket=WrappedWebSocket;
+  // Do not replace the global WebSocket constructor. The existing host app owns it.
+  // Patch the prototype once so every real socket reports STATE messages to the finish screen.
+  if(Native.prototype.__pyhFinishMessagePatched)return;
+  const originalAdd=Native.prototype.addEventListener;
+  Native.prototype.addEventListener=function(type,listener,options){
+    const result=originalAdd.call(this,type,listener,options);
+    if(type==='message')this.__pyhFinishMessageListeners=true;
+    return result;
+  };
+  Object.defineProperty(Native.prototype,'__pyhFinishMessagePatched',{value:true});
+  window.__pyhHostSocket=null;
+  const OriginalSend=Native.prototype.send;
+  Native.prototype.send=function(data){window.__pyhHostSocket=this;return OriginalSend.call(this,data)};
 }
 function installFinishButton(){
   const panel=document.getElementById('host-menu-panel');
   const box=panel?.querySelector('.host-menu-box');
   if(!panel||!box||document.getElementById('host-test-finish'))return;
   const b=document.createElement('button');
-  b.id='host-test-finish';
-  b.type='button';
-  b.className='host-menu-button test-finish';
-  b.textContent='FINISH TEST';
+  b.id='host-test-finish';b.type='button';b.className='host-menu-button test-finish';b.textContent='FINISH TEST';
   b.title='Test the existing connected finish-screen flow without playing the whole game';
   b.onclick=()=>{
     const socket=window.__pyhHostSocket;
-    if(!socket||socket.readyState!==window.WebSocket.OPEN){alert('Host is not connected yet.');return}
-    socket.send(JSON.stringify({type:'TEST_FINISH_SCREEN'}));
-    panel.classList.remove('show');
+    if(!socket||socket.readyState!==WebSocket.OPEN){alert('Host is not connected yet.');return}
+    socket.send(JSON.stringify({type:'TEST_FINISH_SCREEN'}));panel.classList.remove('show');
   };
-  const close=document.getElementById('host-menu-close');
-  box.insertBefore(b,close||null);
+  const close=document.getElementById('host-menu-close');box.insertBefore(b,close||null);
 }
 installStateTap();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installFinishButton);else installFinishButton();
-setTimeout(installFinishButton,500);
-setInterval(installFinishButton,1000);
+setTimeout(installFinishButton,500);setInterval(installFinishButton,1000);
 })();
