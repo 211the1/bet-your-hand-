@@ -21,66 +21,32 @@ function installFinishStyles(){
   document.head.appendChild(style);
 }
 
-function hostCode(){
-  try{return String(JSON.parse(localStorage.getItem('pyhHostSession')||'null')?.code||'').toUpperCase()}catch{return ''}
-}
-
-function stopAllFinishAudio(){
-  document.querySelectorAll('audio').forEach(a=>{
-    try{
-      if(String(a.currentSrc||a.src||'').includes('finish-screen.mp3')){a.pause();a.currentTime=0;}
-    }catch{}
-  });
-}
-
 function signalPlayersForTestFinish(){
-  return new Promise(resolve=>{
-    let hostSession=null;
-    try{hostSession=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{hostSession=null}
-    if(!hostSession?.code||!hostSession?.hostId||!hostSession?.hostToken){resolve(0);return;}
-    const proto=location.protocol==='https:'?'wss:':'ws:';
-    const testWs=new WebSocket(proto+'//'+location.host);
-    let reconnected=false,done=false;
-    const finish=(startAt=0)=>{if(done)return;done=true;try{testWs.close()}catch{}resolve(Number(startAt)||0)};
-    testWs.onopen=()=>testWs.send(JSON.stringify({type:'RECONNECT',code:hostSession.code,hostId:hostSession.hostId,reconnectToken:hostSession.hostToken}));
-    testWs.onmessage=event=>{
-      try{
-        const m=JSON.parse(event.data);
-        if(m.type==='RECONNECTED'&&!reconnected){
-          reconnected=true;
-          testWs.send(JSON.stringify({type:'TEST_FINISH_SCREEN'}));
-          return;
-        }
-        if(m.type==='TEST_FINISH_SCHEDULED'&&reconnected){finish(m.startAt);return;}
-        if(m.type==='ERROR')finish(0);
-      }catch{}
-    };
-    testWs.onerror=()=>finish(0);
-    setTimeout(()=>finish(0),5000);
-  });
-}
-
-async function getSharedStartAt(afterMs=0){
-  const code=hostCode();
-  if(!code)return Date.now()+10000;
-  const deadline=Date.now()+5000;
-  while(Date.now()<deadline){
+  let hostSession=null;
+  try{hostSession=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{hostSession=null}
+  if(!hostSession?.code||!hostSession?.hostId||!hostSession?.hostToken)return;
+  const proto=location.protocol==='https:'?'wss:':'ws:';
+  const testWs=new WebSocket(proto+'//'+location.host);
+  let reconnected=false;
+  testWs.onopen=()=>testWs.send(JSON.stringify({type:'RECONNECT',code:hostSession.code,hostId:hostSession.hostId,reconnectToken:hostSession.hostToken}));
+  testWs.onmessage=event=>{
     try{
-      const r=await fetch('/__test_finish?code='+encodeURIComponent(code),{cache:'no-store'});
-      if(r.ok){
-        const data=await r.json();
-        if(data?.active&&Number(data.updatedAt)>afterMs)return Number(data.startAt)||Number(data.updatedAt)+10000;
+      const m=JSON.parse(event.data);
+      if(m.type==='RECONNECTED'&&!reconnected){
+        reconnected=true;
+        testWs.send(JSON.stringify({type:'TEST_FINISH_SCREEN'}));
+        return;
       }
+      if(m.type==='ERROR'||(m.type==='STATE'&&reconnected)){try{testWs.close()}catch{}}
     }catch{}
-    await new Promise(resolve=>setTimeout(resolve,100));
-  }
-  return Date.now()+10000;
+  };
+  testWs.onerror=()=>{};
+  setTimeout(()=>{try{testWs.close()}catch{}},5000);
 }
 
-async function showFinish(sharedStartAt=0){
+function showFinish(){
   const old=document.getElementById('host-finish-test-overlay');
   if(old)old.remove();
-  stopAllFinishAudio();
   installFinishStyles();
   const overlay=document.createElement('div');
   overlay.id='host-finish-test-overlay';
@@ -98,21 +64,13 @@ async function showFinish(sharedStartAt=0){
   const menuButton=document.getElementById('host-menu-button');
   if(menuButton)menuButton.style.display='none';
   const music=document.getElementById('host-finish-music');
-  if(music){music.pause();music.currentTime=0;music.load();}
-  const startAt=Number(sharedStartAt)||await getSharedStartAt(0);
-  if(music){
-    const wait=Math.max(0,startAt-Date.now());
-    setTimeout(()=>{
-      if(!document.body.contains(music))return;
-      music.currentTime=0;
-      music.play().catch(()=>{});
-    },wait);
-  }
+  if(music){music.currentTime=0;music.play().catch(()=>{});}
   document.getElementById('host-finish-back')?.addEventListener('click',hideFinish);
 }
 
 function hideFinish(){
-  stopAllFinishAudio();
+  const music=document.getElementById('host-finish-music');
+  if(music){music.pause();music.currentTime=0;}
   document.getElementById('host-finish-test-overlay')?.remove();
   document.body.classList.remove('host-finished');
   const menuButton=document.getElementById('host-menu-button');
@@ -124,10 +82,10 @@ function attach(){
   if(!button){setTimeout(attach,250);return;}
   if(button.dataset.finishBound==='1')return;
   button.dataset.finishBound='1';
-  button.addEventListener('click',async()=>{
+  button.addEventListener('click',()=>{
     document.getElementById('host-menu-panel')?.classList.remove('show');
-    const sharedStartAt=await signalPlayersForTestFinish();
-    await showFinish(sharedStartAt);
+    showFinish();
+    signalPlayersForTestFinish();
   });
 }
 
