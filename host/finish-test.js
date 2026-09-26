@@ -26,29 +26,32 @@ function hostCode(){
 }
 
 function signalPlayersForTestFinish(){
-  let hostSession=null;
-  try{hostSession=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{hostSession=null}
-  if(!hostSession?.code||!hostSession?.hostId||!hostSession?.hostToken)return;
-  const proto=location.protocol==='https:'?'wss:':'ws:';
-  const testWs=new WebSocket(proto+'//'+location.host);
-  let reconnected=false;
-  testWs.onopen=()=>testWs.send(JSON.stringify({type:'RECONNECT',code:hostSession.code,hostId:hostSession.hostId,reconnectToken:hostSession.hostToken}));
-  testWs.onmessage=event=>{
-    try{
-      const m=JSON.parse(event.data);
-      if(m.type==='RECONNECTED'&&!reconnected){
-        reconnected=true;
-        testWs.send(JSON.stringify({type:'TEST_FINISH_SCREEN'}));
-        return;
-      }
-      if(m.type==='ERROR'||(m.type==='STATE'&&reconnected)){try{testWs.close()}catch{}}
-    }catch{}
-  };
-  testWs.onerror=()=>{};
-  setTimeout(()=>{try{testWs.close()}catch{}},5000);
+  return new Promise(resolve=>{
+    let hostSession=null;
+    try{hostSession=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{hostSession=null}
+    if(!hostSession?.code||!hostSession?.hostId||!hostSession?.hostToken){resolve();return;}
+    const proto=location.protocol==='https:'?'wss:':'ws:';
+    const testWs=new WebSocket(proto+'//'+location.host);
+    let reconnected=false,done=false;
+    const finish=()=>{if(done)return;done=true;try{testWs.close()}catch{}resolve()};
+    testWs.onopen=()=>testWs.send(JSON.stringify({type:'RECONNECT',code:hostSession.code,hostId:hostSession.hostId,reconnectToken:hostSession.hostToken}));
+    testWs.onmessage=event=>{
+      try{
+        const m=JSON.parse(event.data);
+        if(m.type==='RECONNECTED'&&!reconnected){
+          reconnected=true;
+          testWs.send(JSON.stringify({type:'TEST_FINISH_SCREEN'}));
+          return;
+        }
+        if(m.type==='ERROR'||(m.type==='STATE'&&reconnected))finish();
+      }catch{}
+    };
+    testWs.onerror=finish;
+    setTimeout(finish,5000);
+  });
 }
 
-async function getSharedStartAt(){
+async function getSharedStartAt(afterMs=0){
   const code=hostCode();
   if(!code)return Date.now()+10000;
   const deadline=Date.now()+5000;
@@ -57,7 +60,7 @@ async function getSharedStartAt(){
       const r=await fetch('/__test_finish?code='+encodeURIComponent(code),{cache:'no-store'});
       if(r.ok){
         const data=await r.json();
-        if(data?.active&&Number(data.updatedAt))return Number(data.updatedAt)+10000;
+        if(data?.active&&Number(data.updatedAt)>afterMs)return Number(data.updatedAt)+10000;
       }
     }catch{}
     await new Promise(resolve=>setTimeout(resolve,100));
@@ -65,7 +68,7 @@ async function getSharedStartAt(){
   return Date.now()+10000;
 }
 
-async function showFinish(){
+async function showFinish(afterMs=0){
   const old=document.getElementById('host-finish-test-overlay');
   if(old)old.remove();
   installFinishStyles();
@@ -85,8 +88,8 @@ async function showFinish(){
   const menuButton=document.getElementById('host-menu-button');
   if(menuButton)menuButton.style.display='none';
   const music=document.getElementById('host-finish-music');
-  if(music){music.currentTime=0;music.load();}
-  const sharedStartAt=await getSharedStartAt();
+  if(music){music.pause();music.currentTime=0;music.load();}
+  const sharedStartAt=await getSharedStartAt(afterMs);
   if(music){
     const wait=Math.max(0,sharedStartAt-Date.now());
     setTimeout(()=>{
@@ -112,10 +115,11 @@ function attach(){
   if(!button){setTimeout(attach,250);return;}
   if(button.dataset.finishBound==='1')return;
   button.dataset.finishBound='1';
-  button.addEventListener('click',()=>{
+  button.addEventListener('click',async()=>{
     document.getElementById('host-menu-panel')?.classList.remove('show');
-    showFinish();
-    signalPlayersForTestFinish();
+    const requestStartedAt=Date.now();
+    await signalPlayersForTestFinish();
+    await showFinish(requestStartedAt);
   });
 }
 
