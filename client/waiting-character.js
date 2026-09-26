@@ -61,8 +61,6 @@ style.textContent=`
 @media(max-width:600px){#waiting-character-fixed{top:36%!important;width:42vw!important;height:30vh!important;max-width:220px!important;max-height:310px!important}.waiting-room-recovery{width:min(92vw,390px)!important}.waiting-players-box{padding:8px 10px!important}.waiting-players-title{font-size:16px!important}.waiting-player-name{font-size:14px!important;padding:5px 7px!important}}
 `;
 document.head.appendChild(style);
-const observer=new MutationObserver(drawWaitingPlayers);
-observer.observe(document.body,{childList:true,subtree:true});
 window.addEventListener('storage',drawCharacter);
 window.addEventListener('pageshow',()=>{drawCharacter();drawWaitingPlayers()});
 setInterval(()=>{drawCharacter();drawWaitingPlayers()},700);
