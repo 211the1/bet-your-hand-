@@ -23,7 +23,9 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
     const winner=testPlayers[0];
     testFinishRooms.set(r.code,{active:true,winnerId:winner.id,winnerName:winner.name,winnerCharacter:winner.character,winnerScore:500,updatedAt:Date.now()});
     const testGame={phase:'finished',round:2,viewerId:null,isYourTurn:false,turnPlayerId:null,turnPlayerName:null,direction:1,currentColor:'',topCard:null,discardCount:0,deckCount:0,cardsLeft:0,players:testPlayers.map((p,i)=>({id:p.id,name:p.name,character:p.character,handCount:0,points:i===0?500:0,shield:false,extraPlay:false,colorChoice:false,turnSwitch:false})),viewerHand:undefined,pending:null,wheelResult:null,lastCardEvent:null,winner:winner.id};
-    for(const [id,sock] of r.sockets){if(id===r.hostId)continue;if(sock.readyState===1)send(sock,{type:'STATE',roomCode:r.code,started:true,hostName:r.hostName,players:testPlayers.map(p=>({id:p.id,name:p.name,character:p.character,connected:p.connected})),game:{...testGame,viewerId:id,turnPlayerId:null,turnPlayerName:null}})}
+    const previousGame=r.game;
+    r.game=testGame;
+    try{await rooms.sendState(r.code)}finally{r.game=previousGame}
     return;
   }
   if(t==='RESTART_GAME'){if(!host)throw Error('Host only');testFinishRooms.delete(r.code);const fresh=await rooms.restartGame(r.code);s={...fresh};sessions.set(ws,s);await rooms.attach(fresh.code,fresh.hostId,ws);send(ws,{type:'ROOM_CREATED',...fresh});return rooms.sendState(fresh.code)}
