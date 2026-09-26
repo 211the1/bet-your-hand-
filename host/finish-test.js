@@ -21,6 +21,10 @@ function installFinishStyles(){
   document.head.appendChild(style);
 }
 
+function hostCode(){
+  try{return String(JSON.parse(localStorage.getItem('pyhHostSession')||'null')?.code||'').toUpperCase()}catch{return ''}
+}
+
 function signalPlayersForTestFinish(){
   let hostSession=null;
   try{hostSession=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{hostSession=null}
@@ -44,7 +48,24 @@ function signalPlayersForTestFinish(){
   setTimeout(()=>{try{testWs.close()}catch{}},5000);
 }
 
-function showFinish(){
+async function getSharedStartAt(){
+  const code=hostCode();
+  if(!code)return Date.now()+10000;
+  const deadline=Date.now()+5000;
+  while(Date.now()<deadline){
+    try{
+      const r=await fetch('/__test_finish?code='+encodeURIComponent(code),{cache:'no-store'});
+      if(r.ok){
+        const data=await r.json();
+        if(data?.active&&Number(data.updatedAt))return Number(data.updatedAt)+10000;
+      }
+    }catch{}
+    await new Promise(resolve=>setTimeout(resolve,100));
+  }
+  return Date.now()+10000;
+}
+
+async function showFinish(){
   const old=document.getElementById('host-finish-test-overlay');
   if(old)old.remove();
   installFinishStyles();
@@ -64,7 +85,16 @@ function showFinish(){
   const menuButton=document.getElementById('host-menu-button');
   if(menuButton)menuButton.style.display='none';
   const music=document.getElementById('host-finish-music');
-  if(music){music.currentTime=0;setTimeout(()=>{if(!document.body.contains(music))return;music.currentTime=0;music.play().catch(()=>{});},10000);}
+  if(music){music.currentTime=0;music.load();}
+  const sharedStartAt=await getSharedStartAt();
+  if(music){
+    const wait=Math.max(0,sharedStartAt-Date.now());
+    setTimeout(()=>{
+      if(!document.body.contains(music))return;
+      music.currentTime=0;
+      music.play().catch(()=>{});
+    },wait);
+  }
   document.getElementById('host-finish-back')?.addEventListener('click',hideFinish);
 }
 
