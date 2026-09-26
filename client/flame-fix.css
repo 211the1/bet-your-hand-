@@ -47,3 +47,52 @@
 /* The Host character belongs only on Host/finish screens, never on player screens. */
 #player-host-wanderer{display:none!important}
 body.player-host-walking #player-host-wanderer{display:none!important}
+
+/* Player waiting room: use the approved waiting-screen artwork without changing game logic. */
+body.player-page .waiting-room-recovery{
+  position:fixed!important;
+  inset:0!important;
+  z-index:9990!important;
+  width:100vw!important;
+  height:100vh!important;
+  min-height:100vh!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  background:#020824 url('/assets/waiting-screen.png') center center / 100% 100% no-repeat!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  display:block!important;
+  color:transparent!important;
+  font-size:0!important;
+}
+body.player-page .waiting-room-recovery>h2,
+body.player-page .waiting-room-recovery>div{
+  display:none!important;
+}
+body.player-page .waiting-room-recovery>#leave-old-room{
+  display:block!important;
+  position:absolute!important;
+  left:11.5%!important;
+  bottom:7.5%!important;
+  width:77%!important;
+  height:7.2%!important;
+  min-height:54px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:transparent!important;
+  box-shadow:none!important;
+  font-size:0!important;
+  line-height:1!important;
+  z-index:9991!important;
+  cursor:pointer!important;
+}
+body.player-page .waiting-room-recovery>#leave-old-room:active{
+  transform:scale(.98)!important;
+}
