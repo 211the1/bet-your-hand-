@@ -21,6 +21,29 @@ function installFinishStyles(){
   document.head.appendChild(style);
 }
 
+function signalPlayersForTestFinish(){
+  let hostSession=null;
+  try{hostSession=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{hostSession=null}
+  if(!hostSession?.code||!hostSession?.hostId||!hostSession?.hostToken)return;
+  const proto=location.protocol==='https:'?'wss:':'ws:';
+  const testWs=new WebSocket(proto+'//'+location.host);
+  let reconnected=false;
+  testWs.onopen=()=>testWs.send(JSON.stringify({type:'RECONNECT',code:hostSession.code,hostId:hostSession.hostId,reconnectToken:hostSession.hostToken}));
+  testWs.onmessage=event=>{
+    try{
+      const m=JSON.parse(event.data);
+      if(m.type==='RECONNECTED'&&!reconnected){
+        reconnected=true;
+        testWs.send(JSON.stringify({type:'TEST_FINISH_SCREEN'}));
+        return;
+      }
+      if(m.type==='ERROR'||(m.type==='STATE'&&reconnected)){try{testWs.close()}catch{}}
+    }catch{}
+  };
+  testWs.onerror=()=>{};
+  setTimeout(()=>{try{testWs.close()}catch{}},5000);
+}
+
 function showFinish(){
   const old=document.getElementById('host-finish-test-overlay');
   if(old)old.remove();
@@ -59,7 +82,11 @@ function attach(){
   if(!button){setTimeout(attach,250);return;}
   if(button.dataset.finishBound==='1')return;
   button.dataset.finishBound='1';
-  button.addEventListener('click',()=>{document.getElementById('host-menu-panel')?.classList.remove('show');showFinish();});
+  button.addEventListener('click',()=>{
+    document.getElementById('host-menu-panel')?.classList.remove('show');
+    showFinish();
+    signalPlayersForTestFinish();
+  });
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',attach,{once:true});
