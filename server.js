@@ -21,11 +21,16 @@ function createServer(){const httpServer=http.createServer(serve);const wss=new 
     const testPlayers=[...r.players.values()];
     if(!testPlayers.length)throw Error('No players in room');
     const winner=testPlayers[0];
-    testFinishRooms.set(r.code,{active:true,winnerId:winner.id,winnerName:winner.name,winnerCharacter:winner.character,winnerScore:500,updatedAt:Date.now()});
+    const now=Date.now();
+    const startAt=now+10000;
+    testFinishRooms.set(r.code,{active:true,winnerId:winner.id,winnerName:winner.name,winnerCharacter:winner.character,winnerScore:500,updatedAt:now,startAt});
     const testGame={phase:'finished',round:2,viewerId:null,isYourTurn:false,turnPlayerId:null,turnPlayerName:null,direction:1,currentColor:'',topCard:null,discardCount:0,deckCount:0,cardsLeft:0,players:testPlayers.map((p,i)=>({id:p.id,name:p.name,character:p.character,handCount:0,points:i===0?500:0,shield:false,extraPlay:false,colorChoice:false,turnSwitch:false})),viewerHand:undefined,pending:null,wheelResult:null,lastCardEvent:null,winner:winner.id};
     const previousGame=r.game;
     r.game=testGame;
-    try{await rooms.sendState(r.code)}finally{r.game=previousGame}
+    try{
+      for(const q of r.sockets.values())send(q,{type:'TEST_FINISH_SCHEDULED',startAt,winnerId:winner.id,winnerName:winner.name,winnerCharacter:winner.character,winnerScore:500});
+      await rooms.sendState(r.code);
+    }finally{r.game=previousGame}
     return;
   }
   if(t==='RESTART_GAME'){if(!host)throw Error('Host only');testFinishRooms.delete(r.code);const fresh=await rooms.restartGame(r.code);s={...fresh};sessions.set(ws,s);await rooms.attach(fresh.code,fresh.hostId,ws);send(ws,{type:'ROOM_CREATED',...fresh});return rooms.sendState(fresh.code)}
