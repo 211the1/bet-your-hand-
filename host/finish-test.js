@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 const SEAT_IMAGES={'Bug':'/bug-seat.png?v=1','Face':'/face-seat.png?v=1','Ling Ling':'/ling-ling-seat.png?v=1','Beanz':'/beanz-seat.png?v=1','The One':'/the-one-seat.png?v=1','Boone':'/boone-seat.png?v=1','Chicken Joe':'/chicken-joe-seat.png?v=1','Juby':'/juby-seat.png?v=1','Meemaw':'/meemaw-seat.png?v=1'};
-const HOST_AUDIO_ADVANCE_MS=75;
+const HOST_AUDIO_ADVANCE_MS=100;
 let pendingFinishData=null,audioCtx=null,audioBufferPromise=null,audioSource=null;
 function preloadFinishAudio(){if(audioBufferPromise)return audioBufferPromise;try{audioCtx=new (window.AudioContext||window.webkitAudioContext)()}catch{return Promise.resolve(null)}audioBufferPromise=fetch('/assets/finish-screen.mp3',{cache:'force-cache'}).then(r=>r.arrayBuffer()).then(b=>audioCtx.decodeAudioData(b)).catch(()=>null);return audioBufferPromise}
 function unlockAudio(){try{if(audioCtx&&audioCtx.state==='suspended')return audioCtx.resume().catch(()=>{})}catch{}return Promise.resolve()}
