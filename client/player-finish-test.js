@@ -2,11 +2,9 @@
 'use strict';
 
 /* ISOLATED PLAYER FINISH TEST
-   This does not replace the existing player finish-screen code permanently.
-   It watches the existing byhGameOver marker and, for testing only, swaps that
-   display to the new finish-screen design. Nothing in game state, cards, turns,
-   or the host is changed here. */
-const TEST_KEY_PREFIX='byhGameOver:';
+   The existing player game-over screen remains intact. This helper only watches
+   for that existing GAME OVER state and displays the new finish-screen test on
+   top of it. It does not change game state, cards, turns, sessions, or the host. */
 let shown=false;
 
 function installStyles(){
@@ -29,16 +27,10 @@ function installStyles(){
   document.head.appendChild(style);
 }
 
-function finishKey(){
-  const code=(document.getElementById('code')?.value||'').trim().toUpperCase();
-  return code?TEST_KEY_PREFIX+code:TEST_KEY_PREFIX+'unknown';
-}
-
 function showTestFinish(){
   if(shown)return;
   shown=true;
   installStyles();
-  document.getElementById('player-test-finish-overlay')?.remove();
   const overlay=document.createElement('div');
   overlay.id='player-test-finish-overlay';
   overlay.innerHTML=`
@@ -55,20 +47,13 @@ function showTestFinish(){
   if(music){music.currentTime=0;music.play().catch(()=>{});}
 }
 
-function hideTestFinish(){
-  const music=document.getElementById('player-test-finish-music');
-  if(music){music.pause();music.currentTime=0;}
-  document.getElementById('player-test-finish-overlay')?.remove();
-  shown=false;
-}
-
 function check(){
   if(document.getElementById('player-test-finish-overlay'))return;
-  const key=finishKey();
-  if(localStorage.getItem(key)==='1')showTestFinish();
+  const game=document.getElementById('game');
+  if(game&&/GAME OVER/.test(game.textContent||''))showTestFinish();
 }
 
-window.addEventListener('storage',e=>{if(e.key===finishKey()&&e.newValue==='1')showTestFinish();});
+new MutationObserver(check).observe(document.documentElement,{childList:true,subtree:true});
 setInterval(check,250);
 check();
 })();
