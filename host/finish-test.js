@@ -6,7 +6,20 @@ function styles(){if(document.getElementById('host-finish-live-styles'))return;c
 function playFinishMusic(){try{if(finishAudio){finishAudio.pause();finishAudio.currentTime=0}finishAudio=new Audio('/assets/finish-screen.mp3?v=1');finishAudio.preload='auto';finishAudio.volume=1;const p=finishAudio.play();if(p?.catch)p.catch(()=>{const resume=()=>{finishAudio?.play().catch(()=>{});document.removeEventListener('pointerdown',resume,{capture:true});document.removeEventListener('keydown',resume,{capture:true})};document.addEventListener('pointerdown',resume,{capture:true,once:true});document.addEventListener('keydown',resume,{capture:true,once:true})})}catch{}}
 function show(game){if(shown||game?.phase!=='finished')return;shown=true;styles();document.querySelector('#host-finish-test-overlay')?.remove();const players=[...(game.players||[])];const win=players.find(p=>String(p.id)===String(game.winner))||players.sort((a,b)=>Number(b.points)-Number(a.points))[0]||{};const character=SEAT_IMAGES[win.character]?win.character:'Bug';const score=Number.isFinite(Number(win.points))?Number(win.points):500;const o=document.createElement('div');o.id='host-finish-live';o.innerHTML=`<div class="hfl-bg"></div><div class="hfl-host"><img src="/host-winner.png?v=1" alt=""></div><div class="hfl-winner"><div class="hfl-score">${score}</div><img src="${SEAT_IMAGES[character]}" alt="${character}"></div><button type="button">PLAY AGAIN</button>`;document.body.appendChild(o);playFinishMusic();document.getElementById('host-menu-button')?.style.setProperty('display','none','important');o.querySelector('button').onclick=()=>{finishAudio?.pause();finishAudio=null;o.remove();shown=false;document.getElementById('host-menu-button')?.style.removeProperty('display')}}
 function inspect(event){try{const m=JSON.parse(event?.data);if(m.type==='STATE'&&m.game?.phase==='finished')show(m.game)}catch{}}
-function installStateTap(){const proto=window.WebSocket&&window.WebSocket.prototype;if(!proto||proto.__pyhHostFinishTap)return;const originalAdd=proto.addEventListener;const originalSend=proto.send;if(!proto.__pyhFinishSendTap){proto.send=function(data){window.__pyhHostSocket=this;return originalSend.call(this,data)};Object.defineProperty(proto,'__pyhFinishSendTap',{value:true})}proto.addEventListener=function(type,listener,options){if(type==='message'&&typeof listener==='function'&&!listener.__pyhFinishWrapped){const wrapped=function(event){window.__pyhHostSocket=this;const result=listener.call(this,event);inspect(event);return result};Object.defineProperty(wrapped,'__pyhFinishWrapped',{value:true});return originalAdd.call(this,type,wrapped,options)}return originalAdd.call(this,type,listener,options)};Object.defineProperty(proto,'__pyhHostFinishTap',{value:true})}
+function installStateTap(){
+  const Native=window.WebSocket;
+  if(!Native||Native.__pyhHostFinishSocketTap)return;
+  function WrappedWebSocket(...args){
+    const socket=new Native(...args);
+    window.__pyhHostSocket=socket;
+    socket.addEventListener('message',inspect);
+    return socket;
+  }
+  WrappedWebSocket.prototype=Native.prototype;
+  try{Object.setPrototypeOf(WrappedWebSocket,Native)}catch{}
+  try{Object.defineProperty(WrappedWebSocket,'__pyhHostFinishSocketTap',{value:true})}catch{}
+  window.WebSocket=WrappedWebSocket;
+}
 function installFinishButton(){
   const panel=document.getElementById('host-menu-panel');
   const box=panel?.querySelector('.host-menu-box');
@@ -19,15 +32,14 @@ function installFinishButton(){
   b.title='Test the existing connected finish-screen flow without playing the whole game';
   b.onclick=()=>{
     const socket=window.__pyhHostSocket;
-    if(!socket||socket.readyState!==WebSocket.OPEN){alert('Host is not connected yet.');return}
+    if(!socket||socket.readyState!==window.WebSocket.OPEN){alert('Host is not connected yet.');return}
     socket.send(JSON.stringify({type:'TEST_FINISH_SCREEN'}));
-    if(panel)panel.classList.remove('show');
+    panel.classList.remove('show');
   };
   const close=document.getElementById('host-menu-close');
   box.insertBefore(b,close||null);
 }
 installStateTap();
-document.getElementById('host-test-finish')?.remove();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installFinishButton);else installFinishButton();
 setTimeout(installFinishButton,500);
 setInterval(installFinishButton,1000);
