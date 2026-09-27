@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const characterImages={'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'};
-const waitingSoundSrc='/waiting-game-night.mp3';
+const waitingSoundSrc='/client/waiting-game-night.mp3';
 let waitingAudio=null;
 function getSession(){try{return JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{return null}}
 function isWaitingRoom(){return !!document.querySelector('.waiting-room-recovery')}
