@@ -64,6 +64,26 @@ function playHostEasterCallSound(){
   }catch{}
 }
 
+function playHostEasterEggSound(){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    if(!hostEasterAudioContext)hostEasterAudioContext=new C();
+    const ctx=hostEasterAudioContext;
+    const resume=ctx.state==='suspended'?ctx.resume():Promise.resolve();
+    resume.then(()=>{
+      const now=ctx.currentTime;
+      const master=ctx.createGain();master.gain.value=.55;master.connect(ctx.destination);
+      for(let i=0;i<8;i++){
+        const t=now+i*.19,o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+        o.type='sawtooth';o.frequency.setValueAtTime(125+(i%3)*18,t);o.frequency.exponentialRampToValueAtTime(92,t+.14);
+        f.type='lowpass';f.frequency.value=900;
+        g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.8,t+.025);g.gain.exponentialRampToValueAtTime(.0001,t+.15);
+        o.connect(f).connect(g).connect(master);o.start(t);o.stop(t+.16);
+      }
+    }).catch(()=>{});
+  }catch{}
+}
+
 function showHostWakeFallback(){
   if(document.querySelector('.host-action-effect.wake'))return;
   const el=document.createElement('div');
@@ -71,6 +91,16 @@ function showHostWakeFallback(){
   el.innerHTML='<div class="host-action-flash"></div><div class="host-action-text">WAKE UP!</div>';
   document.body.appendChild(el);
   playHostEasterCallSound();
+  setTimeout(()=>{if(el.isConnected)el.remove()},3200);
+}
+
+function showHostEasterEggFallback(){
+  if(document.querySelector('.host-easter-egg-effect'))return;
+  const el=document.createElement('div');
+  el.className='host-action-effect host-easter-egg-effect';
+  el.innerHTML='<div class="host-action-flash"></div><div class="host-action-text">YOU\'RE STUPID!</div>';
+  document.body.appendChild(el);
+  playHostEasterEggSound();
   setTimeout(()=>{if(el.isConnected)el.remove()},3200);
 }
 
@@ -82,6 +112,7 @@ WebSocket.prototype.dispatchEvent=function(event){
     let message=null;
     try{message=JSON.parse(event.data)}catch{}
     if(message?.type==='CALL_PLAYER')showHostWakeFallback();
+    if(message?.type==='EASTER_EGG')showHostEasterEggFallback();
   }
   return originalWsDispatchEvent.call(this,event);
 };
