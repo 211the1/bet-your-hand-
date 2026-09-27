@@ -28,8 +28,6 @@ function syncWaitingSound(){
 function drawCharacter(){
   const recovery=document.querySelector('.waiting-room-recovery');
   const old=document.getElementById('waiting-character-fixed');
-  // The character frame belongs ONLY on the waiting-room screen.
-  // Never cover the JOIN GAME screen or an active game screen.
   if(!recovery){old?.remove();return}
   const session=getSession()||{};
   const character=session.character||'';
@@ -62,7 +60,6 @@ function drawWaitingPlayers(){
     box.id='waiting-players-fixed';
     document.body.appendChild(box);
   }
-  // Avoid unnecessary DOM writes (and mutation-observer loops).
   if(box.innerHTML!==html)box.innerHTML=html;
 }
 const style=document.createElement('style');
@@ -90,4 +87,12 @@ window.addEventListener('pageshow',()=>{drawCharacter();drawWaitingPlayers();syn
 document.addEventListener('pointerdown',()=>{if(isWaitingRoom())startWaitingSound()},{passive:true});
 setInterval(()=>{drawCharacter();drawWaitingPlayers();syncWaitingSound()},700);
 drawCharacter();drawWaitingPlayers();syncWaitingSound();
+
+// Load the player-only normal-card sound hook after the main player app is ready.
+if(!document.querySelector('script[data-card-play-sound]')){
+  const s=document.createElement('script');
+  s.src='/client/card-play-sound.js?v=1';
+  s.dataset.cardPlaySound='1';
+  document.body.appendChild(s);
+}
 })();
