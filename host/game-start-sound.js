@@ -1,25 +1,45 @@
 (()=>{
 'use strict';
-const src='/client/game-start.mp3';
 let audio=null;
+let startedFromGesture=false;
+function makeAudio(){
+  if(audio)return audio;
+  audio=new Audio('/game-start.mp3');
+  audio.preload='auto';
+  audio.volume=.8;
+  audio.addEventListener('error',()=>{
+    try{
+      const fallback=new Audio('/client/game-start.mp3');
+      fallback.preload='auto';
+      fallback.volume=.8;
+      audio=fallback;
+    }catch{}
+  });
+  return audio;
+}
 function playGameStartSound(){
   try{
-    if(!audio){
-      audio=new Audio(src);
-      audio.preload='auto';
-      audio.volume=.8;
-    }
-    audio.currentTime=0;
-    const p=audio.play();
+    const a=makeAudio();
+    a.currentTime=0;
+    const p=a.play();
     if(p&&typeof p.catch==='function')p.catch(()=>{});
   }catch{}
 }
-function wire(){
-  const start=document.getElementById('start');
-  if(!start||start.dataset.gameStartSound==='1')return;
-  start.dataset.gameStartSound='1';
-  start.addEventListener('click',()=>playGameStartSound());
+function isStartButton(target){
+  if(!target)return false;
+  const el=target.closest&&target.closest('#start,#host-start,[data-action="start-game"]');
+  return !!el;
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();
-setTimeout(wire,500);
+document.addEventListener('click',event=>{
+  if(isStartButton(event.target)){
+    startedFromGesture=true;
+    playGameStartSound();
+  }
+},true);
+document.addEventListener('touchend',event=>{
+  if(isStartButton(event.target)&&!startedFromGesture){
+    playGameStartSound();
+  }
+  startedFromGesture=false;
+},true);
 })();
