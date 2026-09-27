@@ -74,20 +74,16 @@ function showHostWakeFallback(){
   setTimeout(()=>{if(el.isConnected)el.remove()},3200);
 }
 
-const originalWsAddEventListener=WebSocket.prototype.addEventListener;
-WebSocket.prototype.addEventListener=function(type,listener,options){
-  if(type!=='message'||typeof listener!=='function')return originalWsAddEventListener.call(this,type,listener,options);
-  const wrapped=function(event){
+// Intercept the WebSocket event itself. This catches both addEventListener('message')
+// and the onmessage property used by the main host code.
+const originalWsDispatchEvent=WebSocket.prototype.dispatchEvent;
+WebSocket.prototype.dispatchEvent=function(event){
+  if(event&&event.type==='message'){
     let message=null;
     try{message=JSON.parse(event.data)}catch{}
-    // Fire the fallback first so another handler cannot prevent it.
     if(message?.type==='CALL_PLAYER')showHostWakeFallback();
-    try{listener.call(this,event)}catch(err){
-      // Do not let an unrelated host-handler exception cancel the wake-up UI.
-      setTimeout(()=>{throw err},0);
-    }
-  };
-  return originalWsAddEventListener.call(this,type,wrapped,options);
+  }
+  return originalWsDispatchEvent.call(this,event);
 };
 
 // Keep the existing host script-loading chain unchanged.
