@@ -1,7 +1,30 @@
 (()=>{
 'use strict';
 const characterImages={'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'};
+const waitingSoundSrc='/waiting-game-night.mp3';
+let waitingAudio=null;
 function getSession(){try{return JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{return null}}
+function isWaitingRoom(){return !!document.querySelector('.waiting-room-recovery')}
+function startWaitingSound(){
+  if(!isWaitingRoom())return;
+  if(!waitingAudio){
+    waitingAudio=new Audio(waitingSoundSrc);
+    waitingAudio.loop=true;
+    waitingAudio.preload='auto';
+    waitingAudio.volume=.35;
+  }
+  const p=waitingAudio.play();
+  if(p&&typeof p.catch==='function')p.catch(()=>{});
+}
+function stopWaitingSound(){
+  if(!waitingAudio)return;
+  waitingAudio.pause();
+  try{waitingAudio.currentTime=0}catch{}
+}
+function syncWaitingSound(){
+  if(isWaitingRoom())startWaitingSound();
+  else stopWaitingSound();
+}
 function drawCharacter(){
   const recovery=document.querySelector('.waiting-room-recovery');
   const old=document.getElementById('waiting-character-fixed');
@@ -60,10 +83,11 @@ style.textContent=`
 document.head.appendChild(style);
 const game=document.getElementById('game');
 if(game){
-  const observer=new MutationObserver(()=>{drawCharacter();drawWaitingPlayers()});
+  const observer=new MutationObserver(()=>{drawCharacter();drawWaitingPlayers();syncWaitingSound()});
   observer.observe(game,{childList:true,subtree:true});
 }
-window.addEventListener('pageshow',()=>{drawCharacter();drawWaitingPlayers()});
-setInterval(()=>{drawCharacter();drawWaitingPlayers()},700);
-drawCharacter();drawWaitingPlayers();
+window.addEventListener('pageshow',()=>{drawCharacter();drawWaitingPlayers();syncWaitingSound()});
+document.addEventListener('pointerdown',()=>{if(isWaitingRoom())startWaitingSound()},{passive:true});
+setInterval(()=>{drawCharacter();drawWaitingPlayers();syncWaitingSound()},700);
+drawCharacter();drawWaitingPlayers();syncWaitingSound();
 })();
