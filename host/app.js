@@ -2,10 +2,9 @@
 'use strict';
 
 // HOST CALL / WAKE UP EASTER EGG
-// The normal host core handles CALL_PLAYER on a fresh connection, but the
-// reconnect path does not. Wrap WebSocket message listeners so the host gets
-// the same visible wake-up effect even after a reconnect. The original
-// listener still runs first, so this fallback only appears when needed.
+// Keep this fallback independent from the main host message handler. If the
+// normal handler throws while processing another part of the message, the
+// host must still show the wake-up effect.
 const wakeStyle=document.createElement('style');
 wakeStyle.id='host-wake-up-style';
 wakeStyle.textContent=`
@@ -81,11 +80,11 @@ WebSocket.prototype.addEventListener=function(type,listener,options){
   const wrapped=function(event){
     let message=null;
     try{message=JSON.parse(event.data)}catch{}
-    listener.call(this,event);
-    if(message?.type==='CALL_PLAYER'){
-      setTimeout(()=>{
-        if(!document.querySelector('.host-action-effect.wake'))showHostWakeFallback();
-      },0);
+    // Fire the fallback first so another handler cannot prevent it.
+    if(message?.type==='CALL_PLAYER')showHostWakeFallback();
+    try{listener.call(this,event)}catch(err){
+      // Do not let an unrelated host-handler exception cancel the wake-up UI.
+      setTimeout(()=>{throw err},0);
     }
   };
   return originalWsAddEventListener.call(this,type,wrapped,options);
