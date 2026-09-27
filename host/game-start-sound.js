@@ -1,20 +1,11 @@
 (()=>{
 'use strict';
 let audio=null;
-let startedFromGesture=false;
 function makeAudio(){
   if(audio)return audio;
-  audio=new Audio('/game-start.mp3');
+  audio=new Audio('/client/game-start.mp3');
   audio.preload='auto';
   audio.volume=.8;
-  audio.addEventListener('error',()=>{
-    try{
-      const fallback=new Audio('/client/game-start.mp3');
-      fallback.preload='auto';
-      fallback.volume=.8;
-      audio=fallback;
-    }catch{}
-  });
   return audio;
 }
 function playGameStartSound(){
@@ -31,15 +22,9 @@ function isStartButton(target){
   return !!el;
 }
 document.addEventListener('click',event=>{
-  if(isStartButton(event.target)){
-    startedFromGesture=true;
-    playGameStartSound();
-  }
+  if(isStartButton(event.target))playGameStartSound();
 },true);
 document.addEventListener('touchend',event=>{
-  if(isStartButton(event.target)&&!startedFromGesture){
-    playGameStartSound();
-  }
-  startedFromGesture=false;
+  if(isStartButton(event.target))playGameStartSound();
 },true);
 })();
