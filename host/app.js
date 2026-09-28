@@ -104,6 +104,32 @@ function showHostEasterEggFallback(){
   setTimeout(()=>{if(el.isConnected)el.remove()},3200);
 }
 
+function showHostPlayYourHandFallback(){
+  if(document.querySelector('.host-action-effect.play-hand'))return;
+  const el=document.createElement('div');
+  el.className='host-action-effect play-hand';
+  el.innerHTML='<div class="host-action-flash"></div><div class="host-action-text">PLAY YOUR HAND!</div>';
+  document.body.appendChild(el);
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;
+    if(C){
+      if(!hostEasterAudioContext)hostEasterAudioContext=new C();
+      const ctx=hostEasterAudioContext;
+      const resume=ctx.state==='suspended'?ctx.resume():Promise.resolve();
+      resume.then(()=>{
+        const now=ctx.currentTime;
+        [660,880,1046].forEach((freq,i)=>{
+          const o=ctx.createOscillator(),g=ctx.createGain(),t=now+i*.12;
+          o.type='sine';o.frequency.value=freq;
+          g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.22,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.16);
+          o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+.18);
+        });
+      }).catch(()=>{});
+    }
+  }catch{}
+  setTimeout(()=>{if(el.isConnected)el.remove()},3200);
+}
+
 // Intercept message listeners themselves. The browser's internal WebSocket
 // dispatch does not reliably call an overridden dispatchEvent(), so wrapping
 // addEventListener is the reliable path used before host/app-core.js loads.
@@ -115,6 +141,7 @@ WebSocket.prototype.addEventListener=function(type,listener,options){
       try{message=JSON.parse(event?.data||'')}catch{}
       if(message?.type==='CALL_PLAYER')showHostWakeFallback();
       if(message?.type==='EASTER_EGG')showHostEasterEggFallback();
+      if(message?.type==='PLAY_YOUR_HAND_EVENT')showHostPlayYourHandFallback();
       return listener.call(this,event);
     };
     return originalWsAddEventListener.call(this,type,wrapped,options);
