@@ -104,17 +104,22 @@ function showHostEasterEggFallback(){
   setTimeout(()=>{if(el.isConnected)el.remove()},3200);
 }
 
-// Intercept the WebSocket event itself. This catches both addEventListener('message')
-// and the onmessage property used by the main host code.
-const originalWsDispatchEvent=WebSocket.prototype.dispatchEvent;
-WebSocket.prototype.dispatchEvent=function(event){
-  if(event&&event.type==='message'){
-    let message=null;
-    try{message=JSON.parse(event.data)}catch{}
-    if(message?.type==='CALL_PLAYER')showHostWakeFallback();
-    if(message?.type==='EASTER_EGG')showHostEasterEggFallback();
+// Intercept message listeners themselves. The browser's internal WebSocket
+// dispatch does not reliably call an overridden dispatchEvent(), so wrapping
+// addEventListener is the reliable path used before host/app-core.js loads.
+const originalWsAddEventListener=WebSocket.prototype.addEventListener;
+WebSocket.prototype.addEventListener=function(type,listener,options){
+  if(type==='message'&&typeof listener==='function'){
+    const wrapped=function(event){
+      let message=null;
+      try{message=JSON.parse(event?.data||'')}catch{}
+      if(message?.type==='CALL_PLAYER')showHostWakeFallback();
+      if(message?.type==='EASTER_EGG')showHostEasterEggFallback();
+      return listener.call(this,event);
+    };
+    return originalWsAddEventListener.call(this,type,wrapped,options);
   }
-  return originalWsDispatchEvent.call(this,event);
+  return originalWsAddEventListener.call(this,type,listener,options);
 };
 
 // Keep the existing host script-loading chain unchanged.
