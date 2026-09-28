@@ -1,11 +1,18 @@
 (()=>{
   'use strict';
-  const SOUND_URL='/assets/skip.mp3';
-  let audio=null;
+  const sounds={
+    skip:'/assets/skip.mp3',
+    reverse:'/assets/reverse.mp3'
+  };
+  const players={};
 
-  function play(){
+  function play(kind){
     try{
-      if(!audio) audio=new Audio(SOUND_URL);
+      let audio=players[kind];
+      if(!audio){
+        audio=new Audio(sounds[kind]);
+        players[kind]=audio;
+      }
       audio.pause();
       audio.currentTime=0;
       const p=audio.play();
@@ -13,17 +20,18 @@
     }catch{}
   }
 
-  function isSkipCard(el){
-    return !!el?.closest?.('.arcade-card.special-skip, .special-skip');
+  function cardKind(el){
+    if(!el?.closest)return null;
+    if(el.closest('.arcade-card.special-skip, .special-skip'))return 'skip';
+    if(el.closest('.arcade-card.special-reverse, .special-reverse'))return 'reverse';
+    return null;
   }
 
-  // PLAYER SCREEN ONLY. The player page loads this file; the host page does not.
-  // Listen to both pointerdown and click so it works with the game's existing
-  // touch/click card interaction without changing card-play behavior.
-  document.addEventListener('pointerdown',e=>{
-    if(isSkipCard(e.target)) play();
-  },true);
-  document.addEventListener('click',e=>{
-    if(isSkipCard(e.target)) play();
-  },true);
+  // PLAYER SCREEN ONLY. This file is loaded by the player page, not the host.
+  function handle(e){
+    const kind=cardKind(e.target);
+    if(kind)play(kind);
+  }
+  document.addEventListener('pointerdown',handle,true);
+  document.addEventListener('click',handle,true);
 })();
