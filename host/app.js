@@ -98,7 +98,7 @@ function showHostEasterEggFallback(){
   if(document.querySelector('.host-easter-egg-effect'))return;
   const el=document.createElement('div');
   el.className='host-action-effect host-easter-egg-effect';
-  el.innerHTML='<div class="host-action-flash"></div><div class="host-action-text">YOU\'RE STUPID!</div>';
+  el.innerHTML='<div class="host-action-flash"></div><div class="host-action-text">YOU\\'RE STUPID!</div>';
   document.body.appendChild(el);
   playHostEasterEggSound();
   setTimeout(()=>{if(el.isConnected)el.remove()},3200);
@@ -149,6 +149,34 @@ WebSocket.prototype.addEventListener=function(type,listener,options){
   return originalWsAddEventListener.call(this,type,listener,options);
 };
 
+// The host is normally opened on localhost while cloudflared exposes that
+// same server at a temporary public URL. The QR must use that public URL,
+// not the old hard-coded/local URL.
+function installDynamicPublicQr(){
+  const qr=document.getElementById('join-qr');
+  const roomCode=document.getElementById('room-code');
+  if(!qr)return;
+  const params=new URLSearchParams(location.search);
+  let publicUrl=params.get('publicUrl')||params.get('public')||'';
+  if(publicUrl){
+    try{publicUrl=new URL(publicUrl).origin}catch{publicUrl=''}
+  }
+  if(!publicUrl && /(^|\\.)trycloudflare\\.com$/i.test(location.hostname)){
+    publicUrl=location.origin;
+  }
+  if(!publicUrl)return;
+  const setQr=()=>{
+    const code=(roomCode?.textContent||'').trim();
+    if(!code||code==='----')return;
+    const playerUrl=publicUrl+'/';
+    qr.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data='+encodeURIComponent(playerUrl);
+    qr.style.display='block';
+  };
+  const observer=new MutationObserver(setQr);
+  if(roomCode)observer.observe(roomCode,{childList:true,characterData:true,subtree:true});
+  setQr();
+}
+
 // Keep the existing host script-loading chain unchanged.
 const finish=document.createElement('script');
 finish.src='/host/finish-test.js?v=3';
@@ -161,12 +189,14 @@ finish.onload=()=>{
     startSound.onload=()=>{
       const core=document.createElement('script');
       core.src='/host/app-core.js?v=1';
+      core.onload=()=>installDynamicPublicQr();
       core.onerror=()=>{window.console.error('PLAY YOUR HAND Host core failed to load');};
       document.head.appendChild(core);
     };
     startSound.onerror=()=>{
       const core=document.createElement('script');
       core.src='/host/app-core.js?v=1';
+      core.onload=()=>installDynamicPublicQr();
       core.onerror=()=>{window.console.error('PLAY YOUR HAND Host core failed to load');};
       document.head.appendChild(core);
     };
@@ -178,12 +208,14 @@ finish.onload=()=>{
     startSound.onload=()=>{
       const core=document.createElement('script');
       core.src='/host/app-core.js?v=1';
+      core.onload=()=>installDynamicPublicQr();
       core.onerror=()=>{window.console.error('PLAY YOUR HAND Host core failed to load');};
       document.head.appendChild(core);
     };
     startSound.onerror=()=>{
       const core=document.createElement('script');
       core.src='/host/app-core.js?v=1';
+      core.onload=()=>installDynamicPublicQr();
       core.onerror=()=>{window.console.error('PLAY YOUR HAND Host core failed to load');};
       document.head.appendChild(core);
     };
