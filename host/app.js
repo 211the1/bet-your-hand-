@@ -156,25 +156,37 @@ function installDynamicPublicQr(){
   const qr=document.getElementById('join-qr');
   const roomCode=document.getElementById('room-code');
   if(!qr)return;
+
   const params=new URLSearchParams(location.search);
   let publicUrl=params.get('publicUrl')||params.get('public')||'';
-  if(publicUrl){
-    try{publicUrl=new URL(publicUrl).origin}catch{publicUrl=''}
-  }
-  if(!publicUrl && /(^|\\.)trycloudflare\\.com$/i.test(location.hostname)){
-    publicUrl=location.origin;
-  }
-  if(!publicUrl)return;
-  const setQr=()=>{
+
+  const normalize=(value)=>{
+    try{return new URL(String(value).trim()).origin}catch{return ''}
+  };
+
+  const setQr=(url)=>{
+    publicUrl=normalize(url)||publicUrl;
+    if(!publicUrl)return;
     const code=(roomCode?.textContent||'').trim();
     if(!code||code==='----')return;
     const playerUrl=publicUrl+'/';
     qr.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data='+encodeURIComponent(playerUrl);
     qr.style.display='block';
   };
-  const observer=new MutationObserver(setQr);
+
+  // Read the current Cloudflare URL saved by the single server launcher.
+  fetch('/cloudflare-url.txt?ts='+Date.now(),{cache:'no-store'})
+    .then(r=>r.ok?r.text():'')
+    .then(text=>setQr(text))
+    .catch(()=>{});
+
+  if(!publicUrl && /(^|\\.)trycloudflare\\.com$/i.test(location.hostname)){
+    publicUrl=location.origin;
+  }
+
+  const observer=new MutationObserver(()=>setQr(publicUrl));
   if(roomCode)observer.observe(roomCode,{childList:true,characterData:true,subtree:true});
-  setQr();
+  setQr(publicUrl);
 }
 
 // Keep the existing host script-loading chain unchanged.
