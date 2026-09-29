@@ -149,6 +149,28 @@ WebSocket.prototype.addEventListener=function(type,listener,options){
   return originalWsAddEventListener.call(this,type,listener,options);
 };
 
+// MENU FALLBACK: keep the host MENU button working even if another host script fails.
+// Capture the click so the main app handler cannot toggle it a second time.
+function installHostMenuFallback(){
+  const button=document.getElementById('host-menu-button');
+  const panel=document.getElementById('host-menu-panel');
+  const close=document.getElementById('host-menu-close');
+  if(!button||!panel)return;
+  if(button.__pyhMenuFallback)return;
+  button.__pyhMenuFallback=true;
+  button.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    panel.classList.toggle('show');
+  },true);
+  close?.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    panel.classList.remove('show');
+  },true);
+}
+installHostMenuFallback();
+
 // The host is normally opened on localhost while cloudflared exposes that
 // same server at a temporary public URL. The QR must use that public URL,
 // not the old hard-coded/local URL.
