@@ -6,12 +6,12 @@ set "LOG=%TEMP%\play-your-hand-cloudflared.log"
 del /q "%LOG%" 2>nul
 
 echo Starting PLAY YOUR HAND server...
-start "PLAY YOUR HAND SERVER" cmd /k "cd /d "%~dp0" && npm start"
+start "PLAY YOUR HAND SERVER" /D "%~dp0" cmd /k npm start
 
 timeout /t 3 /nobreak >nul
 
 echo Starting Cloudflare Quick Tunnel...
-start "PLAY YOUR HAND CLOUDFLARE" cmd /k "cloudflared tunnel --url http://localhost:10000 2> "%LOG%""
+start "PLAY YOUR HAND CLOUDFLARE" cmd /k cloudflared tunnel --logfile "%LOG%" --url http://localhost:10000
 
 echo Waiting for the Cloudflare address...
 
