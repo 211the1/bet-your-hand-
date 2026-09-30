@@ -293,8 +293,9 @@ const joinNow=()=>{
  }
 };
 let joinTouchGuard=0;
-joinButton.addEventListener('click',()=>{if(Date.now()-joinTouchGuard<700)return;joinNow()});
-joinButton.addEventListener('pointerup',e=>{if(e.pointerType==='touch'){joinTouchGuard=Date.now();joinNow()}});
+window.__pyhJoinNow=joinNow;
+joinButton.onclick=()=>{if(Date.now()-joinTouchGuard<700)return;joinNow()};
+joinButton.ontouchend=e=>{e.preventDefault();e.stopPropagation();joinTouchGuard=Date.now();joinNow()};
 
 if(session?.playerId)connect();
 })();
