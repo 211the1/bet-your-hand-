@@ -98,7 +98,7 @@ function showHostEasterEggFallback(){
   if(document.querySelector('.host-easter-egg-effect'))return;
   const el=document.createElement('div');
   el.className='host-action-effect host-easter-egg-effect';
-  el.innerHTML='<div class="host-action-flash"></div><div class="host-action-text">YOU\\'RE STUPID!</div>';
+  el.innerHTML='<div class="host-action-flash"></div><div class="host-action-text">YOU\'RE STUPID!</div>';
   document.body.appendChild(el);
   playHostEasterEggSound();
   setTimeout(()=>{if(el.isConnected)el.remove()},3200);
