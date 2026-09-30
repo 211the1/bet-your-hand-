@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><meta name="theme-color" content="#050a24"><link rel="manifest" href="/client/manifest.webmanifest"><link rel="stylesheet" href="/client/style.css?v=54"><link rel="stylesheet" href="/client/flame-fix.css?v=2"><style>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAY YOUR HAND</title><meta name="theme-color" content="#050a24"><link rel="manifest" href="/client/manifest.webmanifest"><link rel="stylesheet" href="/client/style.css?v=53"><link rel="stylesheet" href="/client/flame-fix.css?v=2"><style>
 /* HOST CHARACTER WALKER — player screens only */
 #player-host-wanderer{position:fixed;left:-24vw;top:50%;z-index:5000;width:clamp(110px,18vw,220px);pointer-events:none;display:none;will-change:left,top,transform;filter:drop-shadow(0 8px 8px #0009);animation:playerHostTravel 20s linear infinite}
 #player-host-wanderer img{display:block;width:100%;height:auto;object-fit:contain;transform-origin:center bottom;animation:playerHostBob .62s ease-in-out infinite}
@@ -21,7 +21,7 @@ body.player-host-walking #player-host-wanderer{display:block}
   </div>
   <section id="game"></section>
   <div id="player-host-wanderer" aria-hidden="true"><img src="/host-character.png" alt=""></div>
-</main><script src="/client/app.js?v=83"></script><script src="/client/skip-sound.js?v=3"></script><script src="/client/waiting-character.js?v=3"></script><script src="/client/player-finish-test.js?v=2"></script><script>
+</main><script src="/client/app.js?v=80"></script><script src="/client/skip-sound.js?v=3"></script><script src="/client/waiting-character.js?v=3"></script><script src="/client/player-finish-test.js?v=2"></script><script>
 (()=>{
  const code=document.getElementById('code'),sel=document.getElementById('char'),status=document.getElementById('status'),game=document.getElementById('game'),joinPanel=document.getElementById('join-panel');
  let preview=null,timer=null;
