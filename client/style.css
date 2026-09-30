@@ -253,7 +253,7 @@ body.player-page .join-box{position:relative;width:min(360px,92vw);padding:24px 
 body.player-page .join-box h2{font-size:30px;margin:2px 0 4px;color:#fff;text-shadow:0 0 12px #1687ff}
 body.player-page .join-box p{font-family:system-ui;font-size:13px;margin:0 0 12px;opacity:.85}
 body.player-page .join-box input,body.player-page .join-box select{margin:9px 0;padding:12px;border:2px solid #713cff;border-radius:12px;background:#0d1028;color:#fff}
-body.player-page .join-box #join{margin:10px 0 2px;padding:13px;border:3px solid #1687ff;border-radius:13px;background:#1687ff;color:#fff;font-size:17px}
+body.player-page .join-box #join{margin:10px 0 2px;padding:13px;border:3px solid #1687ff;border-radius:13px;background:#1687ff;color:#fff;font-size:17px}\nbody.player-page .join-box #join{position:relative!important;z-index:999999!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important}
 body.player-page .join-box #status{min-height:20px;margin-top:7px;font-family:system-ui;font-weight:800;font-size:13px}
 body.player-page .close-join{position:absolute!important;top:9px;right:9px;width:38px!important;height:38px!important;margin:0!important;padding:0!important;border:2px solid #ff4b4b!important;border-radius:50%!important;background:#3a0b12!important;color:#fff!important;font-size:16px!important}
 @media(max-width:520px){
