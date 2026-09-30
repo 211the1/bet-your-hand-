@@ -11,6 +11,8 @@
       let audio=players[kind];
       if(!audio){
         audio=new Audio(sounds[kind]);
+        audio.preload='auto';
+        audio.volume=1;
         players[kind]=audio;
       }
       audio.pause();
@@ -33,5 +35,5 @@
     if(kind)play(kind);
   }
   document.addEventListener('pointerdown',handle,true);
-  document.addEventListener('click',handle,true);
+  document.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){handle(e)}},true);
 })();
