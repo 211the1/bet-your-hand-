@@ -280,9 +280,8 @@ gameEl.querySelectorAll('[data-card-id]').forEach(b=>{
 const emojiButton=gameEl.querySelector('.arcade-emoji');if(emojiButton)emojiButton.addEventListener('click',()=>openEmojiMenu(game));const call=gameEl.querySelector('#call-players');if(call)call.addEventListener('click',()=>send({type:'CALL_PLAYER',playerId:'all'}));const sound=gameEl.querySelector('#sound-toggle');if(sound)sound.addEventListener('click',()=>{soundEnabled=!soundEnabled;sound.innerHTML=soundEnabled?'SOUND<small>SOUND</small>':'OFF<small>SOUND</small>';if(soundEnabled)playUiTone(880,.16);setStatus(soundEnabled?'SOUND ON':'SOUND OFF')});const draw=gameEl.querySelector('#draw-card');if(draw)draw.addEventListener('click',()=>send({type:'DRAW_CARD'}));const sort=gameEl.querySelector('#sort-cards');if(sort)sort.addEventListener('click',()=>{sortMode=!sortMode;const grid=gameEl.querySelector('.arcade-hand');if(grid){const nodes=[...grid.querySelectorAll('.arcade-card')];const handNow=Array.isArray(game.viewerHand)?game.viewerHand:[];if(sortMode){const rank=new Map(handNow.map((c,i)=>[String(c.id),i]));nodes.sort((a,b)=>{const ca=handNow.find(c=>String(c.id)===String(a.dataset.cardId))||{};const cb=handNow.find(c=>String(c.id)===String(b.dataset.cardId))||{};return String(ca.character||ca.type).localeCompare(String(cb.character||cb.type))||String(ca.color||'').localeCompare(String(cb.color||''))});}else{const original=nodes.slice().sort((a,b)=>(Number(a.dataset.originalIndex??0)-Number(b.dataset.originalIndex??0)));nodes.splice(0,nodes.length,...original);}nodes.forEach((n,i)=>{if(n.dataset.originalIndex==null)n.dataset.originalIndex=String(handNow.findIndex(c=>String(c.id)===String(n.dataset.cardId)));grid.appendChild(n)});}setStatus(sortMode?'HAND SORTED':'HAND ORDER RESTORED')});const left=gameEl.querySelector('#hand-left'),right=gameEl.querySelector('#hand-right'),grid=gameEl.querySelector('.arcade-hand');if(left&&grid)left.addEventListener('click',()=>grid.scrollBy({left:-240,behavior:'smooth'}));if(right&&grid)right.addEventListener('click',()=>grid.scrollBy({left:240,behavior:'smooth'}));const egg=gameEl.querySelector('#easter-egg-logo');if(egg){let taps=0,lastTap=0;egg.addEventListener('click',()=>{const now=Date.now();if(now-lastTap>900)taps=0;lastTap=now;taps++;if(taps>=3){taps=0;send({type:'EASTER_EGG'})}})}const use=gameEl.querySelector('#use-power');if(use)use.addEventListener('click',()=>send({type:'USE_POWER',power:game.pending.power}));gameEl.querySelectorAll('.color-choice').forEach(b=>b.addEventListener('click',()=>{const color=b.dataset.color;const group=b.dataset.colorGroup;if(group==='power-color')send({type:'USE_POWER',power:game.pending.power,color});else send({type:'CHOOSE_COLOR',color})}));});ws.addEventListener('error',()=>{setStatus('CONNECTION LOST — RETRYING…',true);if(!joined)showJoinScreen()});
 ws.addEventListener('close',event=>{connecting=false;clearInterval(pingTimer);ws=null;if(intentionalDisconnect){intentionalDisconnect=false;return}if(event?.reason==='Room restarted by host'){resetToFreshJoinScreen('');return}if(!joined){showJoinScreen();setStatus('CONNECTION LOST — ENTER ROOM CODE, NAME, AND CHARACTER',true)}else{setStatus('CONNECTION LOST — RETRYING…',true)}scheduleReconnect()})}
 function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-joinButton.addEventListener('click',()=>{
+const joinNow=()=>{
  const code=codeInput.value.trim().toUpperCase(),name=nameInput.value.trim(),character=characterSelect.value;
- showJoinScreen();
  if(!code||!name||!character){setStatus('ENTER CODE, NAME, AND CHARACTER',true);return}
  session={code,name,character};save(session);
  joined=false;me=null;
@@ -292,6 +291,10 @@ joinButton.addEventListener('click',()=>{
  }else{
    connect();
  }
-});
+};
+let joinTouchGuard=0;
+joinButton.addEventListener('click',()=>{if(Date.now()-joinTouchGuard<700)return;joinNow()});
+joinButton.addEventListener('pointerup',e=>{if(e.pointerType==='touch'){joinTouchGuard=Date.now();joinNow()}});
+
 if(session?.playerId)connect();
 })();
