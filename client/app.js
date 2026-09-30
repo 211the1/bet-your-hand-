@@ -231,7 +231,18 @@ gameEl.querySelectorAll('[data-card-id]').forEach(b=>{
       return;
     }
     const cardId=b.dataset.cardId;
+    const playedCard=hand.find(c=>String(c.id)===String(cardId));
     selectedCardId=cardId;
+    // PLAY YOUR HAND sound must start from the player's tap/swipe so mobile browsers allow audio playback.
+    if(playedCard?.type==='PLAY_YOUR_HAND'&&soundEnabled){
+      try{
+        const audio=new Audio('/assets/play-your-hand.mp3');
+        audio.preload='auto';
+        audio.volume=1;
+        const p=audio.play();
+        if(p&&typeof p.catch==='function')p.catch(()=>{});
+      }catch{}
+    }
     setStatus('PLAYING CARD…');
     send({type:'PLAY_CARD',cardId});
   };
