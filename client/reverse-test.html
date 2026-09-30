@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PLAY YOUR HAND — Reverse Sound Test</title>
+<style>
+body{margin:0;background:#111;color:#fff;font-family:Arial,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;text-align:center}
+main{width:min(90vw,500px)}
+h1{font-size:28px;margin-bottom:12px}
+p{opacity:.85}
+button{font-size:28px;font-weight:700;padding:22px 34px;border:0;border-radius:18px;background:#6b3cff;color:#fff;box-shadow:0 0 20px #6b3cff;cursor:pointer}
+#status{margin-top:20px;font-size:18px}
+</style>
+</head>
+<body>
+<main>
+<h1>REVERSE SOUND TEST</h1>
+<p>Tap the button once. This tests the actual reverse.mp3 file directly.</p>
+<button id="play">PLAY REVERSE SOUND</button>
+<div id="status">Ready</div>
+<audio id="audio" preload="auto" src="/assets/reverse.mp3"></audio>
+</main>
+<script>
+const audio=document.getElementById('audio');
+const status=document.getElementById('status');
+document.getElementById('play').addEventListener('click',async()=>{
+  try{
+    audio.currentTime=0;
+    audio.volume=1;
+    await audio.play();
+    status.textContent='Playing reverse.mp3';
+  }catch(e){
+    status.textContent='ERROR: '+e.message;
+  }
+});
+audio.addEventListener('ended',()=>status.textContent='Finished — sound file played successfully.');
+audio.addEventListener('error',()=>status.textContent='ERROR: reverse.mp3 could not be loaded.');
+</script>
+</body>
+</html>
