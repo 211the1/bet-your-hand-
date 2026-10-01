@@ -1,7 +1,7 @@
 {
   "name": "PLAY YOUR HAND HOST",
   "short_name": "PLAY YOUR HAND HOST",
-  "start_url": "/host/index_fixed.html",
+  "start_url": "/host/",
   "scope": "/host/",
   "display": "standalone",
   "orientation": "landscape",
@@ -15,5 +15,6 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "id": "/host/"
 }
