@@ -1,0 +1,19 @@
+{
+  "name": "PLAY YOUR HAND HOST",
+  "short_name": "PLAY YOUR HAND HOST",
+  "start_url": "/host/index_fixed.html",
+  "scope": "/host/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#06133a",
+  "description": "Host screen for PLAY YOUR HAND.",
+  "icons": [
+    {
+      "src": "/host/host-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
