@@ -1,7 +1,7 @@
 {
   "name": "PLAY YOUR HAND HOST",
   "short_name": "PLAY YOUR HAND HOST",
-  "start_url": "/host/",
+  "start_url": "/host/index.html",
   "scope": "/host/",
   "id": "/host/",
   "display": "standalone",
@@ -12,22 +12,22 @@
   "description": "Host screen for PLAY YOUR HAND.",
   "icons": [
     {
-      "src": "/host/host-icon.svg",
+      "src": "/host/host-icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/host/host-icon.svg",
+      "src": "/host/host-icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/host/host-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
