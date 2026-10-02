@@ -191,19 +191,20 @@ function installDynamicPublicQr(){
     if(!publicUrl)return;
     const code=(roomCode?.textContent||'').trim();
     if(!code||code==='----')return;
-    const playerUrl=publicUrl+'/';
+    const playerUrl=publicUrl+'/?code='+encodeURIComponent(code);
     qr.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data='+encodeURIComponent(playerUrl);
     qr.style.display='block';
   };
 
-  // Read the current Cloudflare URL saved by the single server launcher.
-  fetch('/cloudflare-url.txt?ts='+Date.now(),{cache:'no-store'})
-    .then(r=>r.ok?r.text():'')
-    .then(text=>setQr(text))
-    .catch(()=>{});
-
-  if(!publicUrl && /(^|\\.)trycloudflare\\.com$/i.test(location.hostname)){
+  // Prefer the live tunnel URL shown in the Host browser.
+  // This prevents an old saved tunnel address from breaking the Host QR.
+  if(/(^|\\.)trycloudflare\\.com$/i.test(location.hostname)){
     publicUrl=location.origin;
+  }else{
+    fetch('/cloudflare-url.txt?ts='+Date.now(),{cache:'no-store'})
+      .then(r=>r.ok?r.text():'')
+      .then(text=>{if(!publicUrl)setQr(text)})
+      .catch(()=>{});
   }
 
   const observer=new MutationObserver(()=>setQr(publicUrl));
