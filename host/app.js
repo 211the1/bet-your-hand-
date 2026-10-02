@@ -194,7 +194,7 @@ finish.onload=()=>{
     startSound.onerror=()=>{
       const core=document.createElement('script');
       core.src='/host/app-core.js?v=1';
-      core.onload=()=>installDynamicPublicQr();
+      core.onload=()=>{};
       core.onerror=()=>{window.console.error('PLAY YOUR HAND Host core failed to load');};
       document.head.appendChild(core);
     };
@@ -206,14 +206,14 @@ finish.onload=()=>{
     startSound.onload=()=>{
       const core=document.createElement('script');
       core.src='/host/app-core.js?v=1';
-      core.onload=()=>installDynamicPublicQr();
+      core.onload=()=>{};
       core.onerror=()=>{window.console.error('PLAY YOUR HAND Host core failed to load');};
       document.head.appendChild(core);
     };
     startSound.onerror=()=>{
       const core=document.createElement('script');
       core.src='/host/app-core.js?v=1';
-      core.onload=()=>installDynamicPublicQr();
+      core.onload=()=>{};
       core.onerror=()=>{window.console.error('PLAY YOUR HAND Host core failed to load');};
       document.head.appendChild(core);
     };
