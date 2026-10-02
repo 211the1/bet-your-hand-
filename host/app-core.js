@@ -131,7 +131,7 @@ function renderTopCard(card,game){
   const visual=specialUrl?'<img class="tv-special-art" src="'+specialUrl+'" alt="'+escapeHtml(name)+'">':(c.type==='SKIP'||c.type==='REVERSE')?specialModern(c,'tv'):img?'<img src="'+img+'" alt="'+escapeHtml(name)+'"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(cardColor(c)||'')+'</small>':'<div class="special-card-symbol">'+escapeHtml((c.type||'CARD').replaceAll('_',' '))+'</div>';
   discardEl.innerHTML='<div class="tv-card '+(c.type==='SKIP'||c.type==='REVERSE'?'special-modern-host ':'')+'color-'+escapeHtml(color)+' '+(c.type==='WILD'?'wild ':'')+(c.type==='PLAY_YOUR_HAND'?'play-special':'')+'">'+visual+'</div>';
 }
-function updateJoinQr(code){if(!qrEl)return;const value=String(code||'').trim();if(!value||value==='----'){qrEl.style.display='none';qrEl.removeAttribute('src');return}const playerUrl=location.origin+'/';qrEl.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data='+encodeURIComponent(playerUrl);qrEl.style.display='block'}
+function updateJoinQr(code){if(!qrEl)return;const value=String(code||'').trim();if(!value||value==='----'){qrEl.style.display='none';qrEl.removeAttribute('src');return}const playerUrl=location.origin+'/?code='+encodeURIComponent(value);qrEl.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data='+encodeURIComponent(playerUrl)+'&ts='+Date.now();qrEl.style.display='block'}
 
 function playHostCallSound(){
   if(!hostSoundEnabled)return;
