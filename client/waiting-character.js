@@ -68,17 +68,21 @@ style.textContent=`
 #waiting-character-fixed img{display:block!important;width:100%!important;height:calc(100% - 48px)!important;object-fit:cover!important;object-position:center center!important;border:0!important;border-radius:12px 12px 0 0!important;box-shadow:none!important;flex:1 1 auto!important;min-height:0!important}
 #waiting-character-fixed .waiting-selected-player-name{width:100%!important;height:48px!important;flex:0 0 48px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;background:linear-gradient(180deg,#07122f,#000)!important;color:#fff!important;font-weight:1000!important;font-size:clamp(16px,3.8vw,25px)!important;letter-spacing:.5px!important;text-align:center!important;text-shadow:0 0 8px #1687ff,0 2px 3px #000!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;padding:0 8px!important}
 #waiting-players-fixed{position:fixed!important;left:50%!important;top:68%!important;transform:translateX(-50%)!important;width:min(78vw,420px)!important;max-height:22vh!important;overflow-y:auto!important;z-index:999998!important;box-sizing:border-box!important;padding:clamp(6px,1vh,10px) clamp(8px,1.2vw,12px)!important;border:2px solid #1687ff!important;border-radius:12px!important;background:linear-gradient(180deg,#07183f,#02091f)!important;box-shadow:0 0 14px #1687ff88!important;color:#fff!important;text-align:center!important}
+#waiting-room-recovery{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;z-index:999997!important;pointer-events:none!important;overflow:hidden!important}
+#waiting-room-recovery h2{display:none!important}
+#waiting-room-recovery #leave-old-room{position:fixed!important;left:50%!important;bottom:max(12px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:min(88vw,520px)!important;min-height:clamp(48px,7vh,72px)!important;margin:0!important;padding:clamp(9px,1.5vh,14px) clamp(12px,3vw,24px)!important;box-sizing:border-box!important;border:3px solid #fff!important;border-radius:16px!important;background:#7d1010!important;color:#fff!important;font-family:Impact,Haettenschweiler,'Arial Narrow Bold',system-ui,sans-serif!important;font-weight:1000!important;font-size:clamp(15px,2.4vw,28px)!important;line-height:1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;box-shadow:0 0 14px #ff3b3b,0 0 30px #ff3b3b66!important;z-index:999997!important;pointer-events:auto!important}
+
 #waiting-players-fixed .waiting-players-title{font-size:15px!important;font-weight:1000!important;letter-spacing:1px!important;color:#fff!important;text-shadow:0 0 7px #1687ff!important;margin:0 0 5px!important}
 #waiting-players-fixed .waiting-player-name{padding:4px 7px!important;margin:3px 0!important;border:1px solid #1687ff!important;border-radius:7px!important;background:#0a1435!important;color:#fff!important;font-size:14px!important;font-weight:900!important;line-height:1.1!important;box-sizing:border-box!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
 @media(max-width:600px){
-#waiting-character-fixed{top:29%!important;width:min(52vw,34vh,250px)!important}
-#waiting-players-fixed{top:68%!important;width:min(82vw,360px)!important;max-height:21vh!important;padding:7px 9px!important}
+#waiting-character-fixed{top:27%!important;width:min(52vw,34vh,250px)!important}
+#waiting-players-fixed{top:63%!important;width:min(82vw,360px)!important;max-height:18vh!important;padding:7px 9px!important}
 #waiting-players-fixed .waiting-players-title{font-size:clamp(12px,3.5vw,15px)!important}
 #waiting-players-fixed .waiting-player-name{font-size:clamp(12px,3.2vw,14px)!important;padding:4px 6px!important}
 }
 @media(max-height:600px){
-#waiting-character-fixed{top:24%!important;width:min(32vw,38vh,300px)!important}
-#waiting-players-fixed{top:67%!important;max-height:23vh!important}
+#waiting-character-fixed{top:20%!important;width:min(32vw,38vh,300px)!important}
+#waiting-players-fixed{top:61%!important;max-height:18vh!important}
 }
 @media(min-width:601px) and (min-height:700px){
 #waiting-character-fixed{top:29%!important}
