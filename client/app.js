@@ -57,14 +57,14 @@ if(finishedSession){
  try{session=JSON.parse(localStorage.getItem('byhPlayerSession')||'null')}catch{session=null}
  if(session){codeInput.value=session.code||'';nameInput.value=session.name||'';characterSelect.value=session.character||'';joined=Boolean(session.playerId)}
 }
+joinButton.disabled=false;
+const setStatus=(m,bad=false)=>{statusEl.textContent=m||'';statusEl.style.color=bad?'#ff6b6b':'#21f17d'};
+const showJoinScreen=(prejoin=true)=>{if(joinPanel){joinPanel.classList.add('show');joinPanel.classList.toggle('prejoin',prejoin);joinPanel.setAttribute('aria-hidden','false')}joinButton.disabled=false};
 const qrRoomCode=new URLSearchParams(location.search).get('code');
 if(qrRoomCode && /^[A-Za-z0-9_-]{2,20}$/.test(qrRoomCode.trim())){
   codeInput.value=qrRoomCode.trim().toUpperCase();
   showJoinScreen(true);
 }
-joinButton.disabled=false;
-const setStatus=(m,bad=false)=>{statusEl.textContent=m||'';statusEl.style.color=bad?'#ff6b6b':'#21f17d'};
-const showJoinScreen=(prejoin=true)=>{if(joinPanel){joinPanel.classList.add('show');joinPanel.classList.toggle('prejoin',prejoin);joinPanel.setAttribute('aria-hidden','false')}joinButton.disabled=false};
 const hideJoinScreen=()=>{if(joinPanel){joinPanel.classList.remove('show','prejoin');joinPanel.setAttribute('aria-hidden','true')}};
 const resetToFreshJoinScreen=(message='')=>{
   intentionalDisconnect=true;
