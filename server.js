@@ -5,7 +5,39 @@ const {RoomServer}=require('./server/room-server');
 const e=require('./game/engine');
 const root=__dirname,rooms=new RoomServer(),testFinishRooms=new Map();
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.jpg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.wav':'audio/wav','.mp3':'audio/mpeg','.mp4':'video/mp4','.json':'application/manifest+json','.webmanifest':'application/manifest+json'};
-function serve(req,res){let u;try{u=new URL(req.url,'http://x')}catch{return res.end('Bad request')}if(u.pathname==='/health'){res.writeHead(200,{'content-type':'text/plain; charset=utf-8','cache-control':'no-store'});return res.end('ok')}if(u.pathname==='/__test_finish'){const code=String(u.searchParams.get('code')||'').toUpperCase();const data=testFinishRooms.get(code);res.writeHead(200,{'content-type':'application/json; charset=utf-8','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'});return res.end(JSON.stringify({...data,serverNow:Date.now()}||{active:false}))}if(u.pathname==='/host/'||u.pathname==='/host/index_fixed.html'){res.writeHead(302,{'location':'/host'+(u.search||''),'cache-control':'no-store'});return res.end()}let p=u.pathname;if(p==='/')p='/client/index.html';if(p==='/host')p='/host/index.html';const file=path.normalize(path.join(root,p));if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end('Not found')}res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'});fs.createReadStream(file).pipe(res)}
+function serve(req,res){
+ let u;
+ try{u=new URL(req.url,'http://x')}catch{return res.end('Bad request')}
+ if(u.pathname==='/health'){res.writeHead(200,{'content-type':'text/plain; charset=utf-8','cache-control':'no-store'});return res.end('ok')}
+ if(u.pathname==='/__test_finish'){const code=String(u.searchParams.get('code')||'').toUpperCase();const data=testFinishRooms.get(code);res.writeHead(200,{'content-type':'application/json; charset=utf-8','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'});return res.end(JSON.stringify({...data,serverNow:Date.now()}||{active:false}))}
+ if(u.pathname==='/host/'||u.pathname==='/host/index_fixed.html'){res.writeHead(302,{'location':'/host'+(u.search||''),'cache-control':'no-store'});return res.end()}
+ let p=u.pathname;
+ if(p==='/')p='/client/index.html';
+ if(p==='/host')p='/host/index.html';
+ const file=path.normalize(path.join(root,p));
+ if(!file.startsWith(root)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end('Not found')}
+ const stat=fs.statSync(file),size=stat.size,type=mime[path.extname(file)]||'application/octet-stream';
+ const headers={'content-type':type,'accept-ranges':'bytes','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'};
+ const range=req.headers.range;
+ if(range&&/^bytes=\\d*-\\d*$/.test(range)){
+  const parts=range.slice(6).split('-');
+  let startByte=parts[0]===''?Math.max(0,size-Number(parts[1])):Number(parts[0]);
+  let endByte=parts[0]===''?size-1:(parts[1]===''?size-1:Number(parts[1]));
+  if(!Number.isSafeInteger(startByte)||!Number.isSafeInteger(endByte)||startByte<0||startByte>=size||endByte<startByte){
+   res.writeHead(416,{'content-range':'bytes */'+size,'accept-ranges':'bytes'});return res.end()
+  }
+  endByte=Math.min(endByte,size-1);
+  headers['content-length']=endByte-startByte+1;
+  headers['content-range']='bytes '+startByte+'-'+endByte+'/'+size;
+  res.writeHead(206,headers);
+  if(req.method==='HEAD')return res.end();
+  return fs.createReadStream(file,{start:startByte,end:endByte}).pipe(res);
+ }
+ headers['content-length']=size;
+ res.writeHead(200,headers);
+ if(req.method==='HEAD')return res.end();
+ fs.createReadStream(file).pipe(res)
+}
 function send(ws,m){if(ws.readyState===1)ws.send(JSON.stringify(m))}
 function createServer(){const httpServer=http.createServer(serve);const wss=new WebSocketServer({server:httpServer});const sessions=new Map();
  wss.on('connection',ws=>{ws.isAlive=true;ws.on('pong',()=>{ws.isAlive=true});ws.on('message',async raw=>{try{await rooms.ready;const m=JSON.parse(raw),t=String(m.type||'').toUpperCase();if(t==='PING')return send(ws,{type:'PONG'});let s=sessions.get(ws),r;
