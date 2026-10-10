@@ -56,12 +56,12 @@ const seatTimers=new Map();
 
 try{session=JSON.parse(localStorage.getItem('pyhHostSession')||'null')}catch{session=null}
 
-const cardImages={'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'};
-const seatImages={'Bug':'/bug-seat.png','Face':'/face-seat.png','Ling Ling':'/ling-ling-seat.png','Beanz':'/beanz-seat.png','The One':'/the-one-seat.png','Boone':'/boone-seat.png','Chicken Joe':'/chicken-joe-seat.png','Juby':'/juby-seat.png','Meemaw':'/meemaw-seat.png'};
+const cardImages={'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.webp','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'};
+const seatImages={'Bug':'/bug-seat.webp','Face':'/face-seat.webp','Ling Ling':'/ling-ling-seat.webp','Beanz':'/beanz-seat.webp','The One':'/the-one-seat.webp','Boone':'/boone-seat.webp','Chicken Joe':'/chicken-joe-seat.webp','Juby':'/juby-seat.webp','Meemaw':'/meemaw-seat.webp'};
 const colors=['Red','Blue','Green','Yellow'];
 
 function characterImage(name){
-  return name?({'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.jpg','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'}[name]||''):'';
+  return name?({'Bug':'/Bug.jpg','Face':'/Face.jpg','Ling Ling':'/Ling_Ling.jpg','Beanz':'/Beanz.jpg','The One':'/The_One.jpg','Boone':'/Boone.webp','Chicken Joe':'/Chicken_Joe.jpg','Juby':'/Juby.jpg','Meemaw':'/Meemaw.jpg'}[name]||''):'';
 }
 
 function cardColor(card){
@@ -120,7 +120,7 @@ function renderPowerWheel(game){
   const result=game?.wheelResult||null,landed=Number(result?.section||0),rotation=landed>0?(1440-(landed-1)*40):0,mode=pending.type==='SPIN_WHEEL'?'spin':(result?'land':'idle'),cls=mode==='spin'?'host-power-wheel-spin':(mode==='land'?'host-power-wheel-land':'');
   const clickCount=mode==='spin'?36:(mode==='land'?Math.max(1,Math.round(Math.abs(rotation)/40)):0);
   if(existing){const rotator=existing.querySelector('.host-power-wheel-rotator');if(rotator){const previousMode=rotator.dataset.mode||'';rotator.className='host-power-wheel-rotator '+cls;rotator.style.setProperty('--host-wheel-land',rotation+'deg');rotator.dataset.mode=mode;if(previousMode!==mode&&clickCount)startWheelClickSequence(mode==='spin'?2600:1600,clickCount,...(mode==='spin'?[.15,.8,.2,1]:[.12,.82,.18,1]))}return}
-  const overlay=document.createElement('div');overlay.id='host-power-wheel-overlay';overlay.className='host-power-wheel-overlay';overlay.innerHTML='<div class="host-power-wheel"><img class="host-power-wheel-rotator '+cls+'" data-mode="'+mode+'" style="--host-wheel-land:'+rotation+'deg" src="/power-wheel.png?v=1" alt="PLAY YOUR HAND Power Wheel"><div class="host-power-wheel-pointer" aria-hidden="true">▼</div></div></div>';document.body.appendChild(overlay);if(clickCount)startWheelClickSequence(mode==='spin'?2600:1600,clickCount,...(mode==='spin'?[.15,.8,.2,1]:[.12,.82,.18,1]));
+  const overlay=document.createElement('div');overlay.id='host-power-wheel-overlay';overlay.className='host-power-wheel-overlay';overlay.innerHTML='<div class="host-power-wheel"><img class="host-power-wheel-rotator '+cls+'" data-mode="'+mode+'" style="--host-wheel-land:'+rotation+'deg" src="/power-wheel.webp?v=1" alt="PLAY YOUR HAND Power Wheel"><div class="host-power-wheel-pointer" aria-hidden="true">▼</div></div></div>';document.body.appendChild(overlay);if(clickCount)startWheelClickSequence(mode==='spin'?2600:1600,clickCount,...(mode==='spin'?[.15,.8,.2,1]:[.12,.82,.18,1]));
 }
 
 function renderTopCard(card,game){
