@@ -19,7 +19,7 @@ function serve(req,res){
  const stat=fs.statSync(file),size=stat.size,type=mime[path.extname(file)]||'application/octet-stream';
  const headers={'content-type':type,'accept-ranges':'bytes','cache-control':'no-store, no-cache, must-revalidate, max-age=0','pragma':'no-cache','expires':'0'};
  const range=req.headers.range;
- if(range&&/^bytes=\\d*-\\d*$/.test(range)){
+ if(range&&/^bytes=\d*-\d*$/.test(range)){
   const parts=range.slice(6).split('-');
   let startByte=parts[0]===''?Math.max(0,size-Number(parts[1])):Number(parts[0]);
   let endByte=parts[0]===''?size-1:(parts[1]===''?size-1:Number(parts[1]));
