@@ -72,3 +72,5 @@ jobs:
         uses: actions/deploy-pages@v4
 
 # Trigger publication of scanner hidden-state fix.
+
+# Republish with network-first scanner service worker.
