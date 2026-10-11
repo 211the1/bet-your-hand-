@@ -93,3 +93,5 @@ jobs:
 # Republish with network-first scanner service worker.
 
 # Republish with host-only install and scanner entry screen.
+
+# Republish with a distinct player PWA manifest identity.
