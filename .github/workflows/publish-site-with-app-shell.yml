@@ -39,6 +39,9 @@ jobs:
         run: |
           mkdir -p site/app-shell
           cp -R source/app-shell/. site/app-shell/
+          # Publish the host PWA icons referenced by app-shell/manifest.webmanifest.
+          mkdir -p site/host
+          cp source/host/host-icon-192.png source/host/host-icon-512.png site/host/
           touch site/.nojekyll
 
       - name: Verify scanner files are in the published artifact
@@ -47,6 +50,8 @@ jobs:
           test -f site/app-shell/shell.js
           test -f site/app-shell/shell.css
           test -f site/app-shell/manifest.webmanifest
+          test -f site/host/host-icon-192.png
+          test -f site/host/host-icon-512.png
           echo "Verified scanner files:"
           find site/app-shell -maxdepth 1 -type f -printf '%f\n' | sort
           echo "Published site root:"
