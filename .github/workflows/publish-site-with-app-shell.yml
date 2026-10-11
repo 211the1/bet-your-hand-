@@ -1,0 +1,60 @@
+name: Publish site with PLAY YOUR HAND app shell
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - fresh-rebuild
+    paths:
+      - 'app-shell/**'
+      - '.github/workflows/publish-site-with-app-shell.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out currently published main site
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: site
+
+      - name: Check out fresh-rebuild branch
+        uses: actions/checkout@v4
+        with:
+          ref: fresh-rebuild
+          path: source
+
+      - name: Add scanner shell without replacing the main site files
+        run: |
+          mkdir -p site/app-shell
+          cp -R source/app-shell/. site/app-shell/
+          touch site/.nojekyll
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
