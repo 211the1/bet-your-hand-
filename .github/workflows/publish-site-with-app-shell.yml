@@ -39,9 +39,14 @@ jobs:
         run: |
           mkdir -p site/app-shell
           cp -R source/app-shell/. site/app-shell/
-          # Publish the host PWA icons referenced by app-shell/manifest.webmanifest.
+          # Publish host scanner icon assets.
           mkdir -p site/host
           cp source/host/host-icon-192.png source/host/host-icon-512.png site/host/
+          # Publish a separate player scanner app without changing the game screens.
+          mkdir -p site/player-shell
+          cp -R source/player-shell/. site/player-shell/
+          # Publish the player app icons referenced by its manifest.
+          cp source/pwa-icon-192.png source/pwa-icon-512.png site/
           touch site/.nojekyll
 
       - name: Verify scanner files are in the published artifact
@@ -52,6 +57,13 @@ jobs:
           test -f site/app-shell/manifest.webmanifest
           test -f site/host/host-icon-192.png
           test -f site/host/host-icon-512.png
+          test -f site/player-shell/index.html
+          test -f site/player-shell/shell.js
+          test -f site/player-shell/shell.css
+          test -f site/player-shell/manifest.webmanifest
+          test -f site/player-shell/sw.js
+          test -f site/pwa-icon-192.png
+          test -f site/pwa-icon-512.png
           echo "Verified scanner files:"
           find site/app-shell -maxdepth 1 -type f -printf '%f\n' | sort
           echo "Published site root:"
