@@ -1,7 +1,8 @@
 {
-  "name": "PLAY YOUR HAND App",
-  "short_name": "PLAY YOUR HAND",
-  "description": "Stable installed app shell for scanning current PLAY YOUR HAND QR codes.",
+  "id": "./",
+  "name": "PLAY YOUR HAND HOST",
+  "short_name": "PYH HOST",
+  "description": "Install PLAY YOUR HAND HOST, then scan the host QR code shown on your laptop.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,7 +10,7 @@
   "background_color": "#050a24",
   "theme_color": "#050a24",
   "icons": [
-    {"src": "../pwa-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "../pwa-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+    {"src": "../host/host-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "../host/host-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
   ]
 }
