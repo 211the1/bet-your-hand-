@@ -95,3 +95,5 @@ jobs:
 # Republish with host-only install and scanner entry screen.
 
 # Republish with a distinct player PWA manifest identity.
+
+# Republish player PWA with GitHub Pages project-path manifest URLs.
