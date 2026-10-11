@@ -40,6 +40,17 @@ jobs:
           cp -R source/app-shell/. site/app-shell/
           touch site/.nojekyll
 
+      - name: Verify scanner files are in the published artifact
+        run: |
+          test -f site/app-shell/index.html
+          test -f site/app-shell/shell.js
+          test -f site/app-shell/shell.css
+          test -f site/app-shell/manifest.webmanifest
+          echo "Verified scanner files:"
+          find site/app-shell -maxdepth 1 -type f -printf '%f\n' | sort
+          echo "Published site root:"
+          ls -la site | head -40
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
