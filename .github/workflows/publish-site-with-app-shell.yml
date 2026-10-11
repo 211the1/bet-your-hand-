@@ -1,4 +1,5 @@
 name: Publish site with PLAY YOUR HAND app shell
+# Re-publish after scanner toolbar interaction fix on fresh-rebuild.
 
 on:
   workflow_dispatch:
